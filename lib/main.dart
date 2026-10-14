@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.white),
             ),
             const SizedBox(height: 8),
-            const Text('Learn Programming, Master Logic!', style: TextStyle(fontSize: 14, color: Colors.white70)),
+            const Text('Belajar Pemrograman Dasar & Logika Koding!', style: TextStyle(fontSize: 14, color: Colors.white70)),
             const SizedBox(height: 48),
             const CircularProgressIndicator(color: Colors.amberAccent),
           ],
@@ -167,7 +167,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('⚠️ Email and Password are required!')),
+        const SnackBar(content: Text('⚠️ Email dan Password wajib diisi!')),
       );
       return;
     }
@@ -175,7 +175,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     if (!UserDatabase.isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('❌ Format email tidak valid! Harap masukkan email yang benar (contoh: nama@domain.com).'),
+          content: Text('❌ Format email tidak valid! Masukkan email yang benar (contoh: siswa@domain.com).'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -185,7 +185,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     if (_isSignUp) {
       if (name.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Enter your Full Name!')),
+          const SnackBar(content: Text('⚠️ Masukkan Nama Lengkapmu!')),
         );
         return;
       }
@@ -193,7 +193,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       bool success = UserDatabase.registerUser(email, name, password);
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Email is already registered! Please login directly.'), backgroundColor: Colors.orange),
+          const SnackBar(content: Text('⚠️ Email sudah terdaftar! Silakan langsung login.'), backgroundColor: Colors.orange),
         );
         return;
       }
@@ -207,14 +207,14 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     } else {
       if (!UserDatabase.isEmailRegistered(email)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Email belum terdaftar! Silakan daftar akun terlebih dahulu.'), backgroundColor: Colors.redAccent),
+          const SnackBar(content: Text('❌ Email belum terdaftar! Silakan daftar akun dulu.'), backgroundColor: Colors.redAccent),
         );
         return;
       }
 
       if (!UserDatabase.validateLogin(email, password)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Incorrect Password!'), backgroundColor: Colors.redAccent),
+          const SnackBar(content: Text('❌ Password salah!'), backgroundColor: Colors.redAccent),
         );
         return;
       }
@@ -243,26 +243,26 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                 Icon(Icons.alternate_email_rounded, size: 70, color: themeColor),
                 const SizedBox(height: 12),
                 Text(
-                  _isSignUp ? 'Student Registration (Email)' : 'Student Portal Login',
+                  _isSignUp ? 'Daftar Akun Siswa (Email)' : 'Login Portal Siswa',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Aplikasi mewajibkan penggunaan format email yang valid',
+                  'Gunakan email aktif yang valid untuk masuk',
                   style: TextStyle(fontSize: 12, color: Colors.black54),
                 ),
                 const SizedBox(height: 28),
                 if (_isSignUp) ...[
                   TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Full Name', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                    decoration: InputDecoration(labelText: 'Nama Lengkap', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
                   ),
                   const SizedBox(height: 16),
                 ],
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(labelText: 'Email Address', hintText: 'e.g. student@netbattle.com', prefixIcon: const Icon(Icons.email_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                  decoration: InputDecoration(labelText: 'Alamat Email', hintText: 'contoh: student@netbattle.com', prefixIcon: const Icon(Icons.email_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -277,13 +277,13 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: themeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                     onPressed: _handleAuth,
-                    child: Text(_isSignUp ? 'REGISTER & CREATE AVATAR 🚀' : 'LOGIN TO ARENA 🔓', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                    child: Text(_isSignUp ? 'DAFTAR & BUAT MASKOT 🚀' : 'MASUK KE ARENA 🔓', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => setState(() => _isSignUp = !_isSignUp),
-                  child: Text(_isSignUp ? 'Already registered? Login here' : 'New student? Register with Email', style: TextStyle(color: themeColor, fontWeight: FontWeight.bold)),
+                  child: Text(_isSignUp ? 'Sudah punya akun? Login di sini' : 'Belum punya akun? Daftar dengan Email', style: TextStyle(color: themeColor, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -332,7 +332,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     Color activeColor = _themeColors[_colorIndex]['color'];
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isInitialSetup ? 'Customize Your Coder Avatar' : 'Edit Avatar'), centerTitle: true),
+      appBar: AppBar(title: Text(widget.isInitialSetup ? 'Rakit Maskot Coder' : 'Edit Avatar'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -369,10 +369,10 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text('Select Hat/Accessory:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(_hats.length, (i) => ChoiceChip(label: _hats[i] == null ? const Text('None', style: TextStyle(fontSize: 11)) : Icon(_hats[i], size: 20), selected: _hatIndex == i, onSelected: (v) => setState(() => _hatIndex = i)))),
+              const Text('Pilih Aksesori Topi/Kepala:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(_hats.length, (i) => ChoiceChip(label: _hats[i] == null ? const Text('Tanpa', style: TextStyle(fontSize: 11)) : Icon(_hats[i], size: 20), selected: _hatIndex == i, onSelected: (v) => setState(() => _hatIndex = i)))),
               const SizedBox(height: 16),
-              const Text('Select Theme Color:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Pilih Warna Tema:', style: TextStyle(fontWeight: FontWeight.bold)),
               Wrap(spacing: 8, children: List.generate(_themeColors.length, (i) {
                 Color c = _themeColors[i]['color'];
                 return ChoiceChip(
@@ -405,7 +405,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       ),
                     );
                   },
-                  child: const Text('SAVE & ENTER DASHBOARD 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text('SIMPAN & MASUK DASHBOARD 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -502,13 +502,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Programming Mission Hub', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+            const Text('Menu Misi Belajar Pemrograman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 14),
 
             _buildGameCard(
               context,
-              title: 'Quest: Basic Programming & If-Else',
-              subtitle: 'Learn syntax & unlock next stages automatically',
+              title: 'Quest: Pemrograman Dasar & If-Else',
+              subtitle: 'Pelajari materi & buka babak selanjutnya otomatis',
               icon: Icons.menu_book_rounded,
               color: Colors.green,
               xp: '+150 XP',
@@ -535,8 +535,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Code Tug-of-War (1v1)',
-              subtitle: 'Multiplayer Real-time 1v1 Battle via Kode Room!',
+              title: 'Battle Tarik Tambang (1v1)',
+              subtitle: 'Lengkapi sintaks koding rumpang untuk menarik tali!',
               icon: Icons.sports_kabaddi_rounded,
               color: Colors.orange,
               xp: '+200 XP',
@@ -552,8 +552,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Solo Code Challenge',
-              subtitle: 'English & Coding logic puzzle questions',
+              title: 'Battle Kuis Kilat (Solo)',
+              subtitle: 'Tantangan kuis cepat logika & koding individu',
               icon: Icons.flash_on_rounded,
               color: widget.themeColor,
               xp: '+100 XP',
@@ -631,27 +631,27 @@ class _QuestScreenState extends State<QuestScreen> {
 
   final List<Map<String, dynamic>> stages = [
     {
-      'title': 'Stage 1: Variable & Print Statement',
-      'desc': 'Learn how to store values and print outputs in English syntax.',
-      'content': 'In programming, a variable stores data. Example in Dart/Python:\n\nString title = "Hello World";\nprint(title);\n\nQuestion: What keyword is used to show output on screen?',
+      'title': 'Babak 1: Variabel & Perintah Output',
+      'desc': 'Pelajari cara menyimpan data dan menampilkan output pada layar.',
+      'content': 'Dalam pemograman, variabel digunakan untuk menyimpan nilai data.\nContoh sintaks Dart/Python:\n\nString nama = "Satria";\nprint(nama);\n\nSoal: Kata kunci apa yang digunakan untuk menampilkan teks ke layar?',
       'xp': 150
     },
     {
-      'title': 'Stage 2: Conditional If-Else Statement',
-      'desc': 'Making decisions in code using logical conditions.',
-      'content': 'If-Else allows your program to make choices based on conditions.\n\nif (score > 75) {\n  print("Passed");\n} else {\n  print("Failed");\n}\n\nEnglish Logic: If the score is greater than 75, print Passed!',
+      'title': 'Babak 2: Kondisi Pengcabangan If-Else',
+      'desc': 'Mengambil keputusan logika dalam kode berdasarkan syarat.',
+      'content': 'Percabangan If-Else memungkinkan program memilih aksi.\n\nif (nilai >= 75) {\n  print("Lulus");\n} else {\n  print("Remidi");\n}\n\nLogika: Jika nilai lebih dari atau sama dengan 75, cetak Lulus!',
       'xp': 200
     },
     {
-      'title': 'Stage 3: Basic Loops (For & While)',
-      'desc': 'Repeating tasks automatically without rewriting code.',
-      'content': 'Loops execute code multiple times. For example, counting from 1 to 5:\n\nfor (int i = 1; i <= 5; i++) {\n  print(i);\n}\n\nEnglish Logic: Repeat printing numbers until condition is met.',
+      'title': 'Babak 3: Perulangan Dasar (For & While)',
+      'desc': 'Mengeksekusi perintah secara berulang secara otomatis.',
+      'content': 'Perulangan memudahkan kita mengeksekusi baris kode berkali-kali:\n\nfor (int i = 1; i <= 5; i++) {\n  print(i);\n}\n\nLogika: Cetak angka dari 1 sampai 5 berurutan.',
       'xp': 250
     },
     {
-      'title': 'Stage 4: Functions & Methods',
-      'desc': 'Reusing blocks of code efficiently.',
-      'content': 'Functions encapsulate logic so you can call them anytime:\n\nint addNumbers(int a, int b) {\n  return a + b;\n}\n\nEnglish Logic: Pass arguments a and b, return their sum.',
+      'title': 'Babak 4: Fungsi & Method',
+      'desc': 'Membuat blok kode yang dapat digunakan kembali.',
+      'content': 'Fungsi membungkus logika agar dapat dipanggil kapan saja:\n\nint tambah(int a, int b) {\n  return a + b;\n}\n\nLogika: Terima dua angka a dan b, lalu kembalikan hasil penjumlahannya.',
       'xp': 300
     },
   ];
@@ -659,7 +659,7 @@ class _QuestScreenState extends State<QuestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Programming Quest Map', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
+      appBar: AppBar(title: const Text('Peta Petualangan Materi', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
       body: ListView.builder(
         padding: const EdgeInsets.all(20.0),
         itemCount: stages.length,
@@ -682,7 +682,7 @@ class _QuestScreenState extends State<QuestScreen> {
               trailing: isUnlocked ? const Icon(Icons.arrow_forward_ios_rounded, size: 18) : const Icon(Icons.lock),
               onTap: () {
                 if (!isUnlocked) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Complete previous stage to unlock!')));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Selesaikan babak sebelumnya terlebih dahulu!')));
                 } else {
                   _showMaterialDialog(context, index, stage['title'], stage['content'], stage['xp']);
                 }
@@ -716,10 +716,10 @@ class _QuestScreenState extends State<QuestScreen> {
               widget.onStageCompleted(currentUnlocked, xp);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('🎉 Stage Completed! +$xp XP & Next Stage Unlocked!')),
+                SnackBar(content: Text('🎉 Babak Selesai! +$xp XP & Babak Selanjutnya Terbuka!')),
               );
             },
-            child: const Text('COMPLETE & UNLOCK NEXT 🚀', style: TextStyle(color: Colors.white)),
+            child: const Text('SELESAI & BUKA BABAK BERIKUTNYA 🚀', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -744,18 +744,18 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Complete the code to make an IF condition in Dart/Java:\n\n____ (score >= 60) {\n  print("Pass");\n}',
+      'question': 'Lengkapi potongan kode berikut untuk membuat percabangan IF:\n\n____ (nilai >= 75) {\n  print("Lulus");\n}',
       'options': ['if', 'when', 'check', 'loop'],
       'answer': 0,
     },
     {
-      'question': 'Which English keyword is used to handle the alternative condition if an IF statement fails?',
+      'question': 'Kata kunci apa yang digunakan sebagai kondisi alternatif jika struktur IF bernilai FALSE?',
       'options': ['then', 'else', 'other', 'default'],
       'answer': 1,
     },
     {
-      'question': 'Complete the code to declare an integer variable named age with value 17:\n\n____ age = 17;',
-      'options': ['String', 'bool', 'int', 'float'],
+      'question': 'Lengkapi sintaks deklarasi variabel bilangan bulat bernilai 17 berikut:\n\n____ umur = 17;',
+      'options': ['String', 'bool', 'int', 'double'],
       'answer': 2,
     },
   ];
@@ -786,7 +786,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Code Challenge ${_currentIndex + 1}/${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Kuis Solo ${_currentIndex + 1}/${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -803,6 +803,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             const SizedBox(height: 24),
+            // TERMINAL STYLE CODE BOX
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -955,7 +956,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
               Navigator.pop(context);
-              // Simulasi Pemain 2 Masuk ke Room
               _startMultiplayerGame(roomCode, true, 'Budi (Lawan)');
             },
             child: const Text('SIMULASI LAWAN MASUK 🚀', style: TextStyle(color: Colors.white)),
@@ -1006,7 +1006,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 28),
 
-            // HOST: BUAT ROOM
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1032,7 +1031,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 20),
 
-            // GUEST: GABUNG ROOM
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1078,7 +1076,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. TUG OF WAR MULTIPLAYER ENGINE (COUNTDOWN, TIMER, SUDDEN DEATH)
+// 8. TUG OF WAR MULTIPLAYER ENGINE (10 SOAL BAHASA INDONESIA & TERMINAL STYLE)
 // ---------------------------------------------------------------------------
 class TugOfWarMultiplayerScreen extends StatefulWidget {
   final String roomCode;
@@ -1099,31 +1097,65 @@ class TugOfWarMultiplayerScreen extends StatefulWidget {
 }
 
 class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
-  // STATE MULTIPLAYER
-  double _ropePosition = 0.5; // 0.0 (Player Win), 1.0 (Opponent Win)
+  double _ropePosition = 0.5;
   int _currentIndex = 0;
   int? _selectedOption;
 
-  // COUNTDOWN & TIMER
   int _startCountdown = 3;
   bool _isGameStarted = false;
-  int _questionTimer = 10; // 10 detik per soal
+  int _questionTimer = 10;
   Timer? _timer;
 
+  // 10 SOAL BAHASA INDONESIA TENTANG PEMROGRAMAN DASAR & KODING RUMPANG
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Complete the code for IF condition in Dart:\n\n____ (score >= 60) {\n  print("Pass");\n}',
-      'options': ['if', 'when', 'check', 'loop'],
+      'question': 'Lengkapi sintaks deklarasi variabel teks di Dart/Java:\n\n____ namaSiswa = "Satria";',
+      'options': ['String', 'int', 'bool', 'double'],
       'answer': 0,
     },
     {
-      'question': 'What keyword starts a loop that runs a specific number of times?',
-      'options': ['for', 'if', 'return', 'class'],
+      'question': 'Lengkapi struktur pengkondisian IF berikut:\n\n____ (skor >= 70) {\n  print("Lulus");\n}',
+      'options': ['if', 'while', 'for', 'switch'],
       'answer': 0,
     },
     {
-      'question': 'Complete the boolean expression for "X is NOT equal to Y":\n\nx ____ y',
+      'question': 'Operator logika mana yang digunakan untuk menyatakan "TIDAK SAMA DENGAN"?\n\nif (a ____ b)',
       'options': ['==', '!=', '>=', '<='],
+      'answer': 1,
+    },
+    {
+      'question': 'Kata kunci yang digunakan untuk menjalankan perulangan berdasarkan jumlah hitungan tertentu:\n\n____ (int i = 0; i < 5; i++)',
+      'options': ['while', 'if', 'for', 'do'],
+      'answer': 2,
+    },
+    {
+      'question': 'Lengkapi sintaks variabel bernilai boolean (benar/salah) berikut:\n\n____ isLulus = true;',
+      'options': ['int', 'bool', 'String', 'var'],
+      'answer': 1,
+    },
+    {
+      'question': 'Sintaks alternatif dalam IF yang dieksekusi ketika kondisi bernilai FALSE:\n\nif (x > 0) {\n  ...\n} ____ {\n  ...\n}',
+      'options': ['then', 'or', 'else', 'case'],
+      'answer': 2,
+    },
+    {
+      'question': 'Bagaimana cara menambahkan nilai 1 secara langsung pada variabel x dalam perulangan?',
+      'options': ['x++', 'x--', 'x==1', 'x+1'],
+      'answer': 0,
+    },
+    {
+      'question': 'Tipe data manakah yang cocok untuk menyimpan nilai desimal seperti 3.14?',
+      'options': ['int', 'String', 'double', 'bool'],
+      'answer': 2,
+    },
+    {
+      'question': 'Kata kunci yang digunakan dalam fungsi untuk mengembalikan nilai hasil perhitungan:\n\nint tambah(int a, int b) {\n  ____ a + b;\n}',
+      'options': ['print', 'return', 'break', 'void'],
+      'answer': 1,
+    },
+    {
+      'question': 'Bagaimana cara mengambil elemen pertama dalam sebuah Array/List bernama angka?',
+      'options': ['angka[1]', 'angka[0]', 'angka.first()', 'angka[first]'],
       'answer': 1,
     },
   ];
@@ -1140,7 +1172,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
     super.dispose();
   }
 
-  // COUNTDOWN 3..2..1 SYNC
   void _runStartCountdown() {
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
@@ -1154,7 +1185,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
     });
   }
 
-  // TIMER SOAL (10 DETIK)
   void _startQuestionTimer() {
     _timer?.cancel();
     setState(() => _questionTimer = 10);
@@ -1164,7 +1194,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       if (_questionTimer > 0) {
         setState(() => _questionTimer--);
       } else {
-        // Waktu Habis -> Penalti Tarikan
         _handleTimeOut();
       }
     });
@@ -1173,8 +1202,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   void _handleTimeOut() {
     _timer?.cancel();
     setState(() {
-      _selectedOption = -1; // Time Out
-      // Tarik ke arah lawan jika tidak menjawab
+      _selectedOption = -1;
       _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
     });
 
@@ -1183,18 +1211,16 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 
   void _answer(int optionIndex) {
     _timer?.cancel();
-    int timeSpent = 10 - _questionTimer; // Semakin cepat semakin kuat tarikan!
+    int timeSpent = 10 - _questionTimer;
 
     setState(() {
       _selectedOption = optionIndex;
       bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
 
       if (isCorrect) {
-        // Bonus Kecepatan: Jawab dalam 3 detik = tarikan +0.30, sisanya +0.20
-        double pullForce = timeSpent <= 3 ? 0.30 : 0.20;
+        double pullForce = timeSpent <= 3 ? 0.25 : 0.15;
         _ropePosition = (_ropePosition - pullForce).clamp(0.0, 1.0);
       } else {
-        // Salah Jawab: Penalti -0.15
         _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
       }
     });
@@ -1206,7 +1232,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (!mounted) return;
 
-      // MEKANISME SUDDEN DEATH (KNOCKOUT 100%)
       if (_ropePosition <= 0.0 || _ropePosition >= 1.0) {
         _finishGame();
         return;
@@ -1245,8 +1270,8 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
             const SizedBox(height: 12),
             Text(
               isWinner
-                  ? 'Luar biasa! Kamu berhasil mengalahkan ${widget.opponentName} di Room ${widget.roomCode}.\n\nXP Obtained: +200 XP'
-                  : 'Tetap semangat! ${widget.opponentName} lebih cepat dan tepat kali ini.\n\nXP Obtained: +50 XP',
+                  ? 'Luar biasa! Kamu berhasil mengalahkan ${widget.opponentName} di Room ${widget.roomCode}.\n\nBonus XP: +200 XP'
+                  : 'Tetap semangat! ${widget.opponentName} lebih cepat dan tepat kali ini.\n\nBonus XP: +50 XP',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
@@ -1275,7 +1300,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('GET READY!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
+              const Text('PERSIAPAN BATTLE!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
               const SizedBox(height: 20),
               CircleAvatar(
                 radius: 50,
@@ -1283,7 +1308,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                 child: Text('$_startCountdown', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
               ),
               const SizedBox(height: 20),
-              Text('Room: ${widget.roomCode} • 1v1 Battle', style: const TextStyle(color: Colors.white70)),
+              Text('Room: ${widget.roomCode} • Tarik Tambang 1v1', style: const TextStyle(color: Colors.white70)),
             ],
           ),
         ),
@@ -1294,7 +1319,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Battle Room: ${widget.roomCode}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+        title: Text('Arena Room: ${widget.roomCode}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -1359,7 +1384,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Power Tarikan Kamu: ${((1 - _ropePosition) * 100).toInt()}%',
+                  'Kekuatan Tarikan Kamu: ${((1 - _ropePosition) * 100).toInt()}%',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54),
                 ),
               ],
@@ -1371,15 +1396,49 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Soal ${_currentIndex + 1} / ${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                  Text('Soal ${_currentIndex + 1} dari ${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 8),
+                  
+                  // TERMINAL STYLE CODE BOX SAMA SEPERTI KUIS SOLO
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
-                    child: Text(q['question'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E2E),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.amberAccent, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          q['question'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFA6ADC8),
+                            fontFamily: 'monospace',
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
+                  
+                  // KARTU PILIHAN JAWABAN
                   Expanded(
                     child: ListView.builder(
                       itemCount: (q['options'] as List).length,
@@ -1404,7 +1463,8 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                             border: Border.all(color: borderColor, width: 1.5),
                           ),
                           child: ListTile(
-                            title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                            title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                             trailing: isSelected
                                 ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red)
                                 : null,

@@ -60,7 +60,7 @@ class NetBattleApp extends StatefulWidget {
 }
 
 class _NetBattleAppState extends State<NetBattleApp> {
-  Color _primaryThemeColor = const Color(0xFF6C63FF);
+  Color _primaryThemeColor = const Color(0xFF3B82F6);
 
   void updateThemeColor(Color newColor) {
     setState(() {
@@ -80,7 +80,7 @@ class _NetBattleAppState extends State<NetBattleApp> {
           seedColor: _primaryThemeColor,
           primary: _primaryThemeColor,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF4F6F9),
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
@@ -123,20 +123,20 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.code_rounded, size: 90, color: Colors.white),
+              child: const Icon(Icons.terminal_rounded, size: 80, color: Colors.white),
             ),
             const SizedBox(height: 24),
             const Text(
               'NETBATTLE CODE ARENA',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.white),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.white),
             ),
             const SizedBox(height: 8),
-            const Text('Belajar Pemrograman Dasar & Logika Koding!', style: TextStyle(fontSize: 14, color: Colors.white70)),
+            const Text('Platform Pembelajaran Logika & Pemrograman', style: TextStyle(fontSize: 13, color: Colors.white70)),
             const SizedBox(height: 48),
-            const CircularProgressIndicator(color: Colors.amberAccent),
+            const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)),
           ],
         ),
       ),
@@ -167,7 +167,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('⚠️ Email dan Password wajib diisi!')),
+        const SnackBar(content: Text('Email dan Password wajib diisi.')),
       );
       return;
     }
@@ -175,7 +175,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     if (!UserDatabase.isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('❌ Format email tidak valid! Masukkan email yang benar (contoh: siswa@domain.com).'),
+          content: Text('Format email tidak valid (contoh: nama@domain.com).'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -185,7 +185,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     if (_isSignUp) {
       if (name.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Masukkan Nama Lengkapmu!')),
+          const SnackBar(content: Text('Nama lengkap wajib diisi.')),
         );
         return;
       }
@@ -193,7 +193,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       bool success = UserDatabase.registerUser(email, name, password);
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Email sudah terdaftar! Silakan langsung login.'), backgroundColor: Colors.orange),
+          const SnackBar(content: Text('Email sudah terdaftar. Silakan login.'), backgroundColor: Colors.orange),
         );
         return;
       }
@@ -207,14 +207,14 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
     } else {
       if (!UserDatabase.isEmailRegistered(email)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Email belum terdaftar! Silakan daftar akun dulu.'), backgroundColor: Colors.redAccent),
+          const SnackBar(content: Text('Email belum terdaftar. Silakan registrasi terlebih dahulu.'), backgroundColor: Colors.redAccent),
         );
         return;
       }
 
       if (!UserDatabase.validateLogin(email, password)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Password salah!'), backgroundColor: Colors.redAccent),
+          const SnackBar(content: Text('Password yang Anda masukkan salah.'), backgroundColor: Colors.redAccent),
         );
         return;
       }
@@ -236,54 +236,67 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(28.0),
+            padding: const EdgeInsets.all(32.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.alternate_email_rounded, size: 70, color: themeColor),
-                const SizedBox(height: 12),
-                Text(
-                  _isSignUp ? 'Daftar Akun Siswa (Email)' : 'Login Portal Siswa',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                Center(child: Icon(Icons.code_rounded, size: 60, color: themeColor)),
+                const SizedBox(height: 16),
+                Center(
+                  child: Text(
+                    _isSignUp ? 'Pendaftaran Akun Baru' : 'Portal Masuk Siswa',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Gunakan email aktif yang valid untuk masuk',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                const Center(
+                  child: Text(
+                    'Masukkan kredensial akun akademik Anda',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 32),
                 if (_isSignUp) ...[
+                  const Text('Nama Lengkap', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+                  const SizedBox(height: 6),
                   TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Nama Lengkap', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                    decoration: InputDecoration(hintText: 'Masukkan nama lengkap', prefixIcon: const Icon(Icons.person_outline, size: 20), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                   ),
                   const SizedBox(height: 16),
                 ],
+                const Text('Alamat Email', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(labelText: 'Alamat Email', hintText: 'contoh: student@netbattle.com', prefixIcon: const Icon(Icons.email_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                  decoration: InputDecoration(hintText: 'nama@sekolah.sch.id', prefixIcon: const Icon(Icons.email_outlined, size: 20), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                 ),
                 const SizedBox(height: 16),
+                const Text('Kata Sandi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(labelText: 'Password', prefixIcon: const Icon(Icons.lock_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                  decoration: InputDecoration(hintText: '••••••••', prefixIcon: const Icon(Icons.lock_outline, size: 20), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 48,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: themeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                    style: ElevatedButton.styleFrom(backgroundColor: themeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     onPressed: _handleAuth,
-                    child: Text(_isSignUp ? 'DAFTAR & BUAT MASKOT 🚀' : 'MASUK KE ARENA 🔓', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                    child: Text(_isSignUp ? 'DAFTAR AKUN' : 'MASUK APLIKASI', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => setState(() => _isSignUp = !_isSignUp),
-                  child: Text(_isSignUp ? 'Sudah punya akun? Login di sini' : 'Belum punya akun? Daftar dengan Email', style: TextStyle(color: themeColor, fontWeight: FontWeight.bold)),
+                Center(
+                  child: TextButton(
+                    onPressed: () => setState(() => _isSignUp = !_isSignUp),
+                    child: Text(_isSignUp ? 'Sudah memiliki akun? Masuk di sini' : 'Belum memiliki akun? Daftar baru', style: TextStyle(color: themeColor, fontWeight: FontWeight.w600)),
+                  ),
                 ),
               ],
             ),
@@ -320,11 +333,11 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   final List<IconData> _faces = [Icons.face_rounded, Icons.sentiment_very_satisfied_rounded, Icons.face_retouching_natural, Icons.smart_toy_rounded];
   final List<IconData> _outfits = [Icons.checkroom_rounded, Icons.shield_outlined, Icons.sports_kabaddi, Icons.dry_cleaning_rounded];
   final List<Map<String, dynamic>> _themeColors = [
-    {'name': 'Cyber Indigo', 'color': const Color(0xFF6C63FF)},
-    {'name': 'Blaze Orange', 'color': Colors.orange},
-    {'name': 'Matrix Green', 'color': const Color(0xFF00B09B)},
-    {'name': 'Royal Purple', 'color': const Color(0xFF8E2DE2)},
-    {'name': 'Ruby Red', 'color': const Color(0xFFE53935)},
+    {'name': 'Professional Blue', 'color': const Color(0xFF3B82F6)},
+    {'name': 'Emerald Dark', 'color': const Color(0xFF059669)},
+    {'name': 'Slate Gray', 'color': const Color(0xFF475569)},
+    {'name': 'Indigo Navy', 'color': const Color(0xFF4F46E5)},
+    {'name': 'Crimson Red', 'color': const Color(0xFFDC2626)},
   ];
 
   @override
@@ -332,51 +345,44 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     Color activeColor = _themeColors[_colorIndex]['color'];
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isInitialSetup ? 'Rakit Maskot Coder' : 'Edit Avatar'), centerTitle: true),
+      appBar: AppBar(title: const Text('Konfigurasi Profil & Avatar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+              Text('Pengguna: ${widget.username}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+              const SizedBox(height: 16),
               Container(
-                width: 200,
-                height: 240,
+                width: 180,
+                height: 220,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: activeColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: activeColor, width: 3),
+                  color: activeColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: activeColor, width: 2),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 28, child: _hats[_hatIndex] != null ? Icon(_hats[_hatIndex], size: 30, color: Colors.amber.shade800) : const SizedBox()),
-                    Icon(_faces[_faceIndex], size: 65, color: activeColor),
+                    SizedBox(height: 28, child: _hats[_hatIndex] != null ? Icon(_hats[_hatIndex], size: 28, color: activeColor) : const SizedBox()),
+                    Icon(_faces[_faceIndex], size: 60, color: activeColor),
                     const SizedBox(height: 2),
-                    Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withOpacity(0.9)),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
-                        const SizedBox(width: 12),
-                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
-                      ],
-                    ),
+                    Icon(_outfits[_outfitIndex], size: 65, color: activeColor.withOpacity(0.8)),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              const Text('Pilih Aksesori Topi/Kepala:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(_hats.length, (i) => ChoiceChip(label: _hats[i] == null ? const Text('Tanpa', style: TextStyle(fontSize: 11)) : Icon(_hats[i], size: 20), selected: _hatIndex == i, onSelected: (v) => setState(() => _hatIndex = i)))),
+              const Align(alignment: Alignment.centerLeft, child: Text('Aksesoris Kepala:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF475569)))),
+              const SizedBox(height: 8),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(_hats.length, (i) => ChoiceChip(label: _hats[i] == null ? const Text('Standar', style: TextStyle(fontSize: 11)) : Icon(_hats[i], size: 18), selected: _hatIndex == i, onSelected: (v) => setState(() => _hatIndex = i)))),
               const SizedBox(height: 16),
-              const Text('Pilih Warna Tema:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Align(alignment: Alignment.centerLeft, child: Text('Skema Warna Tema:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF475569)))),
+              const SizedBox(height: 8),
               Wrap(spacing: 8, children: List.generate(_themeColors.length, (i) {
                 Color c = _themeColors[i]['color'];
                 return ChoiceChip(
-                  avatar: CircleAvatar(backgroundColor: c, radius: 8),
+                  avatar: CircleAvatar(backgroundColor: c, radius: 6),
                   label: Text(_themeColors[i]['name'], style: const TextStyle(fontSize: 11)),
                   selected: _colorIndex == i,
                   onSelected: (v) {
@@ -385,12 +391,12 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                   },
                 );
               })),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 48,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: activeColor),
+                  style: ElevatedButton.styleFrom(backgroundColor: activeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
@@ -405,7 +411,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       ),
                     );
                   },
-                  child: const Text('SIMPAN & MASUK DASHBOARD 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text('SIMPAN & LANJUTKAN KE DASHBOARD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                 ),
               ),
             ],
@@ -417,7 +423,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN
+// 4. HOME SCREEN (XP & LEVEL AWAL KOSONG = 0)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final String studentName;
@@ -426,14 +432,14 @@ class HomeScreen extends StatefulWidget {
   final IconData outfitIcon;
   final Color themeColor;
 
-  const HomeScreen({super.key, required this.studentName, this.hatIcon, this.faceIcon = Icons.face_rounded, this.outfitIcon = Icons.checkroom_rounded, this.themeColor = const Color(0xFF6C63FF)});
+  const HomeScreen({super.key, required this.studentName, this.hatIcon, this.faceIcon = Icons.face_rounded, this.outfitIcon = Icons.checkroom_rounded, this.themeColor = const Color(0xFF3B82F6)});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _userXP = 150;
+  int _userXP = 0; // Mulai dari 0 kosong
   int _unlockedStageIndex = 0;
 
   int get level => (_userXP / 300).floor() + 1;
@@ -448,9 +454,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Row(
           children: const [
-            Icon(Icons.code, color: Colors.amber, size: 28),
+            Icon(Icons.terminal, color: Color(0xFF3B82F6), size: 24),
             SizedBox(width: 8),
-            Text('NetBattle Code Arena', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+            Text('NetBattle Code Arena', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
           ],
         ),
         backgroundColor: Colors.white,
@@ -463,21 +469,21 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [widget.themeColor, widget.themeColor.withOpacity(0.75)]),
-                borderRadius: BorderRadius.circular(22),
+                color: widget.themeColor,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        if (widget.hatIcon != null) Icon(widget.hatIcon, size: 20, color: Colors.amberAccent),
-                        Icon(widget.faceIcon, size: 26, color: Colors.white),
-                        Icon(widget.outfitIcon, size: 26, color: Colors.white),
+                        if (widget.hatIcon != null) Icon(widget.hatIcon, size: 18, color: Colors.white),
+                        Icon(widget.faceIcon, size: 24, color: Colors.white),
+                        Icon(widget.outfitIcon, size: 24, color: Colors.white),
                       ],
                     ),
                   ),
@@ -486,31 +492,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.studentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                        const SizedBox(height: 4),
-                        Text('Level $level • $_userXP XP', style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                        Text(widget.studentName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 2),
+                        Text('Level $level • $_userXP XP', style: const TextStyle(fontSize: 12, color: Colors.white70)),
                         const SizedBox(height: 8),
-                        LinearProgressIndicator(value: (_userXP % 300) / 300, color: Colors.amberAccent, backgroundColor: Colors.white24),
+                        LinearProgressIndicator(value: (_userXP % 300) / 300, color: Colors.white, backgroundColor: Colors.white24),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.checkroom, color: Colors.white),
+                    icon: const Icon(Icons.settings_outlined, color: Colors.white),
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AvatarCustomizerScreen(username: widget.studentName, currentHat: widget.hatIcon, currentFace: widget.faceIcon, currentOutfit: widget.outfitIcon))),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Menu Misi Belajar Pemrograman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-            const SizedBox(height: 14),
+            const Text('Menu Utama Pembelajaran', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            const SizedBox(height: 12),
 
             _buildGameCard(
               context,
-              title: 'Quest: Modul Materi (8 Babak)',
-              subtitle: 'Pelajari konsep mendalam & buka babak selanjutnya otomatis',
+              title: 'Modul Materi Pembelajaran (8 Babak)',
+              subtitle: 'Pelajari konsep komprehensif algoritma & pemrograman',
               icon: Icons.menu_book_rounded,
-              color: Colors.green,
+              color: Colors.teal,
               xp: '+150 XP/Babak',
               onTap: () async {
                 await Navigator.push(
@@ -535,10 +541,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Battle Tarik Tambang (1v1)',
-              subtitle: 'Lengkapi sintaks koding rumpang untuk menarik tali!',
+              title: 'Simulasi Tarik Tambang (1v1 Arena)',
+              subtitle: 'Uji kecepatan logika koding rumpang bersama rekan',
               icon: Icons.sports_kabaddi_rounded,
-              color: Colors.orange,
+              color: Colors.blueAccent,
               xp: '+200 XP',
               onTap: () async {
                 final xp = await Navigator.push(
@@ -552,11 +558,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Battle Kuis Kilat (10 Soal Solo)',
-              subtitle: 'Tantangan kuis cepat 10 soal logika & koding',
-              icon: Icons.flash_on_rounded,
+              title: 'Evaluasi Kuis Mandiri (10 Soal)',
+              subtitle: 'Uji pemahaman mandiri dengan penilaian langsung',
+              icon: Icons.assignment_turned_in_rounded,
               color: widget.themeColor,
-              xp: '+100 XP',
+              xp: '+Skor XP',
               onTap: () async {
                 final xp = await Navigator.push(
                   context,
@@ -573,17 +579,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildGameCard(BuildContext context, {required String title, required String subtitle, required IconData icon, required Color color, required String xp, required VoidCallback onTap}) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 3))]),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: color, size: 30)),
+                Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: color, size: 24)),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -591,11 +597,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)))),
-                          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(8)), child: Text(xp, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber.shade900))),
+                          Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)))),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(6)),
+                            child: Text(xp, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                     ],
                   ),
@@ -610,7 +620,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (DIBUAT DALAM 1 BOX DOKUMEN TUNGGAL BERSIH)
+// 5. QUEST SCREEN (PROFESSIONAL SINGLE BOX MATERIAL)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -632,172 +642,132 @@ class _QuestScreenState extends State<QuestScreen> {
   final List<Map<String, dynamic>> stages = [
     {
       'title': 'Babak 1: Konsep Algoritma, Memori & Variabel',
-      'desc': 'Modul Lengkap: Memahami wadah memori, aturan penamaan variabel, dan Output.',
+      'desc': 'Modul: Memahami wadah memori, aturan penamaan variabel, dan output.',
       'sections': [
         {
-          'header': '📌 1. Apa itu Algoritma dan Variabel?',
-          'body': 'Dalam dunia komputer, Algoritma adalah langkah-langkah logis berurutan untuk menyelesaikan masalah.\n\nKetika program berjalan, data (seperti nama, skor, atau harga) perlu disimpan di dalam RAM komputer. Wadah penyimpanan sementara di dalam memori inilah yang disebut Variabel.'
+          'header': '1. Definisi Algoritma dan Variabel',
+          'body': 'Algoritma adalah prosedur langkah demi langkah yang terstruktur untuk menyelesaikan komputasi. Variabel bertindak sebagai alokasi memori sementara di RAM untuk menyimpan data nilai.'
         },
         {
-          'header': '📖 2. Aturan Penamaan Variabel (Naming Convention)',
-          'body': '- Menggunakan camelCase (contoh: namaLengkap, skorPemain).\n- Tidak boleh diawali angka (contoh salah: 1nama).\n- Tidak boleh menggunakan spasi (contoh salah: nama saya).\n- Bersifat Case-Sensitive (nama dan Nama dianggap dua variabel yang berbeda).'
+          'header': '2. Aturan Penamaan Variabel (Naming Convention)',
+          'body': '- Gunakan format camelCase (contoh: nilaiUjian, namaSiswa).\n- Tidak boleh diawali angka atau mengandung spasi.\n- Sensitif terhadap huruf kapital (Case-Sensitive).'
         },
         {
-          'header': '💻 3. Contoh Kode Koding Nyata (Dart/Java/C++)',
+          'header': '3. Contoh Implementasi Kode',
           'isCode': true,
-          'body': 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
-        },
-        {
-          'header': '⚠️ 4. Kesalahan Umum (Common Errors)',
-          'body': '❌ Mengisi nilai teks tanpa tanda petik: String nama = Satria; (Harus "Satria")\n❌ Lupa tanda titik koma (;) di akhir baris kode.'
+          'body': 'String namaSiswa = "Budi Santoso";\nint nilaiUjian = 88;\nprint("Siswa: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
         }
       ],
       'xp': 150
     },
     {
       'title': 'Babak 2: Tipe Data Dasar & Operator Aritmatika',
-      'desc': 'Modul Lengkap: int, double, String, bool, serta perhitungan matematika.',
+      'desc': 'Modul: int, double, String, bool, serta operasi aritmatika.',
       'sections': [
         {
-          'header': '📌 1. Pengenalan Tipe Data Statis',
-          'body': 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif (contoh: 10, -5, 100).\n- double / float: Angka desimal bertitik (contoh: 3.14, 85.5).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool (Boolean): Nilai logika yang hanya bernilai true atau false.'
+          'header': '1. Jenis Tipe Data',
+          'body': '- int: Bilangan bulat.\n- double: Bilangan desimal.\n- String: Data teks.\n- bool: Kebenaran logika (true/false).'
         },
         {
-          'header': '📖 2. Operator Aritmatika Dasar',
-          'body': 'Operasi Matematika dalam koding:\n- Penjumlahan (+)\n- Pengurangan (-)\n- Perkalian (*)\n- Pembagian (/)\n- Modulo / Sisa Bagi (%) : Menghitung sisa hasil pembagian.'
-        },
-        {
-          'header': '💻 3. Studi Kasus Perhitungan Toko',
+          'header': '2. Contoh Perhitungan',
           'isCode': true,
-          'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\n\ndouble pajak = totalHarga * 0.1; // Pajak 10%\ndouble totalBayar = totalHarga + pajak;\n\nprint("Total Akhir: Rp " + totalBayar.toString());'
-        },
-        {
-          'header': '💡 4. Rangkuman Logika Modulo (%)',
-          'body': 'Operator modulo % sangat berguna untuk mengecek apakah suatu angka genap atau ganjil.\nContoh: 10 % 2 == 0 (Genap), sedangkan 7 % 2 == 1 (Ganjil).'
+          'body': 'int harga = 10000;\nint qty = 3;\nint total = harga * qty;\nprint("Total: " + total.toString());'
         }
       ],
       'xp': 150
     },
     {
       'title': 'Babak 3: Percabangan Logika (If - Else)',
-      'desc': 'Modul Lengkap: Pengambilan keputusan otomatis berdasarkan ekspresi Boolean.',
+      'desc': 'Modul: Pengambilan keputusan kondisional.',
       'sections': [
         {
-          'header': '📌 1. Mengapa Perlu Percabangan?',
-          'body': 'Program yang cerdas harus bisa mengambil keputusan berbeda berdasarkan kondisi nyata. Contoh: Jika password benar maka izinkan masuk, jika salah maka tampilkan error.'
+          'header': '1. Struktur Percabangan',
+          'body': 'Struktur pengkondisian memungkinkan program mengeksekusi blok kode berbeda berdasarkan evaluasi kondisi boolean.'
         },
         {
-          'header': '📖 2. Operator Perbandingan (Relational Operators)',
-          'body': 'Kondisi IF dibentuk menggunakan operator relasional:\n- == (Sama dengan)\n- != (Tidak sama dengan)\n- > (Lebih besar)\n- < (Lebih kecil)\n- >= (Lebih besar atau sama dengan)\n- <= (Lebih kecil atau sama dengan)'
-        },
-        {
-          'header': '💻 3. Kode Sistem Kelulusan Ujian',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': 'int nilaiSiswa = 78;\nint batasLulus = 75;\n\nif (nilaiSiswa >= batasLulus) {\n  print("Selamat, Anda dinyatakan LULUS!");\n} else {\n  print("Mohon maaf, Anda harus mengikuti REMIDI.");\n}'
-        },
-        {
-          'header': '⚠️ 4. Kesalahan Paling Sering Terjadi',
-          'body': '❌ Tertukar antara = dan ==!\nSatu sama dengan (=) digunakan untuk MENGISI NILAI ke variabel.\nDua sama dengan (==) digunakan untuk MEMBANDINGKAN dua nilai.'
+          'body': 'int skor = 80;\nif (skor >= 75) {\n  print("Status: LULUS");\n} else {\n  print("Status: TIDAK LULUS");\n}'
         }
       ],
       'xp': 200
     },
     {
-      'title': 'Babak 4: Percabangan Majemuk (Else If & Logical Operators)',
-      'desc': 'Modul Lengkap: Logika DAN (&&), ATAU (||), serta pengkondisian bersarang.',
+      'title': 'Babak 4: Percabangan Majemuk (Else If & Logika)',
+      'desc': 'Modul: Evaluasi kondisi bertingkat & operator logika.',
       'sections': [
         {
-          'header': '📌 1. Menangani Lebih dari 2 Pilihan Kondisi',
-          'body': 'Ketika pilihan hasil logika bertingkat (misal menentukan Nilai Huruf A, B, C, D, E), gunakan struktur Else If.'
+          'header': '1. Penggunaan Else If',
+          'body': 'Digunakan saat terdapat lebih dari dua jalur alternatif keputusan.'
         },
         {
-          'header': '📖 2. Operator Logika Kombinasi (&& dan ||)',
-          'body': '- AND (&&): Kedua syarat HARUS bernilai TRUE agar kondisi terpenuhi.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE agar kondisi terpenuhi.\n- NOT (!): Membalikkan nilai logika (true menjadi false).'
-        },
-        {
-          'header': '💻 3. Contoh Penilaian Grade Akademik',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': 'int nilai = 88;\n\nif (nilai >= 85) {\n  print("Grade A - Sangat Memuaskan");\n} else if (nilai >= 75) {\n  print("Grade B - Baik");\n} else if (nilai >= 60) {\n  print("Grade C - Cukup");\n} else {\n  print("Grade D - Perlu Bimbingan");\n}'
+          'body': 'int nilai = 85;\nif (nilai >= 85) {\n  print("Predikat: A");\n} else {\n  print("Predikat: B");\n}'
         }
       ],
       'xp': 200
     },
     {
       'title': 'Babak 5: Perulangan Terhitung (For Loop)',
-      'desc': 'Modul Lengkap: Otomasisasi tugas berulang dengan counter increment/decrement.',
+      'desc': 'Modul: Iterasi berulang dengan counter.',
       'sections': [
         {
-          'header': '📌 1. Efisiensi Eksekusi Berulang',
-          'body': 'Bayangkan kamu diminta mencetak tulisan "Saya Tidak Akan Terlambat" sebanyak 100 kali. Tanpa loop, kamu harus menulis 100 baris print. Dengan For Loop, cukup 3 baris kode!'
+          'header': '1. Struktur For Loop',
+          'body': 'Digunakan untuk mengeksekusi blok kode berulang kali dalam rentang hitungan yang pasti.'
         },
         {
-          'header': '📖 2. Anatomy Anatomi Structure For Loop',
-          'body': 'for (inisialisasi; kondisi_batas; iterasi) {\n  // kode yang diulang\n}\n\n1. Inisialisasi: int i = 1 (Nilai awal hitungan).\n2. Kondisi: i <= 5 (Selama i kurang dari sama dengan 5, terus ulang).\n3. Iterasi: i++ (Tambahkan i sebesar 1 setiap kali 1 putaran selesai).'
-        },
-        {
-          'header': '💻 3. Contoh Kode Cetak Perkalian 5',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': 'for (int i = 1; i <= 10; i++) {\n  int hasil = 5 * i;\n  print("5 x " + i.toString() + " = " + hasil.toString());\n}'
+          'body': 'for (int i = 1; i <= 3; i++) {\n  print("Iterasi ke-" + i.toString());\n}'
         }
       ],
       'xp': 250
     },
     {
-      'title': 'Babak 6: Perulangan Kondisional (While & Do-While)',
-      'desc': 'Modul Lengkap: Loop tak terhitung berbasis kondisi dinamis dan Infinite Loop Hazard.',
+      'title': 'Babak 6: Perulangan Kondisional (While Loop)',
+      'desc': 'Modul: Iterasi berbasis kondisi boolean dinamis.',
       'sections': [
         {
-          'header': '📌 1. Kapan Menggunakan While Loop?',
-          'body': 'While Loop digunakan ketika jumlah perulangan TIDAK DIKETAHUI secara pasti di awal, melainkan bergantung pada peristiwa saat program berjalan (contoh: mengulang input hingga user mengetik "stop").'
+          'header': '1. Konsep While',
+          'body': 'Perulangan berjalan terus menerus selama ekspresi kondisi bernilai true.'
         },
         {
-          'header': '📖 2. Bahaya Infinite Loop (Perulangan Abadi)',
-          'body': 'Jika kondisi dalam While selalu bernilai TRUE dan tidak ada pembaruan nilai variabel, aplikasi akan crash/hang karena kehabisan memori!'
-        },
-        {
-          'header': '💻 3. Contoh Game Nyawa Karakter',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': 'int nyawaPemain = 3;\n\nwhile (nyawaPemain > 0) {\n  print("Pemain bertarung... Nyawa tersisa: " + nyawaPemain.toString());\n  nyawaPemain--; // Mengurangi nyawa\n}\nprint("GAME OVER!");'
+          'body': 'int x = 2;\nwhile (x > 0) {\n  print("Running...");\n  x--;\n}'
         }
       ],
       'xp': 250
     },
     {
-      'title': 'Babak 7: Fungsi / Subprogram (Method & Return Value)',
-      'desc': 'Modul Lengkap: Pemrograman modular, pemanggilan parameter, dan nilai kembalian.',
+      'title': 'Babak 7: Fungsi / Subprogram (Method)',
+      'desc': 'Modul: Modularisasi kode dan parameter.',
       'sections': [
         {
-          'header': '📌 1. Prinsip DRY (Don\'t Repeat Yourself)',
-          'body': 'Fungsi adalah sekelompok baris kode yang diberi nama khusus untuk menjalankan tugas spesifik. Fungsi dapat dipanggil berulang kali dari bagian program mana pun.'
+          'header': '1. Definisi Fungsi',
+          'body': 'Fungsi membungkus logika operasional agar dapat digunakan kembali secara efisien.'
         },
         {
-          'header': '📖 2. Void vs Return Value Function',
-          'body': '- Void Function: Fungsi yang HANYA menjalankan perintah tanpa mengembalikan nilai data hasil.\n- Return Function: Fungsi yang mengolah data lalu MENGEMBALIKAN (return) sebuah nilai hasil perhitungan.'
-        },
-        {
-          'header': '💻 3. Contoh Kode Fungsi Matematika',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': '// Definisi Fungsi\nint hitungLuasPersegi(int panjang, int lebar) {\n  return panjang * lebar;\n}\n\n// Pemanggilan Fungsi di Main Program\nvoid main() {\n  int hasilLuas = hitungLuasPersegi(10, 4);\n  print("Luas Tanah: " + hasilLuas.toString() + " m2");\n}'
+          'body': 'int kali(int a, int b) {\n  return a * b;\n}'
         }
       ],
       'xp': 300
     },
     {
-      'title': 'Babak 8: Struktur Data Array / List & Manipulasinya',
-      'desc': 'Modul Lengkap: Koleksi data sejenis, elemen Zero-Indexed, dan looping elemen List.',
+      'title': 'Babak 8: Struktur Data Array / List',
+      'desc': 'Modul: Koleksi data berindeks nol.',
       'sections': [
         {
-          'header': '📌 1. Apa itu Array / List?',
-          'body': 'Daripada membuat 10 variabel terpisah (siswa1, siswa2, ..., siswa10), kita bisa menyimpan kesepuluh nama siswa tersebut di dalam satu variabel List tunggal.'
+          'header': '1. Konsep List',
+          'body': 'Menyimpan sekumpulan data dalam satu variabel tunggal dengan indeks berbasis nol.'
         },
         {
-          'header': '📖 2. Konsep Indeks Nol (Zero-Indexed)',
-          'body': 'Komputer selalu menghitung urutan elemen dalam List dimulai dari posisi angka 0, bukan 1!\n- Elemen ke-1 -> Indeks [0]\n- Elemen ke-2 -> Indeks [1]\n- Elemen ke-N -> Indeks [N-1]'
-        },
-        {
-          'header': '💻 3. Contoh Manipulasi List di Dart',
+          'header': '2. Contoh Kode',
           'isCode': true,
-          'body': 'List<String> daftarHero = ["Miya", "Layla", "Alucard"];\n\n// Menambah data baru\ndaftarHero.add("Zilong");\n\n// Mengakses elemen pertama\nprint("Hero Utama: " + daftarHero[0]); // Output: Miya\n\n// Menampilkan semua item menggunakan For Loop\nfor (int i = 0; i < daftarHero.length; i++) {\n  print("Hero " + i.toString() + ": " + daftarHero[i]);\n}'
+          'body': 'List<String> items = ["Data A", "Data B"];\nprint(items[0]);'
         }
       ],
       'xp': 300
@@ -807,7 +777,7 @@ class _QuestScreenState extends State<QuestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Peta Petualangan Materi', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
+      appBar: AppBar(title: const Text('Modul Materi Pembelajaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
       body: ListView.builder(
         padding: const EdgeInsets.all(20.0),
         itemCount: stages.length,
@@ -816,21 +786,21 @@ class _QuestScreenState extends State<QuestScreen> {
           bool isUnlocked = index <= currentUnlocked;
           bool isCompleted = index < currentUnlocked;
 
-          Color badgeColor = isCompleted ? Colors.green : (isUnlocked ? Colors.orange : Colors.grey);
+          Color badgeColor = isCompleted ? Colors.green : (isUnlocked ? Colors.blue : Colors.grey);
           IconData statusIcon = isCompleted ? Icons.check_circle_rounded : (isUnlocked ? Icons.play_circle_fill_rounded : Icons.lock_outline_rounded);
 
           return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: isUnlocked ? Colors.orange : Colors.grey.shade200, width: isUnlocked ? 2 : 1)),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: isUnlocked ? Colors.blue.shade200 : Colors.grey.shade200)),
             child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withOpacity(0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
-              title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: isUnlocked ? const Color(0xFF2D3142) : Colors.grey)),
-              subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
-              trailing: isUnlocked ? const Icon(Icons.arrow_forward_ios_rounded, size: 18) : const Icon(Icons.lock),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              leading: Icon(statusIcon, color: badgeColor, size: 26),
+              title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isUnlocked ? const Color(0xFF1E293B) : Colors.grey)),
+              subtitle: Text(stage['desc'], style: TextStyle(fontSize: 11, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
+              trailing: isUnlocked ? const Icon(Icons.arrow_forward_ios_rounded, size: 14) : const Icon(Icons.lock, size: 16),
               onTap: () {
                 if (!isUnlocked) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Selesaikan babak sebelumnya terlebih dahulu!')));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Babak sebelumnya harus diselesaikan terlebih dahulu.')));
                 } else {
                   _showSingleBoxMaterialDialog(context, index, stage['title'], stage['sections'] as List<Map<String, dynamic>>, stage['xp']);
                 }
@@ -842,28 +812,21 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  // DIALOG MATERI DENGAN 1 WADAH/BOX TUNGGAL
   void _showSingleBoxMaterialDialog(BuildContext context, int index, String title, List<Map<String, dynamic>> sections, int xp) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(Icons.menu_book_rounded, color: Theme.of(context).primaryColor),
-            const SizedBox(width: 10),
-            Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-          ],
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
             child: Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -874,31 +837,22 @@ class _QuestScreenState extends State<QuestScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        sec['header']!,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
-                      ),
-                      const SizedBox(height: 6),
+                      Text(sec['header']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B))),
+                      const SizedBox(height: 4),
                       if (isCode)
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(14),
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(12)),
-                          child: Text(
-                            sec['body']!,
-                            style: const TextStyle(fontSize: 13, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8)),
-                          ),
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(8)),
+                          child: Text(sec['body']!, style: const TextStyle(fontSize: 12, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8))),
                         )
                       else
-                        Text(
-                          sec['body']!,
-                          style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
-                        ),
+                        Text(sec['body']!, style: const TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF475569))),
                       if (i < sections.length - 1) ...[
-                        const SizedBox(height: 14),
-                        Divider(color: Colors.grey.shade300, height: 1),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
+                        Divider(color: Colors.grey.shade200, height: 1),
+                        const SizedBox(height: 12),
                       ],
                     ],
                   );
@@ -909,23 +863,20 @@ class _QuestScreenState extends State<QuestScreen> {
         ),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             onPressed: () {
               Navigator.pop(context);
-
               setState(() {
                 if (index == currentUnlocked && currentUnlocked < stages.length - 1) {
                   currentUnlocked = index + 1;
                 }
               });
-
               widget.onStageCompleted(currentUnlocked, xp);
-
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('🎉 Babak Selesai! +$xp XP & Babak Selanjutnya Terbuka!')),
+                SnackBar(content: Text('Babak selesai! Ditambahkan +$xp XP.')),
               );
             },
-            child: const Text('PAHAM & BUKA BABAK BERIKUTNYA 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text('SELESAI & LANJUT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -934,7 +885,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (DILENGKAPI SKOR AKHIR DAN SKOR DIALOG)
+// 6. QUIZ BATTLE SCREEN
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -960,7 +911,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
       'answer': 0,
     },
     {
-      'question': 'Kata kunci apa yang digunakan sebagai alternatif jika kondisi IF bernilai FALSE?',
+      'question': 'Kata kunci alternatif jika kondisi IF bernilai FALSE:',
       'options': ['then', 'else', 'other', 'default'],
       'answer': 1,
     },
@@ -970,32 +921,32 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
       'answer': 2,
     },
     {
-      'question': 'Manakah operator yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
+      'question': 'Operator perbandingan untuk "SAMA DENGAN":',
       'options': ['=', '==', '!=', '=>'],
       'answer': 1,
     },
     {
-      'question': 'Kata kunci yang digunakan untuk menghentikan perulangan (loop) secara paksa:',
+      'question': 'Kata kunci penghenti perulangan paksa:',
       'options': ['stop', 'exit', 'break', 'return'],
       'answer': 2,
     },
     {
-      'question': 'Tipe data yang hanya bernilai benar (true) atau salah (false) adalah:',
+      'question': 'Tipe data logika benar/salah:',
       'options': ['int', 'bool', 'String', 'char'],
       'answer': 1,
     },
     {
-      'question': 'Kata kunci yang digunakan untuk mendefinisikan sebuah fungsi tanpa mengembalikan nilai (return):',
+      'question': 'Fungsi tanpa nilai kembalian (return):',
       'options': ['null', 'empty', 'void', 'static'],
       'answer': 2,
     },
     {
-      'question': 'Bagaimanakah cara mengambil jumlah elemen pada variabel List bernama angka?',
+      'question': 'Properti untuk mengambil panjang elemen List:',
       'options': ['angka.size', 'angka.length', 'angka.count', 'angka.total'],
       'answer': 1,
     },
     {
-      'question': 'Simbol apa yang digunakan untuk menambahkan komentar satu baris pada kode Dart/Java?',
+      'question': 'Simbol komentar satu baris:',
       'options': ['//', '<!--', '#', '/*'],
       'answer': 0,
     },
@@ -1021,37 +972,33 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
     });
   }
 
-  // TAMPILAN DIALOG SKOR AKHIR KUIS SOLO
   void _showFinalScoreDialog() {
     int finalScore = (_correctCount / _questions.length * 100).toInt();
-    int xpGained = finalScore * 2; // Misal 100 poin = +200 XP
+    int xpGained = finalScore * 2;
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: const Text('🎉 KUIS SOLO SELESAI!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Evaluasi Selesai', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.emoji_events_rounded, size: 70, color: Colors.amber),
+            const Icon(Icons.verified_rounded, size: 50, color: Colors.blue),
             const SizedBox(height: 12),
-            Text(
-              '$finalScore',
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-            ),
-            const Text('SKOR AKHIR KAMU', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
+            Text('$finalScore', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+            const Text('NILAI EVALUASI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Benar $_correctCount dari ${_questions.length} Soal (+$xpGained XP)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                  const Icon(Icons.check_circle_outline, color: Colors.blue, size: 18),
+                  const SizedBox(width: 6),
+                  Text('Benar $_correctCount dari ${_questions.length} (+$xpGained XP)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 12)),
                 ],
               ),
             ),
@@ -1059,12 +1006,12 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
         ),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             onPressed: () {
-              Navigator.pop(context); // Tutup Dialog
-              Navigator.pop(context, xpGained); // Kembali ke Dashboard membawa XP
+              Navigator.pop(context);
+              Navigator.pop(context, xpGained);
             },
-            child: const Text('KLAIM XP & KEMBALI 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text('KLAIM XP & KEMBALI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -1077,7 +1024,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kuis Solo ${_currentIndex + 1}/${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Evaluasi Soal ${_currentIndex + 1}/${_questions.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -1090,47 +1037,29 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
               value: (_currentIndex + 1) / _questions.length,
               color: Theme.of(context).primaryColor,
               backgroundColor: Colors.grey.shade200,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(10),
+              minHeight: 6,
+              borderRadius: BorderRadius.circular(6),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E2E),
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
-                ],
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
-                      const SizedBox(width: 6),
-                      Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.amberAccent, shape: BoxShape.circle)),
-                      const SizedBox(width: 6),
-                      Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    q['question'],
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFA6ADC8),
-                      fontFamily: 'monospace',
-                      height: 1.5,
-                    ),
-                  ),
-                ],
+              child: Text(
+                q['question'],
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFA6ADC8),
+                  fontFamily: 'monospace',
+                  height: 1.4,
+                ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: (q['options'] as List).length,
@@ -1147,28 +1076,22 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                   }
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
                       color: btnBgColor,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: borderColor, width: 1.5),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 2)),
-                      ],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: borderColor, width: 1.2),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       title: Text(
                         q['options'][index],
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? (isCorrect ? Colors.green.shade800 : Colors.red.shade800) : const Color(0xFF2D3142),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? (isCorrect ? Colors.green.shade800 : Colors.red.shade800) : const Color(0xFF1E293B),
                         ),
                       ),
-                      trailing: isSelected
-                          ? Icon(isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded, color: isCorrect ? Colors.green : Colors.red)
-                          : null,
                       onTap: _selectedOption == null ? () => _answer(index) : null,
                     ),
                   );
@@ -1183,7 +1106,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. MULTIPLAYER ROOM CREATION & LOBBY SCREEN
+// 7. MULTIPLAYER ROOM & LOBBY SCREEN
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
   final String currentUserName;
@@ -1219,36 +1142,36 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('🎮 WAITING LOBBY (HOST)', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Lobby Ruang Simulasi', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Bagikan Kode Room ini ke lawanmu:', style: TextStyle(fontSize: 12)),
-            const SizedBox(height: 12),
+            const Text('Bagikan Kode Akses Ruang:', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(12)),
-              child: Text(roomCode, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.purple)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+              child: Text(roomCode, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: Color(0xFF1E293B))),
             ),
-            const SizedBox(height: 20),
-            const CircularProgressIndicator(),
-            const SizedBox(height: 12),
-            const Text('Menunggu Teman/Pemain 2 Masuk...', style: TextStyle(fontSize: 12, color: Colors.black54, fontStyle: FontStyle.italic)),
+            const SizedBox(height: 16),
+            const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+            const SizedBox(height: 10),
+            const Text('Menunggu partisipan lain bergabung...', style: TextStyle(fontSize: 11, color: Colors.grey)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontSize: 12)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             onPressed: () {
               Navigator.pop(context);
-              _startMultiplayerGame(roomCode, true, 'Budi (Lawan)');
+              _startMultiplayerGame(roomCode, true, 'Rekan Diskusi');
             },
-            child: const Text('SIMULASI LAWAN MASUK 🚀', style: TextStyle(color: Colors.white)),
+            child: const Text('SIMULASI MULAI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -1258,101 +1181,68 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Battle Tarik Tambang 1v1', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Simulasi Tarik Tambang 1v1', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.7)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.sports_kabaddi_rounded, size: 50, color: Colors.white),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('Adu Tanding Real-Time', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                        SizedBox(height: 4),
-                        Text('Buat room dan undang temanmu atau masukkan kode!', style: TextStyle(fontSize: 12, color: Colors.white70)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('1. Buat Ruang Pertandingan (Host)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  const Text('Dapatkan kode unik untuk dibagikan ke HP temanmu.', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                  const SizedBox(height: 16),
+                  const Text('1. Buat Ruang Simulasi Baru', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                  const SizedBox(height: 4),
+                  const Text('Buat kode sesi untuk diakses rekan Anda.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
-                    height: 48,
+                    height: 42,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                       onPressed: () => _showWaitingLobbyDialog('NET889'),
-                      child: const Text('BUAT ROOM & DAPATKAN KODE 🔑', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                      child: const Text('BUAT RUANG SESI', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 12)),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 16),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('2. Gabung Room Teman (Guest)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
+                  const Text('2. Gabung Ruang Sesi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _codeController,
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
-                      hintText: 'Masukkan Kode Room (Contoh: NET889)',
-                      prefixIcon: const Icon(Icons.key_rounded),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      hintText: 'Masukkan Kode Sesi',
+                      prefixIcon: const Icon(Icons.vpn_key_outlined, size: 18),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
-                    height: 48,
+                    height: 42,
                     child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                       onPressed: () {
                         if (_codeController.text.trim().isNotEmpty) {
-                          _startMultiplayerGame(_codeController.text.toUpperCase(), false, 'Host Room');
+                          _startMultiplayerGame(_codeController.text.toUpperCase(), false, 'Host Sesi');
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('⚠️ Masukkan kode room terlebih dahulu!')));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Masukkan kode ruang terlebih dahulu.')));
                         }
                       },
-                      child: const Text('GABUNG DAN BATTLE SEKARANG! ⚔️', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text('GABUNG SESI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                   ),
                 ],
@@ -1408,43 +1298,43 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       'answer': 0,
     },
     {
-      'question': 'Operator logika mana yang digunakan untuk menyatakan "TIDAK SAMA DENGAN"?\n\nif (a ____ b)',
+      'question': 'Operator logika untuk menyatakan "TIDAK SAMA DENGAN":\n\nif (a ____ b)',
       'options': ['==', '!=', '>=', '<='],
       'answer': 1,
     },
     {
-      'question': 'Kata kunci yang digunakan untuk menjalankan perulangan berdasarkan jumlah hitungan tertentu:\n\n____ (int i = 0; i < 5; i++)',
+      'question': 'Kata kunci perulangan berdasarkan hitungan tertentu:\n\n____ (int i = 0; i < 5; i++)',
       'options': ['while', 'if', 'for', 'do'],
       'answer': 2,
     },
     {
-      'question': 'Lengkapi sintaks variabel bernilai boolean (benar/salah) berikut:\n\n____ isLulus = true;',
+      'question': 'Sintaks variabel boolean (benar/salah):\n\n____ isLulus = true;',
       'options': ['int', 'bool', 'String', 'var'],
       'answer': 1,
     },
     {
-      'question': 'Sintaks alternatif dalam IF yang dieksekusi ketika kondisi bernilai FALSE:\n\nif (x > 0) {\n  ...\n} ____ {\n  ...\n}',
+      'question': 'Sintaks alternatif dalam IF kondisi FALSE:\n\nif (x > 0) {\n  ...\n} ____ {\n  ...\n}',
       'options': ['then', 'or', 'else', 'case'],
       'answer': 2,
     },
     {
-      'question': 'Bagaimana cara menambahkan nilai 1 secara langsung pada variabel x dalam perulangan?',
+      'question': 'Cara inkrementasi nilai 1 pada variabel x:',
       'options': ['x++', 'x--', 'x==1', 'x+1'],
       'answer': 0,
     },
     {
-      'question': 'Tipe data manakah yang cocok untuk menyimpan nilai desimal seperti 3.14?',
+      'question': 'Tipe data untuk menyimpan nilai desimal (3.14):',
       'options': ['int', 'String', 'double', 'bool'],
       'answer': 2,
     },
     {
-      'question': 'Kata kunci yang digunakan dalam fungsi untuk mengembalikan nilai hasil perhitungan:\n\nint tambah(int a, int b) {\n  ____ a + b;\n}',
+      'question': 'Kata kunci pengembalian nilai fungsi:\n\nint tambah(int a, int b) {\n  ____ a + b;\n}',
       'options': ['print', 'return', 'break', 'void'],
       'answer': 1,
     },
     {
-      'question': 'Bagaimana cara mengambil elemen pertama dalam sebuah Array/List bernama angka?',
-      'options': ['angka[1]', 'angka[0]', 'angka.first()', 'angka[first]'],
+      'question': 'Indeks awal elemen pertama dalam Array/List:',
+      'options': ['angka[1]', 'angka[0]', 'angka.first()', 'angka.start'],
       'answer': 1,
     },
   ];
@@ -1494,7 +1384,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       _selectedOption = -1;
       _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
     });
-
     _nextQuestionOrFinish();
   }
 
@@ -1518,7 +1407,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   }
 
   void _nextQuestionOrFinish() {
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (!mounted) return;
 
       if (_ropePosition <= 0.0 || _ropePosition >= 1.0) {
@@ -1546,34 +1435,34 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          isWinner ? '🎉 VICTORY! KAMU MENANG!' : '💥 DEFEAT! LAWAN MENANG!',
+          isWinner ? 'Sesi Simulasi Berhasil' : 'Sesi Selesai',
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: isWinner ? Colors.green : Colors.red),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isWinner ? Colors.green.shade700 : Colors.orange.shade800),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isWinner ? Icons.emoji_events : Icons.sports_kabaddi, size: 70, color: isWinner ? Colors.amber : Colors.red),
+            Icon(isWinner ? Icons.task_alt_rounded : Icons.info_outline_rounded, size: 50, color: isWinner ? Colors.green : Colors.orange),
             const SizedBox(height: 12),
             Text(
               isWinner
-                  ? 'Luar biasa! Kamu berhasil mengalahkan ${widget.opponentName} di Room ${widget.roomCode}.\n\nBonus XP: +200 XP'
-                  : 'Tetap semangat! ${widget.opponentName} lebih cepat dan tepat kali ini.\n\nBonus XP: +50 XP',
+                  ? 'Anda berhasil mengungguli sesi di ruang ${widget.roomCode}.\n\nXP Diperoleh: +200 XP'
+                  : 'Sesi berakhir pada ruang ${widget.roomCode}.\n\nXP Diperoleh: +50 XP',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
             ),
           ],
         ),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context, isWinner ? 200 : 50);
             },
-            child: const Text('KEMBALI KE HUB', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text('KEMBALI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -1584,20 +1473,23 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   Widget build(BuildContext context) {
     if (!_isGameStarted) {
       return Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: const Color(0xFF1E293B),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('PERSIAPAN BATTLE!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
-              const SizedBox(height: 20),
+              const Text('MEMULAI SESI...', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.2)),
+              const SizedBox(height: 16),
               CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.amberAccent,
-                child: Text('$_startCountdown', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+                radius: 36,
+                backgroundColor: Colors.white10,
+                child: Text('$_startCountdown', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
-              const SizedBox(height: 20),
-              Text('Room: ${widget.roomCode} • Tarik Tambang 1v1', style: const TextStyle(color: Colors.white70)),
+              const SizedBox(height: 16),
+              Text(
+                'Kode Sesi: ${widget.roomCode}',
+                style: const TextStyle(fontSize: 12, color: Colors.white70),
+              ),
             ],
           ),
         ),
@@ -1608,20 +1500,16 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Arena Room: ${widget.roomCode}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+        title: Text('Sesi Ruang: ${widget.roomCode}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12)),
-            child: Row(
-              children: [
-                const Icon(Icons.timer, color: Colors.red, size: 18),
-                const SizedBox(width: 4),
-                Text('$_questionTimer s', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-              ],
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(6)),
+              child: Text('$_questionTimer dtk', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.red)),
             ),
           ),
         ],
@@ -1629,51 +1517,28 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.amber.shade50,
+            padding: const EdgeInsets.all(12),
+            color: Colors.white,
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const CircleAvatar(backgroundColor: Colors.blue, radius: 14, child: Icon(Icons.face, size: 16, color: Colors.white)),
-                        const SizedBox(width: 6),
-                        Text(widget.playerName, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(widget.opponentName, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                        const SizedBox(width: 6),
-                        const CircleAvatar(backgroundColor: Colors.red, radius: 14, child: Icon(Icons.person, size: 16, color: Colors.white)),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(height: 10, width: double.infinity, decoration: BoxDecoration(color: Colors.brown.shade300, borderRadius: BorderRadius.circular(5))),
-                    Container(height: 24, width: 3, color: Colors.redAccent),
-                    AnimatedAlign(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutBack,
-                      alignment: Alignment((_ropePosition * 2) - 1, 0),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        child: const Icon(Icons.sports_score, size: 18, color: Colors.white),
-                      ),
-                    ),
+                    Text(widget.playerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blue)),
+                    Text(widget.opponentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Kekuatan Tarikan Kamu: ${((1 - _ropePosition) * 100).toInt()}%',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(height: 8, width: double.infinity, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(4))),
+                    AnimatedAlign(
+                      duration: const Duration(milliseconds: 400),
+                      alignment: Alignment((_ropePosition * 2) - 1, 0),
+                      child: Container(width: 14, height: 14, decoration: const BoxDecoration(color: Color(0xFF3B82F6), shape: BoxShape.circle)),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1684,47 +1549,27 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Soal ${_currentIndex + 1} dari ${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                  Text('Pertanyaan ${_currentIndex + 1} dari ${_questions.length}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
                   const SizedBox(height: 8),
-                  
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E1E2E),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
-                      ],
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
-                            const SizedBox(width: 6),
-                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.amberAccent, shape: BoxShape.circle)),
-                            const SizedBox(width: 6),
-                            Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          q['question'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFA6ADC8),
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      q['question'],
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFA6ADC8),
+                        fontFamily: 'monospace',
+                        height: 1.4,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
                   Expanded(
                     child: ListView.builder(
                       itemCount: (q['options'] as List).length,
@@ -1742,18 +1587,15 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                         }
 
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
+                          margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
                             color: btnColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borderColor, width: 1.5),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: borderColor, width: 1.2),
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-                            title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                            trailing: isSelected
-                                ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red)
-                                : null,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                            title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                             onTap: _selectedOption == null ? () => _answer(index) : null,
                           ),
                         );

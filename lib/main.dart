@@ -41,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const LoginAvatarScreen()),
         );
       }
     });
@@ -97,10 +97,222 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. HOME SCREEN (Dashboard Utama)
+// 2. HALAMAN LOGIN & KUSTOMISASI AVATAR (FITUR BARU)
+// ---------------------------------------------------------------------------
+class LoginAvatarScreen extends StatefulWidget {
+  const LoginAvatarScreen({super.key});
+
+  @override
+  State<LoginAvatarScreen> createState() => _LoginAvatarScreenState();
+}
+
+class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
+  final TextEditingController _nameController = TextEditingController(text: 'Satria Hero');
+
+  // Variabel Pilihan Kustomisasi Avatar ala Yahoo
+  int _selectedFaceIndex = 0;
+  int _selectedColorIndex = 0;
+
+  final List<IconData> _avatarFaces = [
+    Icons.face,
+    Icons.face_retouching_natural,
+    Icons.sentiment_very_satisfied,
+    Icons.elderly,
+    Icons.smart_toy,
+  ];
+
+  final List<Color> _avatarBgColors = [
+    const Color(0xFF6C63FF),
+    Colors.orange,
+    Colors.green,
+    Colors.purple,
+    Colors.pinkAccent,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                'Buat Karakter Pahlawanmu!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D3142),
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Atur nama dan tampilan avatar sebelum bertanding',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+              const SizedBox(height: 28),
+
+              // PREVIEW AVATAR INTERAKTIF
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: _avatarBgColors[_selectedColorIndex].withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: _avatarBgColors[_selectedColorIndex], width: 3),
+                ),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: _avatarBgColors[_selectedColorIndex],
+                  child: Icon(
+                    _avatarFaces[_selectedFaceIndex],
+                    size: 65,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // PILIHAN EKSPRESI / EXP
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '1. Pilih Ekspresi Karakter:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(_avatarFaces.length, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedFaceIndex = index;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _selectedFaceIndex == index ? Colors.amber.shade100 : Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: _selectedFaceIndex == index ? Colors.amber : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(_avatarFaces[index], color: const Color(0xFF2D3142)),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 20),
+
+              // PILIHAN WARNA TEMA / ELEMENT
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '2. Pilih Warna Aura Element:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(_avatarBgColors.length, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedColorIndex = index;
+                      });
+                    },
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _avatarBgColors[index],
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: _selectedColorIndex == index ? Colors.black : Colors.transparent,
+                          width: 2.5,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 28),
+
+              // INPUT NAMA SISWA
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Nama Panggilan Siswa / Nickname',
+                  prefixIcon: const Icon(Icons.person),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // TOMBOL MASUK ARENA
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C63FF),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  onPressed: () {
+                    if (_nameController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Isi nama nickname kamu terlebih dahulu!')),
+                      );
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(
+                            studentName: _nameController.text,
+                            avatarFace: _avatarFaces[_selectedFaceIndex],
+                            avatarColor: _avatarBgColors[_selectedColorIndex],
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text(
+                    'MASUK ARENA NETBATTLE 🚀',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 3. HOME SCREEN (Dashboard Utama Menerima Data Profil Custom)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final String studentName;
+  final IconData avatarFace;
+  final Color avatarColor;
+
+  const HomeScreen({
+    super.key,
+    this.studentName = 'Satria (Hero)',
+    this.avatarFace = Icons.face,
+    this.avatarColor = const Color(0xFF6C63FF),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,20 +342,20 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profil Siswa
+            // Profil Siswa yang Disesuaikan dari Halaman Login Avatar
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6C63FF), Color(0xFF4834DF)],
+                gradient: LinearGradient(
+                  colors: [avatarColor, avatarColor.withOpacity(0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF6C63FF).withOpacity(0.4),
+                    color: avatarColor.withOpacity(0.4),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -151,31 +363,31 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 32,
                     backgroundColor: Colors.white24,
-                    child: Icon(Icons.face, size: 40, color: Colors.white),
+                    child: Icon(avatarFace, size: 40, color: Colors.white),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'Satria (Hero)',
-                          style: TextStyle(
+                          studentName,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
+                        const SizedBox(height: 4),
+                        const Text(
                           'Level 5 • 1,250 XP',
                           style: TextStyle(fontSize: 13, color: Colors.white70),
                         ),
-                        SizedBox(height: 8),
-                        LinearProgressIndicator(
+                        const SizedBox(height: 8),
+                        const LinearProgressIndicator(
                           value: 0.7,
                           color: Colors.amberAccent,
                           backgroundColor: Colors.white24,
@@ -376,7 +588,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 3. QUEST SCREEN (Peta Petualangan)
+// 4. QUEST SCREEN (Peta Petualangan)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatelessWidget {
   const QuestScreen({super.key});
@@ -653,7 +865,7 @@ class QuestScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 4. QUIZ BATTLE SCREEN (Solo)
+// 5. QUIZ BATTLE SCREEN (Solo)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -823,7 +1035,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. CUSTOM ROOM SCREEN (Menu Buat / Gabung Room Tarik Tambang)
+// 6. CUSTOM ROOM SCREEN (Menu Buat / Gabung Room Tarik Tambang)
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
   const CustomRoomScreen({super.key});
@@ -959,7 +1171,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                             const SnackBar(content: Text('⚠️ Masukkan kode room terlebih dahulu!')),
                           );
                         } else {
-                          // Masuk ke Arena Tarik Tambang bersama Teman
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -1023,18 +1234,18 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. TUG OF WAR QUIZ SCREEN (Arena Tarik Tambang 1v1)
+// 7. TUG OF WAR QUIZ SCREEN (Arena Tarik Tambang 1v1)
 // ---------------------------------------------------------------------------
 class TugOfWarQuizScreen extends StatefulWidget {
   final String roomCode;
-  const TugOfWarQuizScreen({super.key, required this.roomCode});
+  const TugOfWarQuizScreen({super, required this.roomCode});
 
   @override
   State<TugOfWarQuizScreen> createState() => _TugOfWarQuizScreenState();
 }
 
 class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
-  double _ropePosition = 0.5; // 0.5 = Tengah, 0.0 = Kamu Menang, 1.0 = Teman Menang
+  double _ropePosition = 0.5;
   int _currentQuestionIndex = 0;
   int? _selectedOption;
 
@@ -1059,7 +1270,6 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
   void _answerQuestion(int optionIndex) {
     setState(() {
       _selectedOption = optionIndex;
-      // Jika benar tarik tali ke kiri (ke arah Kamu), jika salah tarik ke kanan (ke arah Teman)
       if (optionIndex == _questions[_currentQuestionIndex]['answer']) {
         _ropePosition = (_ropePosition - 0.25).clamp(0.0, 1.0);
       } else {
@@ -1131,7 +1341,6 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
       ),
       body: Column(
         children: [
-          // VISUALISASI TARIK TAMBANG 1v1
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.amber.shade50,
@@ -1182,8 +1391,6 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
               ],
             ),
           ),
-
-          // PERTANYAAN KUIS
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),

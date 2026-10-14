@@ -5,30 +5,44 @@ void main() {
 }
 
 // ---------------------------------------------------------------------------
-// DATABASE LOKAL (LOGIN BERBASIS NIS)
+// DATABASE LOKAL BERBASIS EMAIL YANG VALID & AMAN
 // ---------------------------------------------------------------------------
 class UserDatabase {
-  static final Map<String, Map<String, String>> _registeredUsers = {
-    '12345': {'name': 'Satria Coder', 'password': '123'},
+  static final Map<String, Map<String, String>> _accounts = {
+    'student@netbattle.com': {'name': 'Satria Coder', 'password': '123'}, // Akun demo
   };
 
-  static bool isNisRegistered(String nis) {
-    return _registeredUsers.containsKey(nis.trim());
+  // Validasi Format Email Menggunakan RegExp Standard
+  static bool isValidEmail(String email) {
+    final emailRegExp = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return emailRegExp.hasMatch(email.trim());
   }
 
-  static bool registerUser(String nis, String name, String password) {
-    if (isNisRegistered(nis)) return false;
-    _registeredUsers[nis.trim()] = {'name': name, 'password': password};
+  static bool isEmailRegistered(String email) {
+    return _accounts.containsKey(email.trim().toLowerCase());
+  }
+
+  static bool registerUser(String email, String name, String password) {
+    String cleanEmail = email.trim().toLowerCase();
+    if (isEmailRegistered(cleanEmail)) return false;
+
+    _accounts[cleanEmail] = {
+      'name': name.trim(),
+      'password': password.trim(),
+    };
     return true;
   }
 
-  static bool validateLogin(String nis, String password) {
-    if (!isNisRegistered(nis)) return false;
-    return _registeredUsers[nis.trim()]?['password'] == password;
+  static bool validateLogin(String email, String password) {
+    String cleanEmail = email.trim().toLowerCase();
+    String cleanPass = password.trim();
+
+    if (!isEmailRegistered(cleanEmail)) return false;
+    return _accounts[cleanEmail]?['password'] == cleanPass;
   }
 
-  static String getUserName(String nis) {
-    return _registeredUsers[nis.trim()]?['name'] ?? 'Siswa Coder';
+  static String getUserName(String email) {
+    return _accounts[email.trim().toLowerCase()]?['name'] ?? 'Siswa Coder';
   }
 }
 
@@ -131,7 +145,7 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. AUTH LOGIN & REGISTRASI NIS
+// 2. AUTH LOGIN & REGISTRASI WAJIB EMAIL
 // ---------------------------------------------------------------------------
 class AuthLoginScreen extends StatefulWidget {
   const AuthLoginScreen({super.key});
@@ -142,18 +156,29 @@ class AuthLoginScreen extends StatefulWidget {
 
 class _AuthLoginScreenState extends State<AuthLoginScreen> {
   bool _isSignUp = false;
-  final TextEditingController _nisController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
 
   void _handleAuth() {
-    String nis = _nisController.text.trim();
+    String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String name = _nameController.text.trim();
 
-    if (nis.isEmpty || password.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('⚠️ NIS and Password are required!')),
+        const SnackBar(content: Text('⚠️ Email and Password are required!')),
+      );
+      return;
+    }
+
+    // Validasi Format Email Wajib
+    if (!UserDatabase.isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ Format email tidak valid! Harap masukkan email yang benar (contoh: nama@domain.com).'),
+          backgroundColor: Colors.redAccent,
+        ),
       );
       return;
     }
@@ -166,10 +191,10 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
         return;
       }
 
-      bool success = UserDatabase.registerUser(nis, name, password);
+      bool success = UserDatabase.registerUser(email, name, password);
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ NIS is already registered! Please login directly.')),
+          const SnackBar(content: Text('⚠️ Email is already registered! Please login directly.'), backgroundColor: Colors.orange),
         );
         return;
       }
@@ -181,21 +206,21 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
         ),
       );
     } else {
-      if (!UserDatabase.isNisRegistered(nis)) {
+      if (!UserDatabase.isEmailRegistered(email)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ NIS not found! Please register an account first.'), backgroundColor: Colors.redAccent),
+          const SnackBar(content: Text('❌ Email belum terdaftar! Silakan daftar akun terlebih dahulu.'), backgroundColor: Colors.redAccent),
         );
         return;
       }
 
-      if (!UserDatabase.validateLogin(nis, password)) {
+      if (!UserDatabase.validateLogin(email, password)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('❌ Incorrect Password!'), backgroundColor: Colors.redAccent),
         );
         return;
       }
 
-      String studentName = UserDatabase.getUserName(nis);
+      String studentName = UserDatabase.getUserName(email);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen(studentName: studentName)),
@@ -216,13 +241,18 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.terminal_rounded, size: 70, color: themeColor),
+                Icon(Icons.alternate_email_rounded, size: 70, color: themeColor),
                 const SizedBox(height: 12),
                 Text(
-                  _isSignUp ? 'Student Registration (NIS)' : 'Student Portal Login',
+                  _isSignUp ? 'Student Registration (Email)' : 'Student Portal Login',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 6),
+                const Text(
+                  'Aplikasi mewajibkan penggunaan format email yang valid',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 28),
                 if (_isSignUp) ...[
                   TextField(
                     controller: _nameController,
@@ -231,9 +261,9 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                   const SizedBox(height: 16),
                 ],
                 TextField(
-                  controller: _nisController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'NIS (Student ID)', hintText: 'e.g. 12345', prefixIcon: const Icon(Icons.badge_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(labelText: 'Email Address', hintText: 'e.g. student@netbattle.com', prefixIcon: const Icon(Icons.email_outlined), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -254,7 +284,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => setState(() => _isSignUp = !_isSignUp),
-                  child: Text(_isSignUp ? 'Already registered? Login here' : 'New student? Register with NIS', style: TextStyle(color: themeColor, fontWeight: FontWeight.bold)),
+                  child: Text(_isSignUp ? 'Already registered? Login here' : 'New student? Register with Email', style: TextStyle(color: themeColor, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -388,7 +418,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (DASHBOARD DENGAN STAGE UNLOCK YANG STABIL)
+// 4. HOME SCREEN
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final String studentName;
@@ -405,20 +435,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _userXP = 150;
-  int _unlockedStageIndex = 0; // Menyimpan progres babak materi terbuka
+  int _unlockedStageIndex = 0; // Progres babak materi terbuka
 
   int get level => (_userXP / 300).floor() + 1;
 
   void _addXP(int points) {
     setState(() => _userXP += points);
-  }
-
-  void _unlockNextStage(int completedIndex) {
-    if (completedIndex >= _unlockedStageIndex) {
-      setState(() {
-        _unlockedStageIndex = completedIndex + 1;
-      });
-    }
   }
 
   @override
@@ -484,7 +506,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text('Programming Mission Hub', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 14),
 
-            // 1. QUEST PETUALANGAN MATERI PEMROGRAMAN DASAR
+            // 1. QUEST PETUALANGAN MATERI (LIVE SYNC UNLOCK)
             _buildGameCard(
               context,
               title: 'Quest: Basic Programming & If-Else',
@@ -493,22 +515,31 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.green,
               xp: '+150 XP',
               onTap: () async {
-                // Menunggu hasil kembali dari QuestScreen untuk memperbarui babak terbuka & XP
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuestScreen(unlockedStageIndex: _unlockedStageIndex),
+                    builder: (context) => QuestScreen(
+                      unlockedStageIndex: _unlockedStageIndex,
+                      onStageCompleted: (newUnlockedIndex, xpGained) {
+                        setState(() {
+                          if (newUnlockedIndex > _unlockedStageIndex) {
+                            _unlockedStageIndex = newUnlockedIndex;
+                          }
+                        });
+                        _addXP(xpGained);
+                      },
+                    ),
                   ),
                 );
-                if (result != null && result is Map) {
-                  _unlockNextStage(result['stageIndex']);
-                  _addXP(result['xp']);
+                // Menangkap hasil total XP jika ada penambahan
+                if (result != null && result is int) {
+                  _addXP(result);
                 }
               },
             ),
             const SizedBox(height: 12),
 
-            // 2. BATTLE TARIK TAMBANG (CODE COMPLETION BATTLE)
+            // 2. BATTLE TARIK TAMBANG
             _buildGameCard(
               context,
               title: 'Code Tug-of-War (1v1)',
@@ -526,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 3. SOLO CODE QUIZ RUMPANG
+            // 3. SOLO CODE CHALLENGE
             _buildGameCard(
               context,
               title: 'Solo Code Challenge',
@@ -587,11 +618,17 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (MATERI PEMROGRAMAN DASAR & AUTO UNLOCK)
+// 5. QUEST SCREEN (LIVE STATE UPDATE UNLOCK MATERI)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
-  const QuestScreen({super.key, required this.unlockedStageIndex});
+  final Function(int newUnlockedIndex, int xpGained) onStageCompleted;
+
+  const QuestScreen({
+    super.key,
+    required this.unlockedStageIndex,
+    required this.onStageCompleted,
+  });
 
   @override
   State<QuestScreen> createState() => _QuestScreenState();
@@ -676,13 +713,21 @@ class _QuestScreenState extends State<QuestScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
+              Navigator.pop(context); // Tutup dialog materi
+
+              // Update state lokal seketika agar langsung terbuka tanpa keluar halaman
               setState(() {
-                if (index >= currentUnlocked) currentUnlocked = index + 1;
+                if (index == currentUnlocked && currentUnlocked < stages.length - 1) {
+                  currentUnlocked = index + 1;
+                }
               });
-              Navigator.pop(context);
-              // Kirim balik data stageIndex dan XP ke HomeScreen agar langsung terbuka babak berikutnya
-              Navigator.pop(context, {'stageIndex': index, 'xp': xp});
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('🎉 Stage Completed! +$xp XP & Next Stage Unlocked!')));
+
+              // Kirim callback langsung ke dashboard utama
+              widget.onStageCompleted(currentUnlocked, xp);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('🎉 Stage Completed! +$xp XP & Next Stage Unlocked!')),
+              );
             },
             child: const Text('COMPLETE & UNLOCK NEXT 🚀', style: TextStyle(color: Colors.white)),
           ),
@@ -693,7 +738,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (SOLO CODE RUMPANG / FILL-IN-THE-BLANK)
+// 6. QUIZ BATTLE SCREEN
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -707,7 +752,6 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
   int _currentIndex = 0;
   int? _selectedOption;
 
-  // SOAL BAHASA INGGRIS & PEMROGRAMAN RUMPANG
   final List<Map<String, dynamic>> _questions = [
     {
       'question': 'Complete the code to make an IF condition in Dart/Java:\n\n____ (score >= 60) {\n  print("Pass");\n}',

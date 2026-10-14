@@ -5,7 +5,7 @@ void main() {
 }
 
 // ---------------------------------------------------------------------------
-// APP ROOT & DYNAMIC THEME STATE MANAGEMENT
+// STATE MANAGEMENT TEMA GLOBAL & DATA PENGGUNA
 // ---------------------------------------------------------------------------
 class NetBattleApp extends StatefulWidget {
   const NetBattleApp({super.key});
@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. FORM AUTHENTICATION (LOGIN & REGISTRASI BENERAN)
+// 2. FORM AUTHENTICATION (LOGIN & REGISTRASI)
 // ---------------------------------------------------------------------------
 class AuthLoginScreen extends StatefulWidget {
   const AuthLoginScreen({super.key});
@@ -143,22 +143,32 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       return;
     }
 
-    if (_isSignUp && _usernameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mohon isi Username untuk akun baru!')),
-      );
-      return;
-    }
+    String username = _isSignUp
+        ? _usernameController.text
+        : (_emailController.text.contains('@')
+            ? _emailController.text.split('@').first
+            : _emailController.text);
 
-    // Alur Setelah Auth Berhasil: Ke Kustomisasi Maskot Yahoo
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AvatarCustomizerScreen(
-          username: _isSignUp ? _usernameController.text : (_emailController.text.split('@').first),
+    if (_isSignUp) {
+      // Jika DAFTAR BARU -> Bawa ke Kustomisasi Maskot Pertama Kali (Onboarding)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AvatarCustomizerScreen(
+            username: username,
+            isInitialSetup: true,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      // Jika LOGIN biasa -> LANGSUNG MASUK DASHBOARD UTAMA
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(studentName: username),
+        ),
+      );
+    }
   }
 
   @override
@@ -182,7 +192,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _isSignUp ? 'Daftar akun siswa untuk menyimpan seluruh progres' : 'Masuk untuk melanjutkan petualangan kuis',
+                  _isSignUp ? 'Daftar akun baru untuk mulai merakit maskot dan bermain' : 'Masuk untuk melanjutkan petualangan kuis',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
@@ -204,7 +214,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'Email / ID NISN',
+                    labelText: 'Email / NISN',
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
@@ -232,7 +242,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                     ),
                     onPressed: _handleAuth,
                     child: Text(
-                      _isSignUp ? 'DAFTAR AKUN BARU' : 'MASUK SEKARANG',
+                      _isSignUp ? 'DAFTAR & RAKIT MASKOT 🚀' : 'MASUK SEKARANG 🔓',
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
@@ -260,43 +270,81 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT YAHOO AVATAR CUSTOMIZER (FULL BODY & DYNAMIC THEMES)
+// 3. MASKOT YAHOO AVATAR CUSTOMIZER (FULL BODY: TOPI, WAJAH, BAJU, TEMA)
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
-  const AvatarCustomizerScreen({super.key, required this.username});
+  final bool isInitialSetup;
+  final IconData? currentHat;
+  final IconData? currentFace;
+  final IconData? currentOutfit;
+  final Color? currentColor;
+
+  const AvatarCustomizerScreen({
+    super.key,
+    required this.username,
+    this.isInitialSetup = false,
+    this.currentHat,
+    this.currentFace,
+    this.currentOutfit,
+    this.currentColor,
+  });
 
   @override
   State<AvatarCustomizerScreen> createState() => _AvatarCustomizerScreenState();
 }
 
 class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
-  int _headIndex = 0;
+  int _hatIndex = 0;
+  int _faceIndex = 0;
   int _outfitIndex = 0;
   int _colorIndex = 0;
 
-  final List<IconData> _heads = [
-    Icons.face,
+  final List<IconData?> _hats = [
+    null, // Tanpa Topi
+    Icons.sports_esports, // Headset Gamer
+    Icons.school_rounded, // Topi Toga / Edukasi
+    Icons.military_tech, // Helm Cyber
+  ];
+
+  final List<IconData> _faces = [
+    Icons.face_rounded,
+    Icons.sentiment_very_satisfied_rounded,
     Icons.face_retouching_natural,
-    Icons.smart_toy_outlined,
-    Icons.sports_motorsports_rounded,
+    Icons.smart_toy_rounded,
   ];
 
   final List<IconData> _outfits = [
-    Icons.checkroom_rounded,
-    Icons.shield_outlined,
-    Icons.sports_esports_outlined,
-    Icons.school_outlined,
+    Icons.checkroom_rounded, // Kaos / Baju Biasa
+    Icons.shield_outlined, // Armor Cyber
+    Icons.sports_kabaddi, // Kostum Bertarung
+    Icons.dry_cleaning_rounded, // Jaket Hoodie
   ];
 
-  // Pilihan Warna Tema yang Mengubah Seluruh Tampilan Aplikasi
   final List<Map<String, dynamic>> _themeColors = [
-    {'name': 'Indigo Hero', 'color': const Color(0xFF6C63FF)},
+    {'name': 'Indigo Cyber', 'color': const Color(0xFF6C63FF)},
     {'name': 'Amber Blaze', 'color': Colors.orange},
-    {'name': 'Emerald Cyber', 'color': const Color(0xFF00B09B)},
-    {'name': 'Amethyst Royal', 'color': const Color(0xFF8E2DE2)},
-    {'name': 'Crimson Warrior', 'color': const Color(0xFFE53935)},
+    {'name': 'Emerald Green', 'color': const Color(0xFF00B09B)},
+    {'name': 'Royal Amethyst', 'color': const Color(0xFF8E2DE2)},
+    {'name': 'Crimson Red', 'color': const Color(0xFFE53935)},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.currentHat != null) {
+      int idx = _hats.indexOf(widget.currentHat);
+      if (idx != -1) _hatIndex = idx;
+    }
+    if (widget.currentFace != null) {
+      int idx = _faces.indexOf(widget.currentFace!);
+      if (idx != -1) _faceIndex = idx;
+    }
+    if (widget.currentOutfit != null) {
+      int idx = _outfits.indexOf(widget.currentOutfit!);
+      if (idx != -1) _outfitIndex = idx;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +352,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rakit Maskot Avatar', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(widget.isInitialSetup ? 'Rakit Maskot Pertamamu' : 'Edit Maskot Avatar'),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -313,20 +361,20 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
           child: Column(
             children: [
               Text(
-                'Halo ${widget.username}!',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                'Karakter Maskot ${widget.username}',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
               ),
               const SizedBox(height: 4),
               const Text(
-                'Pilih kostum maskot & warna elemen tema aplikasi kamu',
+                'Sesuaikan topi, ekspresi wajah, baju, dan warna tema aplikasi',
                 style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
               const SizedBox(height: 20),
 
-              // VISUALISASI MASKOT FULL BODY (ALA YAHOO AVATAR)
+              // VISUALISASI MASKOT FULL BODY UTUH (ALA YAHOO MESSENGER)
               Container(
-                width: 180,
-                height: 220,
+                width: 200,
+                height: 240,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: activeColor.withOpacity(0.12),
@@ -339,19 +387,26 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Kepala Maskot
-                    Icon(_heads[_headIndex], size: 70, color: activeColor),
+                    // Topi / Aksesori Kepala
+                    SizedBox(
+                      height: 28,
+                      child: _hats[_hatIndex] != null
+                          ? Icon(_hats[_hatIndex], size: 30, color: Colors.amber.shade800)
+                          : const SizedBox(),
+                    ),
+                    // Kepala / Ekspresi Wajah
+                    Icon(_faces[_faceIndex], size: 65, color: activeColor),
                     const SizedBox(height: 2),
-                    // Badan / Baju Maskot (Yahoo Style)
-                    Icon(_outfits[_outfitIndex], size: 75, color: activeColor.withOpacity(0.85)),
+                    // Pakaian / Baju Maskot
+                    Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withOpacity(0.9)),
                     const SizedBox(height: 4),
-                    // Kaki Maskot
+                    // Kaki Maskot Utuh
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(width: 14, height: 18, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
-                        const SizedBox(width: 10),
-                        Container(width: 14, height: 18, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
+                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(width: 12),
+                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
                       ],
                     ),
                   ],
@@ -359,23 +414,40 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 24),
 
-              // PILIHAN MODEL KEPALA
-              _buildSelectorTitle('1. Aksesori Kepala / Rambut:'),
+              // 1. PILIHAN TOPI / AKSESORI
+              _buildSectionTitle('1. Pilih Aksesori Topi / Kepala:'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(_heads.length, (i) {
+                children: List.generate(_hats.length, (i) {
                   return ChoiceChip(
-                    label: Icon(_heads[i], size: 20, color: _headIndex == i ? Colors.white : Colors.black87),
-                    selected: _headIndex == i,
+                    label: _hats[i] == null
+                        ? const Text('Tanpa', style: TextStyle(fontSize: 11))
+                        : Icon(_hats[i], size: 20, color: _hatIndex == i ? Colors.white : Colors.black87),
+                    selected: _hatIndex == i,
                     selectedColor: activeColor,
-                    onSelected: (val) => setState(() => _headIndex = i),
+                    onSelected: (val) => setState(() => _hatIndex = i),
                   );
                 }),
               ),
               const SizedBox(height: 16),
 
-              // PILIHAN KOSTUM BADAN
-              _buildSelectorTitle('2. Kostum Pakaian Maskot:'),
+              // 2. PILIHAN EKSPRESI WAJAH
+              _buildSectionTitle('2. Pilih Ekspresi Wajah:'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(_faces.length, (i) {
+                  return ChoiceChip(
+                    label: Icon(_faces[i], size: 20, color: _faceIndex == i ? Colors.white : Colors.black87),
+                    selected: _faceIndex == i,
+                    selectedColor: activeColor,
+                    onSelected: (val) => setState(() => _faceIndex = i),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+
+              // 3. PILIHAN KOSTUM BAJU
+              _buildSectionTitle('3. Pilih Baju / Kostum Maskot:'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(_outfits.length, (i) {
@@ -389,28 +461,27 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 16),
 
-              // PILIHAN WARNA & TEMA APLIKASI
-              _buildSelectorTitle('3. Warna Aura (Tema Aplikasi):'),
+              // 4. PILIHAN WARNA & TEMA DINAMIS
+              _buildSectionTitle('4. Pilih Warna Aura Element (Tema Aplikasi):'),
               Wrap(
-                spacing: 10,
+                spacing: 8,
                 children: List.generate(_themeColors.length, (i) {
-                  Color itemColor = _themeColors[i]['color'];
+                  Color c = _themeColors[i]['color'];
                   return ChoiceChip(
-                    avatar: CircleAvatar(backgroundColor: itemColor, radius: 8),
-                    label: Text(_themeColors[i]['name'], style: TextStyle(color: _colorIndex == i ? Colors.white : Colors.black87)),
+                    avatar: CircleAvatar(backgroundColor: c, radius: 8),
+                    label: Text(_themeColors[i]['name'], style: TextStyle(color: _colorIndex == i ? Colors.white : Colors.black87, fontSize: 11)),
                     selected: _colorIndex == i,
-                    selectedColor: itemColor,
+                    selectedColor: c,
                     onSelected: (val) {
                       setState(() => _colorIndex = i);
-                      // MENGUBAH TEMA GLOBAL APLIKASI
-                      NetBattleApp.of(context).updateThemeColor(itemColor);
+                      NetBattleApp.of(context).updateThemeColor(c);
                     },
                   );
                 }),
               ),
               const SizedBox(height: 28),
 
-              // TOMBOL SIMPAN & KE DASHBOARD
+              // TOMBOL SIMPAN
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -425,7 +496,8 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       MaterialPageRoute(
                         builder: (context) => HomeScreen(
                           studentName: widget.username,
-                          headIcon: _heads[_headIndex],
+                          hatIcon: _hats[_hatIndex],
+                          faceIcon: _faces[_faceIndex],
                           outfitIcon: _outfits[_outfitIndex],
                           themeColor: activeColor,
                         ),
@@ -442,30 +514,32 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     );
   }
 
-  Widget _buildSelectorTitle(String text) {
+  Widget _buildSectionTitle(String title) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF2D3142))),
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (DASHBOARD DENGAN TEMA DINAMIS & MASKOT HASIL RAKITAN)
+// 4. HOME SCREEN (DASHBOARD UTAMA DENGAN TOMBOL EDIT MASKOT DI PROFIL)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   final String studentName;
-  final IconData headIcon;
+  final IconData? hatIcon;
+  final IconData faceIcon;
   final IconData outfitIcon;
   final Color themeColor;
 
   const HomeScreen({
     super.key,
     required this.studentName,
-    this.headIcon = Icons.face,
+    this.hatIcon,
+    this.faceIcon = Icons.face_rounded,
     this.outfitIcon = Icons.checkroom_rounded,
     this.themeColor = const Color(0xFF6C63FF),
   });
@@ -483,16 +557,22 @@ class HomeScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events_rounded, color: Colors.amber),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // PROFIL MASKOT HASIL KUSTOMISASI DENGAN TEMA DINAMIS
+            // CARD PROFIL MASKOT HASIL KUSTOMISASI
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [themeColor, themeColor.withOpacity(0.75)],
@@ -506,7 +586,7 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Mini Preview Maskot Utuh
+                  // PREVIEW MASKOT UTUH DI PROFIL
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -516,8 +596,9 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(headIcon, size: 28, color: Colors.white),
-                        Icon(outfitIcon, size: 28, color: Colors.white),
+                        if (hatIcon != null) Icon(hatIcon, size: 20, color: Colors.amberAccent),
+                        Icon(faceIcon, size: 26, color: Colors.white),
+                        Icon(outfitIcon, size: 26, color: Colors.white),
                       ],
                     ),
                   ),
@@ -540,6 +621,25 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                  // TOMBOL AKSES PILIH/EDIT MASKOT KAPAN SAJA
+                  IconButton(
+                    icon: const Icon(Icons.checkroom, color: Colors.white),
+                    tooltip: 'Edit Maskot Avatar',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AvatarCustomizerScreen(
+                            username: studentName,
+                            currentHat: hatIcon,
+                            currentFace: faceIcon,
+                            currentOutfit: outfitIcon,
+                            currentColor: themeColor,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -1081,7 +1181,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. TUG OF WAR QUIZ SCREEN (TARIK TAMBANG)
+// 8. TUG OF WAR QUIZ SCREEN
 // ---------------------------------------------------------------------------
 class TugOfWarQuizScreen extends StatefulWidget {
   final String roomCode;

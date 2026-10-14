@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. HALAMAN LOGIN & KUSTOMISASI AVATAR (FITUR BARU)
+// 2. HALAMAN LOGIN & KUSTOMISASI AVATAR
 // ---------------------------------------------------------------------------
 class LoginAvatarScreen extends StatefulWidget {
   const LoginAvatarScreen({super.key});
@@ -109,7 +109,6 @@ class LoginAvatarScreen extends StatefulWidget {
 class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
   final TextEditingController _nameController = TextEditingController(text: 'Satria Hero');
 
-  // Variabel Pilihan Kustomisasi Avatar ala Yahoo
   int _selectedFaceIndex = 0;
   int _selectedColorIndex = 0;
 
@@ -157,7 +156,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
               ),
               const SizedBox(height: 28),
 
-              // PREVIEW AVATAR INTERAKTIF
+              // PREVIEW AVATAR
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -177,7 +176,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
               ),
               const SizedBox(height: 24),
 
-              // PILIHAN EKSPRESI / EXP
+              // PILIHAN EKSPRESI
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -212,7 +211,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
               ),
               const SizedBox(height: 20),
 
-              // PILIHAN WARNA TEMA / ELEMENT
+              // PILIHAN WARNA
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -247,7 +246,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
               ),
               const SizedBox(height: 28),
 
-              // INPUT NAMA SISWA
+              // INPUT NAMA
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -258,7 +257,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
               ),
               const SizedBox(height: 28),
 
-              // TOMBOL MASUK ARENA
+              // TOMBOL MASUK
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -300,7 +299,7 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. HOME SCREEN (Dashboard Utama Menerima Data Profil Custom)
+// 3. HOME SCREEN (Dashboard Utama)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   final String studentName;
@@ -342,7 +341,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profil Siswa yang Disesuaikan dari Halaman Login Avatar
+            // Profil Siswa
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -460,7 +459,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // 2. BATTLE TARIK TAMBANG (Bisa via Kode Room)
+            // 2. BATTLE TARIK TAMBANG
             _buildGameCard(
               context,
               title: 'Battle Tarik Tambang (1v1)',
@@ -588,7 +587,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 4. QUEST SCREEN (Peta Petualangan)
+// 4. QUEST SCREEN
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatelessWidget {
   const QuestScreen({super.key});
@@ -1035,7 +1034,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. CUSTOM ROOM SCREEN (Menu Buat / Gabung Room Tarik Tambang)
+// 6. CUSTOM ROOM SCREEN
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
   const CustomRoomScreen({super.key});
@@ -1097,7 +1096,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 28),
 
-            // Opsi 1: Buat Room Baru
+            // Opsi 1: Buat Room
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1131,7 +1130,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Opsi 2: Masukkan Kode Room Teman
+            // Opsi 2: Gabung Kode Room
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1234,11 +1233,12 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. TUG OF WAR QUIZ SCREEN (Arena Tarik Tambang 1v1)
+// 7. TUG OF WAR QUIZ SCREEN (Tarik Tambang - Tunggal & Disesuaikan)
 // ---------------------------------------------------------------------------
 class TugOfWarQuizScreen extends StatefulWidget {
   final String roomCode;
-  const TugOfWarQuizScreen({super, required this.roomCode});
+
+  const TugOfWarQuizScreen({super.key, required this.roomCode}); // <-- Perbaiki baris ini
 
   @override
   State<TugOfWarQuizScreen> createState() => _TugOfWarQuizScreenState();

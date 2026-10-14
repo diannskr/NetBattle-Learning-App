@@ -507,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Quest: Modul Materi Lengkap (8 Babak)',
+              title: 'Quest: Modul Materi (8 Babak)',
               subtitle: 'Pelajari konsep mendalam & buka babak selanjutnya otomatis',
               icon: Icons.menu_book_rounded,
               color: Colors.green,
@@ -610,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (8 BABAK MATERI SANGAT LENGKAP & MENDALAM)
+// 5. QUEST SCREEN (DIBUAT DALAM 1 BOX DOKUMEN TUNGGAL BERSIH)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -644,6 +644,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Kode Koding Nyata (Dart/Java/C++)',
+          'isCode': true,
           'body': 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
         },
         {
@@ -667,6 +668,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Studi Kasus Perhitungan Toko',
+          'isCode': true,
           'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\n\ndouble pajak = totalHarga * 0.1; // Pajak 10%\ndouble totalBayar = totalHarga + pajak;\n\nprint("Total Akhir: Rp " + totalBayar.toString());'
         },
         {
@@ -690,6 +692,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Kode Sistem Kelulusan Ujian',
+          'isCode': true,
           'body': 'int nilaiSiswa = 78;\nint batasLulus = 75;\n\nif (nilaiSiswa >= batasLulus) {\n  print("Selamat, Anda dinyatakan LULUS!");\n} else {\n  print("Mohon maaf, Anda harus mengikuti REMIDI.");\n}'
         },
         {
@@ -713,6 +716,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Penilaian Grade Akademik',
+          'isCode': true,
           'body': 'int nilai = 88;\n\nif (nilai >= 85) {\n  print("Grade A - Sangat Memuaskan");\n} else if (nilai >= 75) {\n  print("Grade B - Baik");\n} else if (nilai >= 60) {\n  print("Grade C - Cukup");\n} else {\n  print("Grade D - Perlu Bimbingan");\n}'
         }
       ],
@@ -732,6 +736,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Kode Cetak Perkalian 5',
+          'isCode': true,
           'body': 'for (int i = 1; i <= 10; i++) {\n  int hasil = 5 * i;\n  print("5 x " + i.toString() + " = " + hasil.toString());\n}'
         }
       ],
@@ -751,6 +756,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Game Nyawa Karakter',
+          'isCode': true,
           'body': 'int nyawaPemain = 3;\n\nwhile (nyawaPemain > 0) {\n  print("Pemain bertarung... Nyawa tersisa: " + nyawaPemain.toString());\n  nyawaPemain--; // Mengurangi nyawa\n}\nprint("GAME OVER!");'
         }
       ],
@@ -770,6 +776,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Kode Fungsi Matematika',
+          'isCode': true,
           'body': '// Definisi Fungsi\nint hitungLuasPersegi(int panjang, int lebar) {\n  return panjang * lebar;\n}\n\n// Pemanggilan Fungsi di Main Program\nvoid main() {\n  int hasilLuas = hitungLuasPersegi(10, 4);\n  print("Luas Tanah: " + hasilLuas.toString() + " m2");\n}'
         }
       ],
@@ -789,6 +796,7 @@ class _QuestScreenState extends State<QuestScreen> {
         },
         {
           'header': '💻 3. Contoh Manipulasi List di Dart',
+          'isCode': true,
           'body': 'List<String> daftarHero = ["Miya", "Layla", "Alucard"];\n\n// Menambah data baru\ndaftarHero.add("Zilong");\n\n// Mengakses elemen pertama\nprint("Hero Utama: " + daftarHero[0]); // Output: Miya\n\n// Menampilkan semua item menggunakan For Loop\nfor (int i = 0; i < daftarHero.length; i++) {\n  print("Hero " + i.toString() + ": " + daftarHero[i]);\n}'
         }
       ],
@@ -824,7 +832,7 @@ class _QuestScreenState extends State<QuestScreen> {
                 if (!isUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Selesaikan babak sebelumnya terlebih dahulu!')));
                 } else {
-                  _showDetailedMaterialDialog(context, index, stage['title'], stage['sections'] as List<Map<String, String>>, stage['xp']);
+                  _showSingleBoxMaterialDialog(context, index, stage['title'], stage['sections'] as List<Map<String, dynamic>>, stage['xp']);
                 }
               },
             ),
@@ -834,7 +842,8 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  void _showDetailedMaterialDialog(BuildContext context, int index, String title, List<Map<String, String>> sections, int xp) {
+  // DIALOG MATERI DENGAN 1 WADAH/BOX TUNGGAL
+  void _showSingleBoxMaterialDialog(BuildContext context, int index, String title, List<Map<String, dynamic>> sections, int xp) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -849,42 +858,52 @@ class _QuestScreenState extends State<QuestScreen> {
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: sections.map((sec) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: sec['header']!.contains('💻') ? const Color(0xFF1E1E2E) : Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: sec['header']!.contains('💻') ? Colors.transparent : Colors.grey.shade300),
-                  ),
-                  child: Column(
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(sections.length, (i) {
+                  final sec = sections[i];
+                  final bool isCode = sec['isCode'] == true;
+
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         sec['header']!,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: sec['header']!.contains('💻') ? const Color(0xFF89B4FA) : const Color(0xFF2D3142),
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        sec['body']!,
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.5,
-                          fontFamily: sec['header']!.contains('💻') ? 'monospace' : null,
-                          color: sec['header']!.contains('💻') ? const Color(0xFFA6ADC8) : Colors.black87,
+                      const SizedBox(height: 6),
+                      if (isCode)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(12)),
+                          child: Text(
+                            sec['body']!,
+                            style: const TextStyle(fontSize: 13, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8)),
+                          ),
+                        )
+                      else
+                        Text(
+                          sec['body']!,
+                          style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
                         ),
-                      ),
+                      if (i < sections.length - 1) ...[
+                        const SizedBox(height: 14),
+                        Divider(color: Colors.grey.shade300, height: 1),
+                        const SizedBox(height: 14),
+                      ],
                     ],
-                  ),
-                );
-              }).toList(),
+                  );
+                }),
+              ),
             ),
           ),
         ),
@@ -915,7 +934,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (SOLO CODE CHALLENGE - 10 SOAL)
+// 6. QUIZ BATTLE SCREEN (DILENGKAPI SKOR AKHIR DAN SKOR DIALOG)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -925,7 +944,7 @@ class QuizBattleScreen extends StatefulWidget {
 }
 
 class _QuizBattleScreenState extends State<QuizBattleScreen> {
-  int _score = 0;
+  int _correctCount = 0;
   int _currentIndex = 0;
   int? _selectedOption;
 
@@ -986,7 +1005,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
     setState(() {
       _selectedOption = optionIndex;
       if (optionIndex == _questions[_currentIndex]['answer']) {
-        _score += 10;
+        _correctCount++;
       }
     });
 
@@ -997,9 +1016,59 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
           _selectedOption = null;
         });
       } else {
-        Navigator.pop(context, _score * 10);
+        _showFinalScoreDialog();
       }
     });
+  }
+
+  // TAMPILAN DIALOG SKOR AKHIR KUIS SOLO
+  void _showFinalScoreDialog() {
+    int finalScore = (_correctCount / _questions.length * 100).toInt();
+    int xpGained = finalScore * 2; // Misal 100 poin = +200 XP
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: const Text('🎉 KUIS SOLO SELESAI!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.emoji_events_rounded, size: 70, color: Colors.amber),
+            const SizedBox(height: 12),
+            Text(
+              '$finalScore',
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+            ),
+            const Text('SKOR AKHIR KAMU', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Benar $_correctCount dari ${_questions.length} Soal (+$xpGained XP)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            onPressed: () {
+              Navigator.pop(context); // Tutup Dialog
+              Navigator.pop(context, xpGained); // Kembali ke Dashboard membawa XP
+            },
+            child: const Text('KLAIM XP & KEMBALI 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

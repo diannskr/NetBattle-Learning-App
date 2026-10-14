@@ -5,7 +5,36 @@ void main() {
 }
 
 // ---------------------------------------------------------------------------
-// STATE MANAGEMENT TEMA GLOBAL & DATA PENGGUNA
+// DATABASE LOKAL SEDERHANA (MENGINGAT AKUN DAN TERDAFTAR)
+// ---------------------------------------------------------------------------
+class UserDatabase {
+  static final Map<String, Map<String, String>> _registeredUsers = {
+    // Akun Demo Awal
+    '12345': {'name': 'Satria Hero', 'password': '123'},
+  };
+
+  static bool isNisRegistered(String nis) {
+    return _registeredUsers.containsKey(nis.trim());
+  }
+
+  static bool registerUser(String nis, String name, String password) {
+    if (isNisRegistered(nis)) return false;
+    _registeredUsers[nis.trim()] = {'name': name, 'password': password};
+    return true;
+  }
+
+  static bool validateLogin(String nis, String password) {
+    if (!isNisRegistered(nis)) return false;
+    return _registeredUsers[nis.trim()]?['password'] == password;
+  }
+
+  static String getUserName(String nis) {
+    return _registeredUsers[nis.trim()]?['name'] ?? 'Siswa NetBattle';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// STATE MANAGEMENT TEMA GLOBAL & DATA USER
 // ---------------------------------------------------------------------------
 class NetBattleApp extends StatefulWidget {
   const NetBattleApp({super.key});
@@ -120,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. FORM AUTHENTICATION (LOGIN & REGISTRASI)
+// 2. FORM AUTHENTICATION (LOGIN & REGISTRASI NIS)
 // ---------------------------------------------------------------------------
 class AuthLoginScreen extends StatefulWidget {
   const AuthLoginScreen({super.key});
@@ -131,41 +160,81 @@ class AuthLoginScreen extends StatefulWidget {
 
 class _AuthLoginScreenState extends State<AuthLoginScreen> {
   bool _isSignUp = false;
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nisController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   void _handleAuth() {
-    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+    String nis = _nisController.text.trim();
+    String password = _passwordController.text.trim();
+    String name = _nameController.text.trim();
+
+    if (nis.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mohon isi Email dan Password dengan lengkap!')),
+        const SnackBar(content: Text('⚠️ NIS dan Password harus diisi!')),
       );
       return;
     }
 
-    String username = _isSignUp
-        ? _usernameController.text
-        : (_emailController.text.contains('@')
-            ? _emailController.text.split('@').first
-            : _emailController.text);
-
     if (_isSignUp) {
-      // Jika DAFTAR BARU -> Bawa ke Kustomisasi Maskot Pertama Kali (Onboarding)
+      // PROSES REGISTRASI
+      if (name.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('⚠️ Masukkan Nama Lengkap Siswa!')),
+        );
+        return;
+      }
+
+      bool success = UserDatabase.registerUser(nis, name, password);
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('⚠️ NIS sudah terdaftar! Silakan langsung login.')),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('🎉 Pendaftaran Berhasil! Silakan rakut maskotmu.')),
+      );
+
+      // Ke Halaman Kustomisasi Maskot Pertama Kali
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => AvatarCustomizerScreen(
-            username: username,
+            username: name,
             isInitialSetup: true,
           ),
         ),
       );
     } else {
-      // Jika LOGIN biasa -> LANGSUNG MASUK DASHBOARD UTAMA
+      // PROSES LOGIN VALIDASI NIS
+      if (!UserDatabase.isNisRegistered(nis)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ NIS belum terdaftar! Silakan daftar akun terlebih dahulu.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
+
+      if (!UserDatabase.validateLogin(nis, password)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Password salah! Periksa kembali password Anda.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
+
+      // Login Sukses -> Langsung Masuk Dashboard Utama
+      String studentName = UserDatabase.getUserName(nis);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(studentName: username),
+          builder: (context) => HomeScreen(studentName: studentName),
         ),
       );
     }
@@ -184,15 +253,17 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.shield_moon_rounded, size: 70, color: themeColor),
+                Icon(Icons.badge_rounded, size: 70, color: themeColor),
                 const SizedBox(height: 12),
                 Text(
-                  _isSignUp ? 'Buat Akun NetBattle' : 'Selamat Datang Kembali!',
+                  _isSignUp ? 'Daftar Akun Siswa (NIS)' : 'Login Portal Siswa',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _isSignUp ? 'Daftar akun baru untuk mulai merakit maskot dan bermain' : 'Masuk untuk melanjutkan petualangan kuis',
+                  _isSignUp
+                      ? 'Daftar akun menggunakan Nomor Induk Siswa (NIS)'
+                      : 'Masukkan NIS dan Password terdaftar untuk masuk',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
@@ -200,9 +271,9 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 
                 if (_isSignUp) ...[
                   TextField(
-                    controller: _usernameController,
+                    controller: _nameController,
                     decoration: InputDecoration(
-                      labelText: 'Username Siswa',
+                      labelText: 'Nama Lengkap Siswa',
                       prefixIcon: const Icon(Icons.person_outline),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                     ),
@@ -211,11 +282,12 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                 ],
 
                 TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _nisController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Email / NISN',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    labelText: 'Nomor Induk Siswa (NIS)',
+                    hintText: 'Contoh: 12345',
+                    prefixIcon: const Icon(Icons.badge_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
@@ -242,7 +314,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                     ),
                     onPressed: _handleAuth,
                     child: Text(
-                      _isSignUp ? 'DAFTAR & RAKIT MASKOT 🚀' : 'MASUK SEKARANG 🔓',
+                      _isSignUp ? 'DAFTAR AKUN BARU 🚀' : 'MASUK SEKARANG 🔓',
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
@@ -256,7 +328,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
                     });
                   },
                   child: Text(
-                    _isSignUp ? 'Sudah punya akun? Login di sini' : 'Belum punya akun? Daftar sekarang',
+                    _isSignUp ? 'Sudah punya akun? Login NIS' : 'Belum punya akun? Daftar NIS di sini',
                     style: TextStyle(color: themeColor, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -270,7 +342,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT YAHOO AVATAR CUSTOMIZER (FULL BODY: TOPI, WAJAH, BAJU, TEMA)
+// 3. MASKOT YAHOO AVATAR CUSTOMIZER
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
@@ -301,10 +373,10 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   int _colorIndex = 0;
 
   final List<IconData?> _hats = [
-    null, // Tanpa Topi
-    Icons.sports_esports, // Headset Gamer
-    Icons.school_rounded, // Topi Toga / Edukasi
-    Icons.military_tech, // Helm Cyber
+    null,
+    Icons.sports_esports,
+    Icons.school_rounded,
+    Icons.military_tech,
   ];
 
   final List<IconData> _faces = [
@@ -315,10 +387,10 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   ];
 
   final List<IconData> _outfits = [
-    Icons.checkroom_rounded, // Kaos / Baju Biasa
-    Icons.shield_outlined, // Armor Cyber
-    Icons.sports_kabaddi, // Kostum Bertarung
-    Icons.dry_cleaning_rounded, // Jaket Hoodie
+    Icons.checkroom_rounded,
+    Icons.shield_outlined,
+    Icons.sports_kabaddi,
+    Icons.dry_cleaning_rounded,
   ];
 
   final List<Map<String, dynamic>> _themeColors = [
@@ -328,23 +400,6 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     {'name': 'Royal Amethyst', 'color': const Color(0xFF8E2DE2)},
     {'name': 'Crimson Red', 'color': const Color(0xFFE53935)},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.currentHat != null) {
-      int idx = _hats.indexOf(widget.currentHat);
-      if (idx != -1) _hatIndex = idx;
-    }
-    if (widget.currentFace != null) {
-      int idx = _faces.indexOf(widget.currentFace!);
-      if (idx != -1) _faceIndex = idx;
-    }
-    if (widget.currentOutfit != null) {
-      int idx = _outfits.indexOf(widget.currentOutfit!);
-      if (idx != -1) _outfitIndex = idx;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -371,7 +426,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 20),
 
-              // VISUALISASI MASKOT FULL BODY UTUH (ALA YAHOO MESSENGER)
+              // VISUALISASI MASKOT FULL BODY
               Container(
                 width: 200,
                 height: 240,
@@ -387,20 +442,16 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Topi / Aksesori Kepala
                     SizedBox(
                       height: 28,
                       child: _hats[_hatIndex] != null
                           ? Icon(_hats[_hatIndex], size: 30, color: Colors.amber.shade800)
                           : const SizedBox(),
                     ),
-                    // Kepala / Ekspresi Wajah
                     Icon(_faces[_faceIndex], size: 65, color: activeColor),
                     const SizedBox(height: 2),
-                    // Pakaian / Baju Maskot
                     Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withOpacity(0.9)),
                     const SizedBox(height: 4),
-                    // Kaki Maskot Utuh
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -414,7 +465,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 1. PILIHAN TOPI / AKSESORI
+              // PILIHAN TOPI
               _buildSectionTitle('1. Pilih Aksesori Topi / Kepala:'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -431,7 +482,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 2. PILIHAN EKSPRESI WAJAH
+              // PILIHAN WAJAH
               _buildSectionTitle('2. Pilih Ekspresi Wajah:'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -446,7 +497,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 3. PILIHAN KOSTUM BAJU
+              // PILIHAN BAJU
               _buildSectionTitle('3. Pilih Baju / Kostum Maskot:'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -461,7 +512,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 4. PILIHAN WARNA & TEMA DINAMIS
+              // PILIHAN TEMA
               _buildSectionTitle('4. Pilih Warna Aura Element (Tema Aplikasi):'),
               Wrap(
                 spacing: 8,
@@ -481,7 +532,6 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ),
               const SizedBox(height: 28),
 
-              // TOMBOL SIMPAN
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -526,9 +576,9 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (DASHBOARD UTAMA DENGAN TOMBOL EDIT MASKOT DI PROFIL)
+// 4. HOME SCREEN (DASHBOARD APLIKASI DENGAN XP & LEVEL DINAMIS)
 // ---------------------------------------------------------------------------
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final String studentName;
   final IconData? hatIcon;
   final IconData faceIcon;
@@ -543,6 +593,31 @@ class HomeScreen extends StatelessWidget {
     this.outfitIcon = Icons.checkroom_rounded,
     this.themeColor = const Color(0xFF6C63FF),
   });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // SYSTEM STATE XP & UNLOCKED STAGE
+  int _userXP = 150;
+  int _unlockedStageIndex = 0; // Index stage materi yang terbuka (0 = Babak 1)
+
+  int get level => (_userXP / 300).floor() + 1;
+
+  void _addXP(int points) {
+    setState(() {
+      _userXP += points;
+    });
+  }
+
+  void _unlockNextStage(int completedIndex) {
+    if (completedIndex >= _unlockedStageIndex) {
+      setState(() {
+        _unlockedStageIndex = completedIndex + 1;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -569,24 +644,23 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // CARD PROFIL MASKOT HASIL KUSTOMISASI
+            // CARD PROFIL SISWA DENGAN PROGRES XP
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [themeColor, themeColor.withOpacity(0.75)],
+                  colors: [widget.themeColor, widget.themeColor.withOpacity(0.75)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(22),
                 boxShadow: [
-                  BoxShadow(color: themeColor.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 5)),
+                  BoxShadow(color: widget.themeColor.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 5)),
                 ],
               ),
               child: Row(
                 children: [
-                  // PREVIEW MASKOT UTUH DI PROFIL
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -596,9 +670,9 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (hatIcon != null) Icon(hatIcon, size: 20, color: Colors.amberAccent),
-                        Icon(faceIcon, size: 26, color: Colors.white),
-                        Icon(outfitIcon, size: 26, color: Colors.white),
+                        if (widget.hatIcon != null) Icon(widget.hatIcon, size: 20, color: Colors.amberAccent),
+                        Icon(widget.faceIcon, size: 26, color: Colors.white),
+                        Icon(widget.outfitIcon, size: 26, color: Colors.white),
                       ],
                     ),
                   ),
@@ -608,21 +682,20 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          studentName,
+                          widget.studentName,
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         const SizedBox(height: 4),
-                        const Text('Level 5 • 1,250 XP', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                        Text('Level $level • $_userXP XP', style: const TextStyle(fontSize: 13, color: Colors.white70)),
                         const SizedBox(height: 8),
-                        const LinearProgressIndicator(
-                          value: 0.7,
+                        LinearProgressIndicator(
+                          value: (_userXP % 300) / 300,
                           color: Colors.amberAccent,
                           backgroundColor: Colors.white24,
                         ),
                       ],
                     ),
                   ),
-                  // TOMBOL AKSES PILIH/EDIT MASKOT KAPAN SAJA
                   IconButton(
                     icon: const Icon(Icons.checkroom, color: Colors.white),
                     tooltip: 'Edit Maskot Avatar',
@@ -631,11 +704,11 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AvatarCustomizerScreen(
-                            username: studentName,
-                            currentHat: hatIcon,
-                            currentFace: faceIcon,
-                            currentOutfit: outfitIcon,
-                            currentColor: themeColor,
+                            username: widget.studentName,
+                            currentHat: widget.hatIcon,
+                            currentFace: widget.faceIcon,
+                            currentOutfit: widget.outfitIcon,
+                            currentColor: widget.themeColor,
                           ),
                         ),
                       );
@@ -664,7 +737,7 @@ class HomeScreen extends StatelessWidget {
                       children: const [
                         Text('Streak Belajar: 3 Hari Beruntun!', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                         SizedBox(height: 2),
-                        Text('Ayo selesaikan 1 misi lagi hari ini untuk bonus XP!', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                        Text('Selesaikan materi & kuis untuk menambah XP!', style: TextStyle(fontSize: 12, color: Colors.black54)),
                       ],
                     ),
                   ),
@@ -680,11 +753,22 @@ class HomeScreen extends StatelessWidget {
             _buildGameCard(
               context,
               title: 'Quest Petualangan Materi',
-              subtitle: 'Pelajari materi lewat cerita interaktif yang seru',
+              subtitle: 'Baca materi & buka babak selanjutnya otomatis',
               icon: Icons.map_rounded,
               color: Colors.green,
               xp: '+150 XP',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuestScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QuestScreen(
+                    unlockedStageIndex: _unlockedStageIndex,
+                    onStageCompleted: (idx, xpGained) {
+                      _addXP(xpGained);
+                      _unlockNextStage(idx);
+                    },
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -692,11 +776,18 @@ class HomeScreen extends StatelessWidget {
             _buildGameCard(
               context,
               title: 'Battle Tarik Tambang (1v1)',
-              subtitle: 'Buat room atau masukkan kode teman untuk tanding!',
+              subtitle: 'Adu kuis tarik tambang via kode room',
               icon: Icons.sports_kabaddi_rounded,
               color: Colors.orange,
               xp: '+200 XP',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomRoomScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CustomRoomScreen(
+                    onBattleFinished: (xpGained) => _addXP(xpGained),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -704,11 +795,18 @@ class HomeScreen extends StatelessWidget {
             _buildGameCard(
               context,
               title: 'Battle Kuis Kilat (Solo)',
-              subtitle: 'Jawab soal cepat berebut skor individu',
+              subtitle: 'Jawab cepat berebut skor individu',
               icon: Icons.flash_on_rounded,
-              color: themeColor,
+              color: widget.themeColor,
               xp: '+100 XP',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuizBattleScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QuizBattleScreen(
+                    onQuizFinished: (xpGained) => _addXP(xpGained),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -788,18 +886,25 @@ class HomeScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN
+// 5. QUEST SCREEN (PEMBUKAAN BABAK MATERI SECARA OTOMATIS)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatelessWidget {
-  const QuestScreen({super.key});
+  final int unlockedStageIndex;
+  final Function(int stageIndex, int xpGained) onStageCompleted;
+
+  const QuestScreen({
+    super.key,
+    required this.unlockedStageIndex,
+    required this.onStageCompleted,
+  });
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> stages = [
-      {'title': 'Babak 1: Dasar-Dasar Jaringan', 'desc': 'Pahami IP Address, Mac Address & Topologi', 'status': 'completed', 'xp': '150 XP'},
-      {'title': 'Babak 2: Pengenalan Protokol HTTP & HTTPS', 'desc': 'Bagaimana cara web bekerja di balik layar', 'status': 'active', 'xp': '200 XP'},
-      {'title': 'Babak 3: Keamanan Cyber & Firewall', 'desc': 'Lindungi data dari serangan hacker', 'status': 'locked', 'xp': '250 XP'},
-      {'title': 'Babak 4: Routing & Switching Lanjutan', 'desc': 'Membaca peta jalan data lalu lintas internet', 'status': 'locked', 'xp': '300 XP'},
+      {'title': 'Babak 1: Dasar-Dasar Jaringan', 'desc': 'Pahami IP Address, Mac Address & Topologi', 'xp': 150},
+      {'title': 'Babak 2: Pengenalan Protokol HTTP & HTTPS', 'desc': 'Bagaimana cara web bekerja di balik layar', 'xp': 200},
+      {'title': 'Babak 3: Keamanan Cyber & Firewall', 'desc': 'Lindungi data dari serangan hacker', 'xp': 250},
+      {'title': 'Babak 4: Routing & Switching Lanjutan', 'desc': 'Membaca peta jalan data lalu lintas internet', 'xp': 300},
     ];
 
     return Scaffold(
@@ -833,7 +938,7 @@ class QuestScreen extends StatelessWidget {
                       children: const [
                         Text('Dunia Jaringan Komputer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(height: 4),
-                        Text('Selesaikan setiap babak materi untuk membuka area baru!', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                        Text('Selesaikan setiap babak untuk membuka materi selanjutnya!', style: TextStyle(fontSize: 12, color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -849,29 +954,36 @@ class QuestScreen extends StatelessWidget {
               itemCount: stages.length,
               itemBuilder: (context, index) {
                 final stage = stages[index];
-                final status = stage['status'];
+                bool isUnlocked = index <= unlockedStageIndex;
+                bool isCompleted = index < unlockedStageIndex;
 
-                Color badgeColor = status == 'completed' ? Colors.green : (status == 'active' ? Colors.orange : Colors.grey);
-                IconData statusIcon = status == 'completed' ? Icons.check_circle_rounded : (status == 'active' ? Icons.play_circle_fill_rounded : Icons.lock_outline_rounded);
+                Color badgeColor = isCompleted ? Colors.green : (isUnlocked ? Colors.orange : Colors.grey);
+                IconData statusIcon = isCompleted
+                    ? Icons.check_circle_rounded
+                    : (isUnlocked ? Icons.play_circle_fill_rounded : Icons.lock_outline_rounded);
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: status == 'active' ? Colors.orange : Colors.grey.shade200, width: status == 'active' ? 2 : 1),
+                    border: Border.all(color: isUnlocked ? Colors.orange : Colors.grey.shade200, width: isUnlocked ? 2 : 1),
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withOpacity(0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
-                    title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: status == 'locked' ? Colors.grey : const Color(0xFF2D3142))),
-                    subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: status == 'locked' ? Colors.grey.shade400 : Colors.grey.shade600)),
-                    trailing: status == 'locked' ? const Icon(Icons.lock, color: Colors.grey) : const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+                    title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: isUnlocked ? const Color(0xFF2D3142) : Colors.grey)),
+                    subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
+                    trailing: isUnlocked
+                        ? const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey)
+                        : const Icon(Icons.lock, color: Colors.grey),
                     onTap: () {
-                      if (status == 'locked') {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Babak ini masih terkunci! Selesaikan babak sebelumnya dulu.')));
+                      if (!isUnlocked) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('🔒 Babak ini masih terkunci! Selesaikan materi babak sebelumnya dahulu.')),
+                        );
                       } else {
-                        _showMaterialDialog(context, stage['title']);
+                        _showMaterialDialog(context, index, stage['title'], stage['xp']);
                       }
                     },
                   ),
@@ -884,24 +996,27 @@ class QuestScreen extends StatelessWidget {
     );
   }
 
-  void _showMaterialDialog(BuildContext context, String title) {
+  void _showMaterialDialog(BuildContext context, int stageIndex, String title, int xp) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         content: const Text(
-          'HTTP (Hypertext Transfer Protocol) adalah protokol tempat data dikirimkan antara browser dan website. Sedangkan HTTPS menggunakan enkripsi SSL/TLS agar data aman!',
+          'HTTP (Hypertext Transfer Protocol) adalah protokol tempat data dikirimkan antara browser dan website. Sedangkan HTTPS menggunakan enkripsi SSL/TLS agar data aman dari kejahatan siber!',
           style: TextStyle(fontSize: 13, height: 1.4),
         ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
+              onStageCompleted(stageIndex, xp);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🎉 Selamat! Materi selesai dibaca, +200 XP!')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('🎉 Selamat! Babak Selesai, +$xp XP Ditambahkan & Babak Selanjutnya Terbuka!')),
+              );
             },
-            child: const Text('SELESAIKAN QUEST', style: TextStyle(color: Colors.white)),
+            child: const Text('SELESAIKAN MATERI & UNLOCK', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -913,7 +1028,8 @@ class QuestScreen extends StatelessWidget {
 // 6. QUIZ BATTLE SCREEN (SOLO)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
-  const QuizBattleScreen({super.key});
+  final Function(int xpGained) onQuizFinished;
+  const QuizBattleScreen({super.key, required this.onQuizFinished});
 
   @override
   State<QuizBattleScreen> createState() => _QuizBattleScreenState();
@@ -945,6 +1061,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
           _selectedOption = null;
         });
       } else {
+        widget.onQuizFinished(_score);
         _showResultDialog();
       }
     });
@@ -962,7 +1079,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
           children: [
             const Icon(Icons.emoji_events, size: 70, color: Colors.amber),
             const SizedBox(height: 12),
-            Text('Total Skor Kamu:\n$_score XP', textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text('Total Skor Kamu:\n+$_score XP Ditambahkan!', textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -1031,10 +1148,11 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. CUSTOM ROOM SCREEN
+// 7. CUSTOM ROOM SCREEN & TUG OF WAR
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
-  const CustomRoomScreen({super.key});
+  final Function(int xpGained) onBattleFinished;
+  const CustomRoomScreen({super.key, required this.onBattleFinished});
 
   @override
   State<CustomRoomScreen> createState() => _CustomRoomScreenState();
@@ -1132,7 +1250,15 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                       style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       onPressed: () {
                         if (_codeController.text.trim().isNotEmpty) {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TugOfWarQuizScreen(roomCode: _codeController.text.toUpperCase())));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TugOfWarQuizScreen(
+                                roomCode: _codeController.text.toUpperCase(),
+                                onBattleFinished: widget.onBattleFinished,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: const Text('GABUNG DAN TARIK TAMBANG!'),
@@ -1170,7 +1296,15 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const TugOfWarQuizScreen(roomCode: 'NET889')));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TugOfWarQuizScreen(
+                    roomCode: 'NET889',
+                    onBattleFinished: widget.onBattleFinished,
+                  ),
+                ),
+              );
             },
             child: const Text('MASUK ARENA', style: TextStyle(color: Colors.white)),
           ),
@@ -1185,7 +1319,12 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 // ---------------------------------------------------------------------------
 class TugOfWarQuizScreen extends StatefulWidget {
   final String roomCode;
-  const TugOfWarQuizScreen({super.key, required this.roomCode});
+  final Function(int xpGained) onBattleFinished;
+
+  const TugOfWarQuizScreen({super.key,
+    required this.roomCode,
+    required this.onBattleFinished,
+  });
 
   @override
   State<TugOfWarQuizScreen> createState() => _TugOfWarQuizScreenState();
@@ -1219,20 +1358,28 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
           _selectedOption = null;
         });
       } else {
-        _showMatchResult();
+        bool isWinner = _ropePosition < 0.5;
+        widget.onBattleFinished(isWinner ? 200 : 50);
+        _showMatchResult(isWinner);
       }
     });
   }
 
-  void _showMatchResult() {
-    bool isWinner = _ropePosition < 0.5;
-
+  void _showMatchResult(bool isWinner) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(isWinner ? '🎉 KAMU MENANG!' : '💥 TEMANMU MENANG!', textAlign: TextAlign.center, style: TextStyle(color: isWinner ? Colors.green : Colors.red, fontWeight: FontWeight.bold)),
+        title: Text(
+          isWinner ? '🎉 KAMU MENANG TARIK TAMBANG!' : '💥 TEMANMU MENANG!',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: isWinner ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          isWinner ? 'Selamat! +200 XP ditambahkan ke profilmu.' : 'Tetap semangat! +50 XP partisipasi ditambahkan.',
+          textAlign: TextAlign.center,
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),

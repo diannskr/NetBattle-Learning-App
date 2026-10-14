@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -535,14 +536,14 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildGameCard(
               context,
               title: 'Code Tug-of-War (1v1)',
-              subtitle: 'Fill in missing code snippets to pull the rope!',
+              subtitle: 'Multiplayer Real-time 1v1 Battle via Kode Room!',
               icon: Icons.sports_kabaddi_rounded,
               color: Colors.orange,
               xp: '+200 XP',
               onTap: () async {
                 final xp = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CustomRoomScreen()),
+                  MaterialPageRoute(builder: (context) => CustomRoomScreen(currentUserName: widget.studentName)),
                 );
                 if (xp != null && xp is int) _addXP(xp);
               },
@@ -727,7 +728,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (SOLO CODE CHALLENGE DENGAN TAMPILAN KEREN)
+// 6. QUIZ BATTLE SCREEN (SOLO CODE CHALLENGE)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -802,7 +803,6 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             const SizedBox(height: 24),
-            // TERMINAL STYLE CODE BOX
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -892,10 +892,11 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. CUSTOM ROOM SCREEN & CODE TUG OF WAR (KEMBALI KE TAMPILAN KEREN SEMULA)
+// 7. MULTIPLAYER ROOM CREATION & LOBBY SCREEN
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
-  const CustomRoomScreen({super.key});
+  final String currentUserName;
+  const CustomRoomScreen({super.key, required this.currentUserName});
 
   @override
   State<CustomRoomScreen> createState() => _CustomRoomScreenState();
@@ -904,11 +905,71 @@ class CustomRoomScreen extends StatefulWidget {
 class _CustomRoomScreenState extends State<CustomRoomScreen> {
   final TextEditingController _codeController = TextEditingController();
 
+  void _startMultiplayerGame(String roomCode, bool isHost, String opponentName) async {
+    final xp = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TugOfWarMultiplayerScreen(
+          roomCode: roomCode,
+          playerName: widget.currentUserName,
+          opponentName: opponentName,
+          isHost: isHost,
+        ),
+      ),
+    );
+
+    if (xp != null && xp is int && mounted) {
+      Navigator.pop(context, xp);
+    }
+  }
+
+  void _showWaitingLobbyDialog(String roomCode) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('🎮 WAITING LOBBY (HOST)', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Bagikan Kode Room ini ke lawanmu:', style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(12)),
+              child: Text(roomCode, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.purple)),
+            ),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 12),
+            const Text('Menunggu Teman/Pemain 2 Masuk...', style: TextStyle(fontSize: 12, color: Colors.black54, fontStyle: FontStyle.italic)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            onPressed: () {
+              Navigator.pop(context);
+              // Simulasi Pemain 2 Masuk ke Room
+              _startMultiplayerGame(roomCode, true, 'Budi (Lawan)');
+            },
+            child: const Text('SIMULASI LAWAN MASUK 🚀', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Battle Tarik Tambang (Room)', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
+        title: const Text('Battle Tarik Tambang 1v1', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -934,7 +995,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text('Adu Tanding 1v1', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text('Adu Tanding Real-Time', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(height: 4),
                         Text('Buat room dan undang temanmu atau masukkan kode!', style: TextStyle(fontSize: 12, color: Colors.white70)),
                       ],
@@ -945,6 +1006,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 28),
 
+            // HOST: BUAT ROOM
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -952,15 +1014,17 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Buat Ruang Pertandingan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text('1. Buat Ruang Pertandingan (Host)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
+                  const Text('Dapatkan kode unik untuk dibagikan ke HP temanmu.', style: TextStyle(fontSize: 12, color: Colors.black54)),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                      onPressed: () => _showCreatedRoomDialog(context),
-                      child: const Text('BUAT ROOM TARIK TAMBANG', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                      onPressed: () => _showWaitingLobbyDialog('NET889'),
+                      child: const Text('BUAT ROOM & DAPATKAN KODE 🔑', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -968,6 +1032,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 20),
 
+            // GUEST: GABUNG ROOM
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -975,13 +1040,14 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Gabung Room Teman', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text('2. Gabung Room Teman (Guest)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _codeController,
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
-                      hintText: 'Contoh: NET889',
+                      hintText: 'Masukkan Kode Room (Contoh: NET889)',
+                      prefixIcon: const Icon(Icons.key_rounded),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
@@ -991,18 +1057,14 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                     height: 48,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                      onPressed: () async {
+                      onPressed: () {
                         if (_codeController.text.trim().isNotEmpty) {
-                          final xp = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => TugOfWarQuizScreen(roomCode: _codeController.text.toUpperCase())),
-                          );
-                          if (xp != null && xp is int && context.mounted) {
-                            Navigator.pop(context, xp);
-                          }
+                          _startMultiplayerGame(_codeController.text.toUpperCase(), false, 'Host Room');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('⚠️ Masukkan kode room terlebih dahulu!')));
                         }
                       },
-                      child: const Text('GABUNG DAN TARIK TAMBANG!'),
+                      child: const Text('GABUNG DAN BATTLE SEKARANG! ⚔️', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -1013,106 +1075,166 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
       ),
     );
   }
-
-  void _showCreatedRoomDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('🎮 ROOM DIBUAT!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Bagikan kode ini ke temanmu:', style: TextStyle(fontSize: 12)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(12)),
-              child: const Text('NET889', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.purple)),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
-            onPressed: () async {
-              Navigator.pop(context);
-              final xp = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TugOfWarQuizScreen(roomCode: 'NET889')),
-              );
-              if (xp != null && xp is int && context.mounted) {
-                Navigator.pop(context, xp);
-              }
-            },
-            child: const Text('MASUK ARENA', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
-// TUG OF WAR SCREEN DENGAN ARENA KEREN SEMULA
+// 8. TUG OF WAR MULTIPLAYER ENGINE (COUNTDOWN, TIMER, SUDDEN DEATH)
 // ---------------------------------------------------------------------------
-class TugOfWarQuizScreen extends StatefulWidget {
+class TugOfWarMultiplayerScreen extends StatefulWidget {
   final String roomCode;
-  const TugOfWarQuizScreen({super.key, required this.roomCode});
+  final String playerName;
+  final String opponentName;
+  final bool isHost;
+
+  const TugOfWarMultiplayerScreen({
+    super.key,
+    required this.roomCode,
+    required this.playerName,
+    required this.opponentName,
+    required this.isHost,
+  });
 
   @override
-  State<TugOfWarQuizScreen> createState() => _TugOfWarQuizScreenState();
+  State<TugOfWarMultiplayerScreen> createState() => _TugOfWarMultiplayerScreenState();
 }
 
-class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
-  double _ropePosition = 0.5;
+class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
+  // STATE MULTIPLAYER
+  double _ropePosition = 0.5; // 0.0 (Player Win), 1.0 (Opponent Win)
   int _currentIndex = 0;
   int? _selectedOption;
 
+  // COUNTDOWN & TIMER
+  int _startCountdown = 3;
+  bool _isGameStarted = false;
+  int _questionTimer = 10; // 10 detik per soal
+  Timer? _timer;
+
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Complete the boolean expression for "X is NOT equal to Y":\n\nx ____ y',
-      'options': ['==', '!=', '>=', '<='],
-      'answer': 1,
+      'question': 'Complete the code for IF condition in Dart:\n\n____ (score >= 60) {\n  print("Pass");\n}',
+      'options': ['if', 'when', 'check', 'loop'],
+      'answer': 0,
     },
     {
       'question': 'What keyword starts a loop that runs a specific number of times?',
       'options': ['for', 'if', 'return', 'class'],
       'answer': 0,
     },
+    {
+      'question': 'Complete the boolean expression for "X is NOT equal to Y":\n\nx ____ y',
+      'options': ['==', '!=', '>=', '<='],
+      'answer': 1,
+    },
   ];
 
-  void _answer(int optionIndex) {
-    setState(() {
-      _selectedOption = optionIndex;
-      if (optionIndex == _questions[_currentIndex]['answer']) {
-        _ropePosition = (_ropePosition - 0.25).clamp(0.0, 1.0);
-      } else {
-        _ropePosition = (_ropePosition + 0.25).clamp(0.0, 1.0);
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    _runStartCountdown();
+  }
 
-    Future.delayed(const Duration(milliseconds: 1200), () {
-      if (_currentIndex < _questions.length - 1 && _ropePosition > 0.0 && _ropePosition < 1.0) {
-        setState(() {
-          _currentIndex++;
-          _selectedOption = null;
-        });
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  // COUNTDOWN 3..2..1 SYNC
+  void _runStartCountdown() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      if (_startCountdown > 1) {
+        setState(() => _startCountdown--);
       } else {
-        bool isWinner = _ropePosition < 0.5;
-        _showMatchResult(isWinner);
+        timer.cancel();
+        setState(() => _isGameStarted = true);
+        _startQuestionTimer();
       }
     });
   }
 
-  void _showMatchResult(bool isWinner) {
+  // TIMER SOAL (10 DETIK)
+  void _startQuestionTimer() {
+    _timer?.cancel();
+    setState(() => _questionTimer = 10);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      if (_questionTimer > 0) {
+        setState(() => _questionTimer--);
+      } else {
+        // Waktu Habis -> Penalti Tarikan
+        _handleTimeOut();
+      }
+    });
+  }
+
+  void _handleTimeOut() {
+    _timer?.cancel();
+    setState(() {
+      _selectedOption = -1; // Time Out
+      // Tarik ke arah lawan jika tidak menjawab
+      _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
+    });
+
+    _nextQuestionOrFinish();
+  }
+
+  void _answer(int optionIndex) {
+    _timer?.cancel();
+    int timeSpent = 10 - _questionTimer; // Semakin cepat semakin kuat tarikan!
+
+    setState(() {
+      _selectedOption = optionIndex;
+      bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
+
+      if (isCorrect) {
+        // Bonus Kecepatan: Jawab dalam 3 detik = tarikan +0.30, sisanya +0.20
+        double pullForce = timeSpent <= 3 ? 0.30 : 0.20;
+        _ropePosition = (_ropePosition - pullForce).clamp(0.0, 1.0);
+      } else {
+        // Salah Jawab: Penalti -0.15
+        _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
+      }
+    });
+
+    _nextQuestionOrFinish();
+  }
+
+  void _nextQuestionOrFinish() {
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+
+      // MEKANISME SUDDEN DEATH (KNOCKOUT 100%)
+      if (_ropePosition <= 0.0 || _ropePosition >= 1.0) {
+        _finishGame();
+        return;
+      }
+
+      if (_currentIndex < _questions.length - 1) {
+        setState(() {
+          _currentIndex++;
+          _selectedOption = null;
+        });
+        _startQuestionTimer();
+      } else {
+        _finishGame();
+      }
+    });
+  }
+
+  void _finishGame() {
+    _timer?.cancel();
+    bool isWinner = _ropePosition < 0.5;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          isWinner ? '🎉 KAMU MENANG TARIK TAMBANG!' : '💥 TEMANMU YANG MENANG!',
+          isWinner ? '🎉 VICTORY! KAMU MENANG!' : '💥 DEFEAT! LAWAN MENANG!',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold, color: isWinner ? Colors.green : Colors.red),
         ),
@@ -1123,30 +1245,76 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
             const SizedBox(height: 12),
             Text(
               isWinner
-                  ? 'Hebat! Tarikanmu berhasil mengalahkan lawan di Room ${widget.roomCode}. (+200 XP)'
-                  : 'Sayang sekali, lawan lebih cepat menarik tali di Room ${widget.roomCode}. (+50 XP)',
+                  ? 'Luar biasa! Kamu berhasil mengalahkan ${widget.opponentName} di Room ${widget.roomCode}.\n\nXP Obtained: +200 XP'
+                  : 'Tetap semangat! ${widget.opponentName} lebih cepat dan tepat kali ini.\n\nXP Obtained: +50 XP',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
           ],
         ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context, isWinner ? 200 : 50);
+            },
+            child: const Text('KEMBALI KE HUB', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isGameStarted) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('GET READY!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
+              const SizedBox(height: 20),
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.amberAccent,
+                child: Text('$_startCountdown', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+              ),
+              const SizedBox(height: 20),
+              Text('Room: ${widget.roomCode} • 1v1 Battle', style: const TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
+      );
+    }
+
     final q = _questions[_currentIndex];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Arena Room: ${widget.roomCode}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+        title: Text('Battle Room: ${widget.roomCode}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                const Icon(Icons.timer, color: Colors.red, size: 18),
+                const SizedBox(width: 4),
+                Text('$_questionTimer s', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+              ],
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // PAPAN ARENA BATTLE TARIK TAMBANG
+          // ARENA MULTIPLAYER TARIK TAMBANG
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.amber.shade50,
@@ -1154,19 +1322,19 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Row(
                       children: [
-                        CircleAvatar(backgroundColor: Colors.blue, radius: 14, child: Icon(Icons.face, size: 16, color: Colors.white)),
-                        SizedBox(width: 6),
-                        Text('Kamu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                        const CircleAvatar(backgroundColor: Colors.blue, radius: 14, child: Icon(Icons.face, size: 16, color: Colors.white)),
+                        const SizedBox(width: 6),
+                        Text(widget.playerName, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
                       ],
                     ),
                     Row(
                       children: [
-                        Text('Teman (Lawan)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                        SizedBox(width: 6),
-                        CircleAvatar(backgroundColor: Colors.red, radius: 14, child: Icon(Icons.person, size: 16, color: Colors.white)),
+                        Text(widget.opponentName, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                        const SizedBox(width: 6),
+                        const CircleAvatar(backgroundColor: Colors.red, radius: 14, child: Icon(Icons.person, size: 16, color: Colors.white)),
                       ],
                     ),
                   ],
@@ -1191,7 +1359,7 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Status Tali: ${((1 - _ropePosition) * 100).toInt()}% Ketarikan Kamu',
+                  'Power Tarikan Kamu: ${((1 - _ropePosition) * 100).toInt()}%',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54),
                 ),
               ],
@@ -1208,11 +1376,7 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
                     child: Text(q['question'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                   ),
                   const SizedBox(height: 16),

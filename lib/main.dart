@@ -507,11 +507,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Quest: Pemrograman Dasar & If-Else',
-              subtitle: 'Pelajari materi & buka babak selanjutnya otomatis',
+              title: 'Quest: Modul Materi Lengkap (8 Babak)',
+              subtitle: 'Pelajari konsep mendalam & buka babak selanjutnya otomatis',
               icon: Icons.menu_book_rounded,
               color: Colors.green,
-              xp: '+150 XP',
+              xp: '+150 XP/Babak',
               onTap: () async {
                 await Navigator.push(
                   context,
@@ -552,8 +552,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildGameCard(
               context,
-              title: 'Battle Kuis Kilat (Solo)',
-              subtitle: 'Tantangan kuis cepat logika & koding individu',
+              title: 'Battle Kuis Kilat (10 Soal Solo)',
+              subtitle: 'Tantangan kuis cepat 10 soal logika & koding',
               icon: Icons.flash_on_rounded,
               color: widget.themeColor,
               xp: '+100 XP',
@@ -610,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN
+// 5. QUEST SCREEN (8 BABAK MATERI SANGAT LENGKAP & MENDALAM)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -631,27 +631,167 @@ class _QuestScreenState extends State<QuestScreen> {
 
   final List<Map<String, dynamic>> stages = [
     {
-      'title': 'Babak 1: Variabel & Perintah Output',
-      'desc': 'Pelajari cara menyimpan data dan menampilkan output pada layar.',
-      'content': 'Dalam pemograman, variabel digunakan untuk menyimpan nilai data.\nContoh sintaks Dart/Python:\n\nString nama = "Satria";\nprint(nama);\n\nSoal: Kata kunci apa yang digunakan untuk menampilkan teks ke layar?',
+      'title': 'Babak 1: Konsep Algoritma, Memori & Variabel',
+      'desc': 'Modul Lengkap: Memahami wadah memori, aturan penamaan variabel, dan Output.',
+      'sections': [
+        {
+          'header': '📌 1. Apa itu Algoritma dan Variabel?',
+          'body': 'Dalam dunia komputer, Algoritma adalah langkah-langkah logis berurutan untuk menyelesaikan masalah.\n\nKetika program berjalan, data (seperti nama, skor, atau harga) perlu disimpan di dalam RAM komputer. Wadah penyimpanan sementara di dalam memori inilah yang disebut Variabel.'
+        },
+        {
+          'header': '📖 2. Aturan Penamaan Variabel (Naming Convention)',
+          'body': '- Menggunakan camelCase (contoh: namaLengkap, skorPemain).\n- Tidak boleh diawali angka (contoh salah: 1nama).\n- Tidak boleh menggunakan spasi (contoh salah: nama saya).\n- Bersifat Case-Sensitive (nama dan Nama dianggap dua variabel yang berbeda).'
+        },
+        {
+          'header': '💻 3. Contoh Kode Koding Nyata (Dart/Java/C++)',
+          'body': 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
+        },
+        {
+          'header': '⚠️ 4. Kesalahan Umum (Common Errors)',
+          'body': '❌ Mengisi nilai teks tanpa tanda petik: String nama = Satria; (Harus "Satria")\n❌ Lupa tanda titik koma (;) di akhir baris kode.'
+        }
+      ],
       'xp': 150
     },
     {
-      'title': 'Babak 2: Kondisi Pengcabangan If-Else',
-      'desc': 'Mengambil keputusan logika dalam kode berdasarkan syarat.',
-      'content': 'Percabangan If-Else memungkinkan program memilih aksi.\n\nif (nilai >= 75) {\n  print("Lulus");\n} else {\n  print("Remidi");\n}\n\nLogika: Jika nilai lebih dari atau sama dengan 75, cetak Lulus!',
+      'title': 'Babak 2: Tipe Data Dasar & Operator Aritmatika',
+      'desc': 'Modul Lengkap: int, double, String, bool, serta perhitungan matematika.',
+      'sections': [
+        {
+          'header': '📌 1. Pengenalan Tipe Data Statis',
+          'body': 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif (contoh: 10, -5, 100).\n- double / float: Angka desimal bertitik (contoh: 3.14, 85.5).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool (Boolean): Nilai logika yang hanya bernilai true atau false.'
+        },
+        {
+          'header': '📖 2. Operator Aritmatika Dasar',
+          'body': 'Operasi Matematika dalam koding:\n- Penjumlahan (+)\n- Pengurangan (-)\n- Perkalian (*)\n- Pembagian (/)\n- Modulo / Sisa Bagi (%) : Menghitung sisa hasil pembagian.'
+        },
+        {
+          'header': '💻 3. Studi Kasus Perhitungan Toko',
+          'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\n\ndouble pajak = totalHarga * 0.1; // Pajak 10%\ndouble totalBayar = totalHarga + pajak;\n\nprint("Total Akhir: Rp " + totalBayar.toString());'
+        },
+        {
+          'header': '💡 4. Rangkuman Logika Modulo (%)',
+          'body': 'Operator modulo % sangat berguna untuk mengecek apakah suatu angka genap atau ganjil.\nContoh: 10 % 2 == 0 (Genap), sedangkan 7 % 2 == 1 (Ganjil).'
+        }
+      ],
+      'xp': 150
+    },
+    {
+      'title': 'Babak 3: Percabangan Logika (If - Else)',
+      'desc': 'Modul Lengkap: Pengambilan keputusan otomatis berdasarkan ekspresi Boolean.',
+      'sections': [
+        {
+          'header': '📌 1. Mengapa Perlu Percabangan?',
+          'body': 'Program yang cerdas harus bisa mengambil keputusan berbeda berdasarkan kondisi nyata. Contoh: Jika password benar maka izinkan masuk, jika salah maka tampilkan error.'
+        },
+        {
+          'header': '📖 2. Operator Perbandingan (Relational Operators)',
+          'body': 'Kondisi IF dibentuk menggunakan operator relasional:\n- == (Sama dengan)\n- != (Tidak sama dengan)\n- > (Lebih besar)\n- < (Lebih kecil)\n- >= (Lebih besar atau sama dengan)\n- <= (Lebih kecil atau sama dengan)'
+        },
+        {
+          'header': '💻 3. Kode Sistem Kelulusan Ujian',
+          'body': 'int nilaiSiswa = 78;\nint batasLulus = 75;\n\nif (nilaiSiswa >= batasLulus) {\n  print("Selamat, Anda dinyatakan LULUS!");\n} else {\n  print("Mohon maaf, Anda harus mengikuti REMIDI.");\n}'
+        },
+        {
+          'header': '⚠️ 4. Kesalahan Paling Sering Terjadi',
+          'body': '❌ Tertukar antara = dan ==!\nSatu sama dengan (=) digunakan untuk MENGISI NILAI ke variabel.\nDua sama dengan (==) digunakan untuk MEMBANDINGKAN dua nilai.'
+        }
+      ],
       'xp': 200
     },
     {
-      'title': 'Babak 3: Perulangan Dasar (For & While)',
-      'desc': 'Mengeksekusi perintah secara berulang secara otomatis.',
-      'content': 'Perulangan memudahkan kita mengeksekusi baris kode berkali-kali:\n\nfor (int i = 1; i <= 5; i++) {\n  print(i);\n}\n\nLogika: Cetak angka dari 1 sampai 5 berurutan.',
+      'title': 'Babak 4: Percabangan Majemuk (Else If & Logical Operators)',
+      'desc': 'Modul Lengkap: Logika DAN (&&), ATAU (||), serta pengkondisian bersarang.',
+      'sections': [
+        {
+          'header': '📌 1. Menangani Lebih dari 2 Pilihan Kondisi',
+          'body': 'Ketika pilihan hasil logika bertingkat (misal menentukan Nilai Huruf A, B, C, D, E), gunakan struktur Else If.'
+        },
+        {
+          'header': '📖 2. Operator Logika Kombinasi (&& dan ||)',
+          'body': '- AND (&&): Kedua syarat HARUS bernilai TRUE agar kondisi terpenuhi.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE agar kondisi terpenuhi.\n- NOT (!): Membalikkan nilai logika (true menjadi false).'
+        },
+        {
+          'header': '💻 3. Contoh Penilaian Grade Akademik',
+          'body': 'int nilai = 88;\n\nif (nilai >= 85) {\n  print("Grade A - Sangat Memuaskan");\n} else if (nilai >= 75) {\n  print("Grade B - Baik");\n} else if (nilai >= 60) {\n  print("Grade C - Cukup");\n} else {\n  print("Grade D - Perlu Bimbingan");\n}'
+        }
+      ],
+      'xp': 200
+    },
+    {
+      'title': 'Babak 5: Perulangan Terhitung (For Loop)',
+      'desc': 'Modul Lengkap: Otomasisasi tugas berulang dengan counter increment/decrement.',
+      'sections': [
+        {
+          'header': '📌 1. Efisiensi Eksekusi Berulang',
+          'body': 'Bayangkan kamu diminta mencetak tulisan "Saya Tidak Akan Terlambat" sebanyak 100 kali. Tanpa loop, kamu harus menulis 100 baris print. Dengan For Loop, cukup 3 baris kode!'
+        },
+        {
+          'header': '📖 2. Anatomy Anatomi Structure For Loop',
+          'body': 'for (inisialisasi; kondisi_batas; iterasi) {\n  // kode yang diulang\n}\n\n1. Inisialisasi: int i = 1 (Nilai awal hitungan).\n2. Kondisi: i <= 5 (Selama i kurang dari sama dengan 5, terus ulang).\n3. Iterasi: i++ (Tambahkan i sebesar 1 setiap kali 1 putaran selesai).'
+        },
+        {
+          'header': '💻 3. Contoh Kode Cetak Perkalian 5',
+          'body': 'for (int i = 1; i <= 10; i++) {\n  int hasil = 5 * i;\n  print("5 x " + i.toString() + " = " + hasil.toString());\n}'
+        }
+      ],
       'xp': 250
     },
     {
-      'title': 'Babak 4: Fungsi & Method',
-      'desc': 'Membuat blok kode yang dapat digunakan kembali.',
-      'content': 'Fungsi membungkus logika agar dapat dipanggil kapan saja:\n\nint tambah(int a, int b) {\n  return a + b;\n}\n\nLogika: Terima dua angka a dan b, lalu kembalikan hasil penjumlahannya.',
+      'title': 'Babak 6: Perulangan Kondisional (While & Do-While)',
+      'desc': 'Modul Lengkap: Loop tak terhitung berbasis kondisi dinamis dan Infinite Loop Hazard.',
+      'sections': [
+        {
+          'header': '📌 1. Kapan Menggunakan While Loop?',
+          'body': 'While Loop digunakan ketika jumlah perulangan TIDAK DIKETAHUI secara pasti di awal, melainkan bergantung pada peristiwa saat program berjalan (contoh: mengulang input hingga user mengetik "stop").'
+        },
+        {
+          'header': '📖 2. Bahaya Infinite Loop (Perulangan Abadi)',
+          'body': 'Jika kondisi dalam While selalu bernilai TRUE dan tidak ada pembaruan nilai variabel, aplikasi akan crash/hang karena kehabisan memori!'
+        },
+        {
+          'header': '💻 3. Contoh Game Nyawa Karakter',
+          'body': 'int nyawaPemain = 3;\n\nwhile (nyawaPemain > 0) {\n  print("Pemain bertarung... Nyawa tersisa: " + nyawaPemain.toString());\n  nyawaPemain--; // Mengurangi nyawa\n}\nprint("GAME OVER!");'
+        }
+      ],
+      'xp': 250
+    },
+    {
+      'title': 'Babak 7: Fungsi / Subprogram (Method & Return Value)',
+      'desc': 'Modul Lengkap: Pemrograman modular, pemanggilan parameter, dan nilai kembalian.',
+      'sections': [
+        {
+          'header': '📌 1. Prinsip DRY (Don\'t Repeat Yourself)',
+          'body': 'Fungsi adalah sekelompok baris kode yang diberi nama khusus untuk menjalankan tugas spesifik. Fungsi dapat dipanggil berulang kali dari bagian program mana pun.'
+        },
+        {
+          'header': '📖 2. Void vs Return Value Function',
+          'body': '- Void Function: Fungsi yang HANYA menjalankan perintah tanpa mengembalikan nilai data hasil.\n- Return Function: Fungsi yang mengolah data lalu MENGEMBALIKAN (return) sebuah nilai hasil perhitungan.'
+        },
+        {
+          'header': '💻 3. Contoh Kode Fungsi Matematika',
+          'body': '// Definisi Fungsi\nint hitungLuasPersegi(int panjang, int lebar) {\n  return panjang * lebar;\n}\n\n// Pemanggilan Fungsi di Main Program\nvoid main() {\n  int hasilLuas = hitungLuasPersegi(10, 4);\n  print("Luas Tanah: " + hasilLuas.toString() + " m2");\n}'
+        }
+      ],
+      'xp': 300
+    },
+    {
+      'title': 'Babak 8: Struktur Data Array / List & Manipulasinya',
+      'desc': 'Modul Lengkap: Koleksi data sejenis, elemen Zero-Indexed, dan looping elemen List.',
+      'sections': [
+        {
+          'header': '📌 1. Apa itu Array / List?',
+          'body': 'Daripada membuat 10 variabel terpisah (siswa1, siswa2, ..., siswa10), kita bisa menyimpan kesepuluh nama siswa tersebut di dalam satu variabel List tunggal.'
+        },
+        {
+          'header': '📖 2. Konsep Indeks Nol (Zero-Indexed)',
+          'body': 'Komputer selalu menghitung urutan elemen dalam List dimulai dari posisi angka 0, bukan 1!\n- Elemen ke-1 -> Indeks [0]\n- Elemen ke-2 -> Indeks [1]\n- Elemen ke-N -> Indeks [N-1]'
+        },
+        {
+          'header': '💻 3. Contoh Manipulasi List di Dart',
+          'body': 'List<String> daftarHero = ["Miya", "Layla", "Alucard"];\n\n// Menambah data baru\ndaftarHero.add("Zilong");\n\n// Mengakses elemen pertama\nprint("Hero Utama: " + daftarHero[0]); // Output: Miya\n\n// Menampilkan semua item menggunakan For Loop\nfor (int i = 0; i < daftarHero.length; i++) {\n  print("Hero " + i.toString() + ": " + daftarHero[i]);\n}'
+        }
+      ],
       'xp': 300
     },
   ];
@@ -684,7 +824,7 @@ class _QuestScreenState extends State<QuestScreen> {
                 if (!isUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Selesaikan babak sebelumnya terlebih dahulu!')));
                 } else {
-                  _showMaterialDialog(context, index, stage['title'], stage['content'], stage['xp']);
+                  _showDetailedMaterialDialog(context, index, stage['title'], stage['sections'] as List<Map<String, String>>, stage['xp']);
                 }
               },
             ),
@@ -694,13 +834,60 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  void _showMaterialDialog(BuildContext context, int index, String title, String content, int xp) {
+  void _showDetailedMaterialDialog(BuildContext context, int index, String title, List<Map<String, String>> sections, int xp) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        content: SingleChildScrollView(child: Text(content, style: const TextStyle(fontSize: 13, height: 1.4))),
+        title: Row(
+          children: [
+            Icon(Icons.menu_book_rounded, color: Theme.of(context).primaryColor),
+            const SizedBox(width: 10),
+            Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: sections.map((sec) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: sec['header']!.contains('💻') ? const Color(0xFF1E1E2E) : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: sec['header']!.contains('💻') ? Colors.transparent : Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sec['header']!,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: sec['header']!.contains('💻') ? const Color(0xFF89B4FA) : const Color(0xFF2D3142),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        sec['body']!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.5,
+                          fontFamily: sec['header']!.contains('💻') ? 'monospace' : null,
+                          color: sec['header']!.contains('💻') ? const Color(0xFFA6ADC8) : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
@@ -719,7 +906,7 @@ class _QuestScreenState extends State<QuestScreen> {
                 SnackBar(content: Text('🎉 Babak Selesai! +$xp XP & Babak Selanjutnya Terbuka!')),
               );
             },
-            child: const Text('SELESAI & BUKA BABAK BERIKUTNYA 🚀', style: TextStyle(color: Colors.white)),
+            child: const Text('PAHAM & BUKA BABAK BERIKUTNYA 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -728,7 +915,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (SOLO CODE CHALLENGE)
+// 6. QUIZ BATTLE SCREEN (SOLO CODE CHALLENGE - 10 SOAL)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -744,19 +931,54 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Lengkapi potongan kode berikut untuk membuat percabangan IF:\n\n____ (nilai >= 75) {\n  print("Lulus");\n}',
+      'question': 'Lengkapi sintaks deklarasi variabel teks berikut:\n\n____ nama = "NetBattle";',
+      'options': ['String', 'int', 'bool', 'double'],
+      'answer': 0,
+    },
+    {
+      'question': 'Lengkapi perintah pengkondisian IF di bawah ini:\n\n____ (skor >= 80) {\n  print("Lulus");\n}',
       'options': ['if', 'when', 'check', 'loop'],
       'answer': 0,
     },
     {
-      'question': 'Kata kunci apa yang digunakan sebagai kondisi alternatif jika struktur IF bernilai FALSE?',
+      'question': 'Kata kunci apa yang digunakan sebagai alternatif jika kondisi IF bernilai FALSE?',
       'options': ['then', 'else', 'other', 'default'],
       'answer': 1,
     },
     {
-      'question': 'Lengkapi sintaks deklarasi variabel bilangan bulat bernilai 17 berikut:\n\n____ umur = 17;',
+      'question': 'Sintaks deklarasi variabel bilangan bulat berangka 25:\n\n____ umur = 25;',
       'options': ['String', 'bool', 'int', 'double'],
       'answer': 2,
+    },
+    {
+      'question': 'Manakah operator yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
+      'options': ['=', '==', '!=', '=>'],
+      'answer': 1,
+    },
+    {
+      'question': 'Kata kunci yang digunakan untuk menghentikan perulangan (loop) secara paksa:',
+      'options': ['stop', 'exit', 'break', 'return'],
+      'answer': 2,
+    },
+    {
+      'question': 'Tipe data yang hanya bernilai benar (true) atau salah (false) adalah:',
+      'options': ['int', 'bool', 'String', 'char'],
+      'answer': 1,
+    },
+    {
+      'question': 'Kata kunci yang digunakan untuk mendefinisikan sebuah fungsi tanpa mengembalikan nilai (return):',
+      'options': ['null', 'empty', 'void', 'static'],
+      'answer': 2,
+    },
+    {
+      'question': 'Bagaimanakah cara mengambil jumlah elemen pada variabel List bernama angka?',
+      'options': ['angka.size', 'angka.length', 'angka.count', 'angka.total'],
+      'answer': 1,
+    },
+    {
+      'question': 'Simbol apa yang digunakan untuk menambahkan komentar satu baris pada kode Dart/Java?',
+      'options': ['//', '<!--', '#', '/*'],
+      'answer': 0,
     },
   ];
 
@@ -764,7 +986,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
     setState(() {
       _selectedOption = optionIndex;
       if (optionIndex == _questions[_currentIndex]['answer']) {
-        _score += 100;
+        _score += 10;
       }
     });
 
@@ -775,7 +997,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
           _selectedOption = null;
         });
       } else {
-        Navigator.pop(context, _score);
+        Navigator.pop(context, _score * 10);
       }
     });
   }
@@ -803,7 +1025,6 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             const SizedBox(height: 24),
-            // TERMINAL STYLE CODE BOX
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1076,7 +1297,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. TUG OF WAR MULTIPLAYER ENGINE (10 SOAL BAHASA INDONESIA & TERMINAL STYLE)
+// 8. TUG OF WAR MULTIPLAYER ENGINE
 // ---------------------------------------------------------------------------
 class TugOfWarMultiplayerScreen extends StatefulWidget {
   final String roomCode;
@@ -1106,7 +1327,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   int _questionTimer = 10;
   Timer? _timer;
 
-  // 10 SOAL BAHASA INDONESIA TENTANG PEMROGRAMAN DASAR & KODING RUMPANG
   final List<Map<String, dynamic>> _questions = [
     {
       'question': 'Lengkapi sintaks deklarasi variabel teks di Dart/Java:\n\n____ namaSiswa = "Satria";',
@@ -1339,7 +1559,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       ),
       body: Column(
         children: [
-          // ARENA MULTIPLAYER TARIK TAMBANG
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.amber.shade50,
@@ -1399,7 +1618,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                   Text('Soal ${_currentIndex + 1} dari ${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 8),
                   
-                  // TERMINAL STYLE CODE BOX SAMA SEPERTI KUIS SOLO
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
@@ -1438,7 +1656,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // KARTU PILIHAN JAWABAN
                   Expanded(
                     child: ListView.builder(
                       itemCount: (q['options'] as List).length,

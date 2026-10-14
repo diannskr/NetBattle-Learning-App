@@ -4,8 +4,27 @@ void main() {
   runApp(const NetBattleApp());
 }
 
-class NetBattleApp extends StatelessWidget {
+// ---------------------------------------------------------------------------
+// APP ROOT & DYNAMIC THEME STATE MANAGEMENT
+// ---------------------------------------------------------------------------
+class NetBattleApp extends StatefulWidget {
   const NetBattleApp({super.key});
+
+  static _NetBattleAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_NetBattleAppState>()!;
+
+  @override
+  State<NetBattleApp> createState() => _NetBattleAppState();
+}
+
+class _NetBattleAppState extends State<NetBattleApp> {
+  Color _primaryThemeColor = const Color(0xFF6C63FF);
+
+  void updateThemeColor(Color newColor) {
+    setState(() {
+      _primaryThemeColor = newColor;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +33,11 @@ class NetBattleApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.amber,
+        primaryColor: _primaryThemeColor,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _primaryThemeColor,
+          primary: _primaryThemeColor,
+        ),
         scaffoldBackgroundColor: const Color(0xFFF4F6F9),
         useMaterial3: true,
       ),
@@ -41,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginAvatarScreen()),
+          MaterialPageRoute(builder: (context) => const AuthLoginScreen()),
         );
       }
     });
@@ -50,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6C63FF),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -97,200 +120,138 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. HALAMAN LOGIN & KUSTOMISASI AVATAR
+// 2. FORM AUTHENTICATION (LOGIN & REGISTRASI BENERAN)
 // ---------------------------------------------------------------------------
-class LoginAvatarScreen extends StatefulWidget {
-  const LoginAvatarScreen({super.key});
+class AuthLoginScreen extends StatefulWidget {
+  const AuthLoginScreen({super.key});
 
   @override
-  State<LoginAvatarScreen> createState() => _LoginAvatarScreenState();
+  State<AuthLoginScreen> createState() => _AuthLoginScreenState();
 }
 
-class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
-  final TextEditingController _nameController = TextEditingController(text: 'Satria Hero');
+class _AuthLoginScreenState extends State<AuthLoginScreen> {
+  bool _isSignUp = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
-  int _selectedFaceIndex = 0;
-  int _selectedColorIndex = 0;
+  void _handleAuth() {
+    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mohon isi Email dan Password dengan lengkap!')),
+      );
+      return;
+    }
 
-  final List<IconData> _avatarFaces = [
-    Icons.face,
-    Icons.face_retouching_natural,
-    Icons.sentiment_very_satisfied,
-    Icons.elderly,
-    Icons.smart_toy,
-  ];
+    if (_isSignUp && _usernameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mohon isi Username untuk akun baru!')),
+      );
+      return;
+    }
 
-  final List<Color> _avatarBgColors = [
-    const Color(0xFF6C63FF),
-    Colors.orange,
-    Colors.green,
-    Colors.purple,
-    Colors.pinkAccent,
-  ];
+    // Alur Setelah Auth Berhasil: Ke Kustomisasi Maskot Yahoo
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AvatarCustomizerScreen(
+          username: _isSignUp ? _usernameController.text : (_emailController.text.split('@').first),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Buat Karakter Pahlawanmu!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3142),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(28.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.shield_moon_rounded, size: 70, color: themeColor),
+                const SizedBox(height: 12),
+                Text(
+                  _isSignUp ? 'Buat Akun NetBattle' : 'Selamat Datang Kembali!',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                 ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Atur nama dan tampilan avatar sebelum bertanding',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 28),
+                const SizedBox(height: 6),
+                Text(
+                  _isSignUp ? 'Daftar akun siswa untuk menyimpan seluruh progres' : 'Masuk untuk melanjutkan petualangan kuis',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 32),
 
-              // PREVIEW AVATAR
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: _avatarBgColors[_selectedColorIndex].withOpacity(0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _avatarBgColors[_selectedColorIndex], width: 3),
-                ),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: _avatarBgColors[_selectedColorIndex],
-                  child: Icon(
-                    _avatarFaces[_selectedFaceIndex],
-                    size: 65,
-                    color: Colors.white,
+                if (_isSignUp) ...[
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username Siswa',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Email / ID NISN',
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-              // PILIHAN EKSPRESI
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '1. Pilih Ekspresi Karakter:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(_avatarFaces.length, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedFaceIndex = index;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: _selectedFaceIndex == index ? Colors.amber.shade100 : Colors.grey.shade100,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _selectedFaceIndex == index ? Colors.amber : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child: Icon(_avatarFaces[index], color: const Color(0xFF2D3142)),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 20),
-
-              // PILIHAN WARNA
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '2. Pilih Warna Aura Element:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(_avatarBgColors.length, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedColorIndex = index;
-                      });
-                    },
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: _avatarBgColors[index],
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _selectedColorIndex == index ? Colors.black : Colors.transparent,
-                          width: 2.5,
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 28),
-
-              // INPUT NAMA
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Nama Panggilan Siswa / Nickname',
-                  prefixIcon: const Icon(Icons.person),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // TOMBOL MASUK
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6C63FF),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
+                ),
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: _handleAuth,
+                    child: Text(
+                      _isSignUp ? 'DAFTAR AKUN BARU' : 'MASUK SEKARANG',
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                TextButton(
                   onPressed: () {
-                    if (_nameController.text.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Isi nama nickname kamu terlebih dahulu!')),
-                      );
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(
-                            studentName: _nameController.text,
-                            avatarFace: _avatarFaces[_selectedFaceIndex],
-                            avatarColor: _avatarBgColors[_selectedColorIndex],
-                          ),
-                        ),
-                      );
-                    }
+                    setState(() {
+                      _isSignUp = !_isSignUp;
+                    });
                   },
-                  child: const Text(
-                    'MASUK ARENA NETBATTLE 🚀',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  child: Text(
+                    _isSignUp ? 'Sudah punya akun? Login di sini' : 'Belum punya akun? Daftar sekarang',
+                    style: TextStyle(color: themeColor, fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -299,18 +260,214 @@ class _LoginAvatarScreenState extends State<LoginAvatarScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. HOME SCREEN (Dashboard Utama)
+// 3. MASKOT YAHOO AVATAR CUSTOMIZER (FULL BODY & DYNAMIC THEMES)
+// ---------------------------------------------------------------------------
+class AvatarCustomizerScreen extends StatefulWidget {
+  final String username;
+  const AvatarCustomizerScreen({super.key, required this.username});
+
+  @override
+  State<AvatarCustomizerScreen> createState() => _AvatarCustomizerScreenState();
+}
+
+class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
+  int _headIndex = 0;
+  int _outfitIndex = 0;
+  int _colorIndex = 0;
+
+  final List<IconData> _heads = [
+    Icons.face,
+    Icons.face_retouching_natural,
+    Icons.smart_toy_outlined,
+    Icons.sports_motorsports_rounded,
+  ];
+
+  final List<IconData> _outfits = [
+    Icons.checkroom_rounded,
+    Icons.shield_outlined,
+    Icons.sports_esports_outlined,
+    Icons.school_outlined,
+  ];
+
+  // Pilihan Warna Tema yang Mengubah Seluruh Tampilan Aplikasi
+  final List<Map<String, dynamic>> _themeColors = [
+    {'name': 'Indigo Hero', 'color': const Color(0xFF6C63FF)},
+    {'name': 'Amber Blaze', 'color': Colors.orange},
+    {'name': 'Emerald Cyber', 'color': const Color(0xFF00B09B)},
+    {'name': 'Amethyst Royal', 'color': const Color(0xFF8E2DE2)},
+    {'name': 'Crimson Warrior', 'color': const Color(0xFFE53935)},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Color activeColor = _themeColors[_colorIndex]['color'];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Rakit Maskot Avatar', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Text(
+                'Halo ${widget.username}!',
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Pilih kostum maskot & warna elemen tema aplikasi kamu',
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+
+              // VISUALISASI MASKOT FULL BODY (ALA YAHOO AVATAR)
+              Container(
+                width: 180,
+                height: 220,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: activeColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: activeColor, width: 3),
+                  boxShadow: [
+                    BoxShadow(color: activeColor.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6)),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Kepala Maskot
+                    Icon(_heads[_headIndex], size: 70, color: activeColor),
+                    const SizedBox(height: 2),
+                    // Badan / Baju Maskot (Yahoo Style)
+                    Icon(_outfits[_outfitIndex], size: 75, color: activeColor.withOpacity(0.85)),
+                    const SizedBox(height: 4),
+                    // Kaki Maskot
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(width: 14, height: 18, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(width: 10),
+                        Container(width: 14, height: 18, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // PILIHAN MODEL KEPALA
+              _buildSelectorTitle('1. Aksesori Kepala / Rambut:'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(_heads.length, (i) {
+                  return ChoiceChip(
+                    label: Icon(_heads[i], size: 20, color: _headIndex == i ? Colors.white : Colors.black87),
+                    selected: _headIndex == i,
+                    selectedColor: activeColor,
+                    onSelected: (val) => setState(() => _headIndex = i),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+
+              // PILIHAN KOSTUM BADAN
+              _buildSelectorTitle('2. Kostum Pakaian Maskot:'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(_outfits.length, (i) {
+                  return ChoiceChip(
+                    label: Icon(_outfits[i], size: 20, color: _outfitIndex == i ? Colors.white : Colors.black87),
+                    selected: _outfitIndex == i,
+                    selectedColor: activeColor,
+                    onSelected: (val) => setState(() => _outfitIndex = i),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+
+              // PILIHAN WARNA & TEMA APLIKASI
+              _buildSelectorTitle('3. Warna Aura (Tema Aplikasi):'),
+              Wrap(
+                spacing: 10,
+                children: List.generate(_themeColors.length, (i) {
+                  Color itemColor = _themeColors[i]['color'];
+                  return ChoiceChip(
+                    avatar: CircleAvatar(backgroundColor: itemColor, radius: 8),
+                    label: Text(_themeColors[i]['name'], style: TextStyle(color: _colorIndex == i ? Colors.white : Colors.black87)),
+                    selected: _colorIndex == i,
+                    selectedColor: itemColor,
+                    onSelected: (val) {
+                      setState(() => _colorIndex = i);
+                      // MENGUBAH TEMA GLOBAL APLIKASI
+                      NetBattleApp.of(context).updateThemeColor(itemColor);
+                    },
+                  );
+                }),
+              ),
+              const SizedBox(height: 28),
+
+              // TOMBOL SIMPAN & KE DASHBOARD
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: activeColor,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(
+                          studentName: widget.username,
+                          headIcon: _heads[_headIndex],
+                          outfitIcon: _outfits[_outfitIndex],
+                          themeColor: activeColor,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('SIMPAN & MASUK DASHBOARD 🚀', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectorTitle(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 4. HOME SCREEN (DASHBOARD DENGAN TEMA DINAMIS & MASKOT HASIL RAKITAN)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   final String studentName;
-  final IconData avatarFace;
-  final Color avatarColor;
+  final IconData headIcon;
+  final IconData outfitIcon;
+  final Color themeColor;
 
   const HomeScreen({
     super.key,
-    this.studentName = 'Satria (Hero)',
-    this.avatarFace = Icons.face,
-    this.avatarColor = const Color(0xFF6C63FF),
+    required this.studentName,
+    this.headIcon = Icons.face,
+    this.outfitIcon = Icons.checkroom_rounded,
+    this.themeColor = const Color(0xFF6C63FF),
   });
 
   @override
@@ -321,51 +478,48 @@ class HomeScreen extends StatelessWidget {
           children: const [
             Icon(Icons.bolt, color: Colors.amber, size: 28),
             SizedBox(width: 8),
-            Text(
-              'NetBattle Quest',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-            ),
+            Text('NetBattle Quest', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
           ],
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profil Siswa
+            // PROFIL MASKOT HASIL KUSTOMISASI DENGAN TEMA DINAMIS
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [avatarColor, avatarColor.withOpacity(0.7)],
+                  colors: [themeColor, themeColor.withOpacity(0.75)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
                 boxShadow: [
-                  BoxShadow(
-                    color: avatarColor.withOpacity(0.4),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
+                  BoxShadow(color: themeColor.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 5)),
                 ],
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.white24,
-                    child: Icon(avatarFace, size: 40, color: Colors.white),
+                  // Mini Preview Maskot Utuh
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(headIcon, size: 28, color: Colors.white),
+                        Icon(outfitIcon, size: 28, color: Colors.white),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -374,17 +528,10 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Text(
                           studentName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          'Level 5 • 1,250 XP',
-                          style: TextStyle(fontSize: 13, color: Colors.white70),
-                        ),
+                        const Text('Level 5 • 1,250 XP', style: TextStyle(fontSize: 13, color: Colors.white70)),
                         const SizedBox(height: 8),
                         const LinearProgressIndicator(
                           value: 0.7,
@@ -399,7 +546,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Streak Belajar
+            // STREAK BELAJAR
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -415,15 +562,9 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text(
-                          'Streak Belajar: 3 Hari Beruntun!',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-                        ),
+                        Text('Streak Belajar: 3 Hari Beruntun!', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                         SizedBox(height: 2),
-                        Text(
-                          'Ayo selesaikan 1 misi lagi hari ini untuk bonus XP!',
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
-                        ),
+                        Text('Ayo selesaikan 1 misi lagi hari ini untuk bonus XP!', style: TextStyle(fontSize: 12, color: Colors.black54)),
                       ],
                     ),
                   ),
@@ -432,14 +573,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              'Pilih Misi Belajarmu',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3142),
-              ),
-            ),
+            const Text('Pilih Misi Belajarmu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 14),
 
             // 1. QUEST PETUALANGAN MATERI
@@ -450,12 +584,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.map_rounded,
               color: Colors.green,
               xp: '+150 XP',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const QuestScreen()),
-                );
-              },
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuestScreen())),
             ),
             const SizedBox(height: 12),
 
@@ -467,12 +596,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.sports_kabaddi_rounded,
               color: Colors.orange,
               xp: '+200 XP',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CustomRoomScreen()),
-                );
-              },
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomRoomScreen())),
             ),
             const SizedBox(height: 12),
 
@@ -482,14 +606,9 @@ class HomeScreen extends StatelessWidget {
               title: 'Battle Kuis Kilat (Solo)',
               subtitle: 'Jawab soal cepat berebut skor individu',
               icon: Icons.flash_on_rounded,
-              color: Colors.purple,
+              color: themeColor,
               xp: '+100 XP',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const QuizBattleScreen()),
-                );
-              },
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuizBattleScreen())),
             ),
           ],
         ),
@@ -511,11 +630,7 @@ class HomeScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 3)),
         ],
       ),
       child: Material(
@@ -543,14 +658,7 @@ class HomeScreen extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3142),
-                              ),
-                            ),
+                            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -560,20 +668,13 @@ class HomeScreen extends StatelessWidget {
                             ),
                             child: Text(
                               xp,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.amber.shade900,
-                              ),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        subtitle,
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                      ),
+                      Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                     ],
                   ),
                 ),
@@ -587,7 +688,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 4. QUEST SCREEN
+// 5. QUEST SCREEN
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatelessWidget {
   const QuestScreen({super.key});
@@ -595,42 +696,15 @@ class QuestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> stages = [
-      {
-        'title': 'Babak 1: Dasar-Dasar Jaringan',
-        'desc': 'Pahami IP Address, Mac Address & Topologi',
-        'status': 'completed',
-        'stars': 3,
-        'xp': '150 XP',
-      },
-      {
-        'title': 'Babak 2: Pengenalan Protokol HTTP & HTTPS',
-        'desc': 'Bagaimana cara web bekerja di balik layar',
-        'status': 'active',
-        'stars': 0,
-        'xp': '200 XP',
-      },
-      {
-        'title': 'Babak 3: Keamanan Cyber & Firewall',
-        'desc': 'Lindungi data dari serangan hacker',
-        'status': 'locked',
-        'stars': 0,
-        'xp': '250 XP',
-      },
-      {
-        'title': 'Babak 4: Routing & Switching Lanjutan',
-        'desc': 'Membaca peta jalan data lalu lintas internet',
-        'status': 'locked',
-        'stars': 0,
-        'xp': '300 XP',
-      },
+      {'title': 'Babak 1: Dasar-Dasar Jaringan', 'desc': 'Pahami IP Address, Mac Address & Topologi', 'status': 'completed', 'xp': '150 XP'},
+      {'title': 'Babak 2: Pengenalan Protokol HTTP & HTTPS', 'desc': 'Bagaimana cara web bekerja di balik layar', 'status': 'active', 'xp': '200 XP'},
+      {'title': 'Babak 3: Keamanan Cyber & Firewall', 'desc': 'Lindungi data dari serangan hacker', 'status': 'locked', 'xp': '250 XP'},
+      {'title': 'Babak 4: Routing & Switching Lanjutan', 'desc': 'Membaca peta jalan data lalu lintas internet', 'status': 'locked', 'xp': '300 XP'},
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Peta Petualangan Materi',
-          style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Peta Petualangan Materi', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -642,8 +716,8 @@ class QuestScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00B09B), Color(0xFF96C93D)],
+                gradient: LinearGradient(
+                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -656,20 +730,10 @@ class QuestScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Dunia Jaringan Komputer',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Selesaikan setiap babak materi untuk membuka area baru!',
-                          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.9)),
-                        ),
+                      children: const [
+                        Text('Dunia Jaringan Komputer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        SizedBox(height: 4),
+                        Text('Selesaikan setiap babak materi untuk membuka area baru!', style: TextStyle(fontSize: 12, color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -677,14 +741,7 @@ class QuestScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Daftar Babak (Stage)',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3142),
-              ),
-            ),
+            const Text('Daftar Babak (Stage)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
@@ -694,98 +751,25 @@ class QuestScreen extends StatelessWidget {
                 final stage = stages[index];
                 final status = stage['status'];
 
-                Color cardColor = Colors.white;
-                Color badgeColor = Colors.grey;
-                IconData statusIcon = Icons.lock_outline_rounded;
-
-                if (status == 'completed') {
-                  badgeColor = Colors.green;
-                  statusIcon = Icons.check_circle_rounded;
-                } else if (status == 'active') {
-                  badgeColor = Colors.orange;
-                  statusIcon = Icons.play_circle_fill_rounded;
-                }
+                Color badgeColor = status == 'completed' ? Colors.green : (status == 'active' ? Colors.orange : Colors.grey);
+                IconData statusIcon = status == 'completed' ? Icons.check_circle_rounded : (status == 'active' ? Icons.play_circle_fill_rounded : Icons.lock_outline_rounded);
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: cardColor,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: status == 'active' ? Colors.orange : Colors.grey.shade200,
-                      width: status == 'active' ? 2 : 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      )
-                    ],
+                    border: Border.all(color: status == 'active' ? Colors.orange : Colors.grey.shade200, width: status == 'active' ? 2 : 1),
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      radius: 26,
-                      backgroundColor: badgeColor.withOpacity(0.15),
-                      child: Icon(statusIcon, color: badgeColor, size: 28),
-                    ),
-                    title: Text(
-                      stage['title'],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: status == 'locked' ? Colors.grey : const Color(0xFF2D3142),
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          stage['desc'],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: status == 'locked' ? Colors.grey.shade400 : Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.amber.shade100,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                stage['xp'],
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.amber.shade900,
-                                ),
-                              ),
-                            ),
-                            if (status == 'completed') ...[
-                              const SizedBox(width: 8),
-                              const Icon(Icons.star, color: Colors.amber, size: 16),
-                              const Icon(Icons.star, color: Colors.amber, size: 16),
-                              const Icon(Icons.star, color: Colors.amber, size: 16),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                    trailing: status == 'locked'
-                        ? const Icon(Icons.lock, color: Colors.grey)
-                        : const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+                    leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withOpacity(0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
+                    title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: status == 'locked' ? Colors.grey : const Color(0xFF2D3142))),
+                    subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: status == 'locked' ? Colors.grey.shade400 : Colors.grey.shade600)),
+                    trailing: status == 'locked' ? const Icon(Icons.lock, color: Colors.grey) : const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
                     onTap: () {
                       if (status == 'locked') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('🔒 Babak ini masih terkunci! Selesaikan babak sebelumnya dulu.'),
-                          ),
-                        );
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔒 Babak ini masih terkunci! Selesaikan babak sebelumnya dulu.')));
                       } else {
                         _showMaterialDialog(context, stage['title']);
                       }
@@ -805,55 +789,17 @@ class QuestScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.lightbulb, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Materi Ringkas & Interaktif',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'HTTP (Hypertext Transfer Protocol) adalah protokol tempat data dikirimkan antara browser dan website. Sedangkan HTTPS menggunakan enkripsi SSL/TLS agar data tidak bisa diintip hacker!',
-              style: TextStyle(fontSize: 13, height: 1.4),
-            ),
-          ],
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        content: const Text(
+          'HTTP (Hypertext Transfer Protocol) adalah protokol tempat data dikirimkan antara browser dan website. Sedangkan HTTPS menggunakan enkripsi SSL/TLS agar data aman!',
+          style: TextStyle(fontSize: 13, height: 1.4),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('BACA NANTI'),
-          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6C63FF),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('🎉 Selamat! Materi selesai dibaca, +200 XP!')),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🎉 Selamat! Materi selesai dibaca, +200 XP!')));
             },
             child: const Text('SELESAIKAN QUEST', style: TextStyle(color: Colors.white)),
           ),
@@ -864,7 +810,7 @@ class QuestScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUIZ BATTLE SCREEN (Solo)
+// 6. QUIZ BATTLE SCREEN (SOLO)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -879,21 +825,9 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
   int? _selectedOption;
 
   final List<Map<String, dynamic>> _questions = [
-    {
-      'question': 'Protokol apa yang digunakan untuk mengirim pesan web secara aman?',
-      'options': ['HTTP', 'HTTPS', 'FTP', 'SSH'],
-      'answer': 1,
-    },
-    {
-      'question': 'Perangkat keras mana yang berfungsi menghubungkan dua jaringan berbeda?',
-      'options': ['Switch', 'Hub', 'Router', 'Kabel LAN'],
-      'answer': 2,
-    },
-    {
-      'question': 'Di bawah ini mana yang merupakan bahasa pemrograman Flutter?',
-      'options': ['Java', 'Python', 'Dart', 'PHP'],
-      'answer': 2,
-    },
+    {'question': 'Protokol apa yang digunakan untuk mengirim pesan web secara aman?', 'options': ['HTTP', 'HTTPS', 'FTP', 'SSH'], 'answer': 1},
+    {'question': 'Perangkat keras mana yang berfungsi menghubungkan dua jaringan berbeda?', 'options': ['Switch', 'Hub', 'Router', 'Kabel LAN'], 'answer': 2},
+    {'question': 'Di bawah ini mana yang merupakan bahasa pemrograman Flutter?', 'options': ['Java', 'Python', 'Dart', 'PHP'], 'answer': 2},
   ];
 
   void _answerQuestion(int optionIndex) {
@@ -922,21 +856,13 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          '🎉 PERTANDINGAN SELESAI!',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6C63FF)),
-        ),
+        title: const Text('🎉 PERTANDINGAN SELESAI!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.emoji_events, size: 70, color: Colors.amber),
             const SizedBox(height: 12),
-            Text(
-              'Total Skor Kamu:\n$_score XP',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
+            Text('Total Skor Kamu:\n$_score XP', textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -958,68 +884,39 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Soal ${_currentQuestionIndex + 1} / ${_questions.length}',
-          style: const TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold),
-        ),
+        title: Text('Soal ${_currentQuestionIndex + 1} / ${_questions.length}', style: const TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            LinearProgressIndicator(
-              value: (_currentQuestionIndex + 1) / _questions.length,
-              color: const Color(0xFF6C63FF),
-              backgroundColor: Colors.grey.shade200,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(10),
-            ),
+            LinearProgressIndicator(value: (_currentQuestionIndex + 1) / _questions.length, color: Theme.of(context).primaryColor),
             const SizedBox(height: 24),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Text(
-                currentQ['question'],
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-              ),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200)),
+              child: Text(currentQ['question'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             ),
             const SizedBox(height: 24),
             Expanded(
               child: ListView.builder(
                 itemCount: (currentQ['options'] as List).length,
                 itemBuilder: (context, index) {
-                  final optionText = currentQ['options'][index];
                   final isSelected = _selectedOption == index;
                   final isCorrect = index == currentQ['answer'];
-
-                  Color btnColor = Colors.white;
-                  Color borderColor = Colors.grey.shade200;
-
-                  if (isSelected) {
-                    btnColor = isCorrect ? Colors.green.shade50 : Colors.red.shade50;
-                    borderColor = isCorrect ? Colors.green : Colors.red;
-                  }
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: btnColor,
+                      color: isSelected ? (isCorrect ? Colors.green.shade50 : Colors.red.shade50) : Colors.white,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: borderColor, width: 1.5),
+                      border: Border.all(color: isSelected ? (isCorrect ? Colors.green : Colors.red) : Colors.grey.shade200, width: 1.5),
                     ),
                     child: ListTile(
-                      title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      trailing: isSelected
-                          ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red)
-                          : null,
+                      title: Text(currentQ['options'][index], style: const TextStyle(fontWeight: FontWeight.w600)),
                       onTap: _selectedOption == null ? () => _answerQuestion(index) : null,
                     ),
                   );
@@ -1034,7 +931,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. CUSTOM ROOM SCREEN
+// 7. CUSTOM ROOM SCREEN
 // ---------------------------------------------------------------------------
 class CustomRoomScreen extends StatefulWidget {
   const CustomRoomScreen({super.key});
@@ -1050,10 +947,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Battle Tarik Tambang (Room)',
-          style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Battle Tarik Tambang (Room)', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -1064,8 +958,8 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                gradient: LinearGradient(
+                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -1079,15 +973,9 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text(
-                          'Adu Tanding 1v1',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
+                        Text('Adu Tanding 1v1', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(height: 4),
-                        Text(
-                          'Buat room dan undang temanmu atau masukkan kode untuk bertanding!',
-                          style: TextStyle(fontSize: 12, color: Colors.white70),
-                        ),
+                        Text('Buat room dan undang temanmu atau masukkan kode!', style: TextStyle(fontSize: 12, color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -1096,31 +984,20 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 28),
 
-            // Opsi 1: Buat Room
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.purple.shade100),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 3))],
-              ),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Buat Ruang Pertandingan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text('Dapatkan kode unik dan bagikan ke teman sebelahmu.', style: TextStyle(fontSize: 12, color: Colors.black54)),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8E2DE2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       onPressed: () => _showCreatedRoomDialog(context),
                       child: const Text('BUAT ROOM TARIK TAMBANG', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
@@ -1130,16 +1007,10 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Opsi 2: Gabung Kode Room
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.grey.shade200),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 3))],
-              ),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1150,9 +1021,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
                       hintText: 'Contoh: NET889',
-                      labelText: 'Masukkan Kode Room Teman',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -1160,25 +1029,13 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                     width: double.infinity,
                     height: 48,
                     child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF8E2DE2), width: 1.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
+                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       onPressed: () {
-                        if (_codeController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('⚠️ Masukkan kode room terlebih dahulu!')),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TugOfWarQuizScreen(roomCode: _codeController.text.toUpperCase()),
-                            ),
-                          );
+                        if (_codeController.text.trim().isNotEmpty) {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TugOfWarQuizScreen(roomCode: _codeController.text.toUpperCase())));
                         }
                       },
-                      child: const Text('GABUNG DAN TARIK TAMBANG!', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8E2DE2))),
+                      child: const Text('GABUNG DAN TARIK TAMBANG!'),
                     ),
                   ),
                 ],
@@ -1195,34 +1052,25 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('🎮 ROOM BERHASIL DIBUAT!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8E2DE2))),
+        title: const Text('🎮 ROOM DIBUAT!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Bagikan kode ini ke temanmu untuk tanding:', style: TextStyle(fontSize: 12, color: Colors.black54)),
-            const SizedBox(height: 16),
+            const Text('Bagikan kode ini ke temanmu:', style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.purple.shade200),
-              ),
-              child: const Text('NET889', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4, color: Color(0xFF8E2DE2))),
+              decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(12)),
+              child: const Text('NET889', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.purple)),
             ),
           ],
         ),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8E2DE2)),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TugOfWarQuizScreen(roomCode: 'NET889'),
-                ),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TugOfWarQuizScreen(roomCode: 'NET889')));
             },
             child: const Text('MASUK ARENA', style: TextStyle(color: Colors.white)),
           ),
@@ -1233,12 +1081,11 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. TUG OF WAR QUIZ SCREEN (Tarik Tambang - Tunggal & Disesuaikan)
+// 8. TUG OF WAR QUIZ SCREEN (TARIK TAMBANG)
 // ---------------------------------------------------------------------------
 class TugOfWarQuizScreen extends StatefulWidget {
   final String roomCode;
-
-  const TugOfWarQuizScreen({super.key, required this.roomCode}); // <-- Perbaiki baris ini
+  const TugOfWarQuizScreen({super.key, required this.roomCode});
 
   @override
   State<TugOfWarQuizScreen> createState() => _TugOfWarQuizScreenState();
@@ -1250,21 +1097,9 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
   int? _selectedOption;
 
   final List<Map<String, dynamic>> _questions = [
-    {
-      'question': 'Protokol apa yang digunakan untuk mengirim pesan web secara aman?',
-      'options': ['HTTP', 'HTTPS', 'FTP', 'SSH'],
-      'answer': 1,
-    },
-    {
-      'question': 'Perangkat keras mana yang berfungsi menghubungkan dua jaringan berbeda?',
-      'options': ['Switch', 'Hub', 'Router', 'Kabel LAN'],
-      'answer': 2,
-    },
-    {
-      'question': 'Di bawah ini mana yang merupakan bahasa pemrograman Flutter?',
-      'options': ['Java', 'Python', 'Dart', 'PHP'],
-      'answer': 2,
-    },
+    {'question': 'Protokol apa yang digunakan untuk mengirim pesan web secara aman?', 'options': ['HTTP', 'HTTPS', 'FTP', 'SSH'], 'answer': 1},
+    {'question': 'Perangkat keras mana yang berfungsi menghubungkan dua jaringan berbeda?', 'options': ['Switch', 'Hub', 'Router', 'Kabel LAN'], 'answer': 2},
+    {'question': 'Di bawah ini mana yang merupakan bahasa pemrograman Flutter?', 'options': ['Java', 'Python', 'Dart', 'PHP'], 'answer': 2},
   ];
 
   void _answerQuestion(int optionIndex) {
@@ -1297,26 +1132,10 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          isWinner ? '🎉 KAMU MENANG TARIK TAMBANG!' : '💥 TEMANMU YANG MENANG!',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: isWinner ? Colors.green : Colors.red),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(isWinner ? Icons.emoji_events : Icons.sports_kabaddi, size: 70, color: isWinner ? Colors.amber : Colors.red),
-            const SizedBox(height: 12),
-            Text(
-              isWinner ? 'Hebat! Tarikanmu berhasil mengalahkan lawan di Room ${widget.roomCode}.' : 'Sayang sekali, lawan lebih cepat menarik tali di Room ${widget.roomCode}.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-          ],
-        ),
+        title: Text(isWinner ? '🎉 KAMU MENANG!' : '💥 TEMANMU MENANG!', textAlign: TextAlign.center, style: TextStyle(color: isWinner ? Colors.green : Colors.red, fontWeight: FontWeight.bold)),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF)),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
@@ -1349,20 +1168,8 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Row(
-                      children: [
-                        CircleAvatar(backgroundColor: Colors.blue, radius: 14, child: Icon(Icons.face, size: 16, color: Colors.white)),
-                        SizedBox(width: 4),
-                        Text('Kamu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text('Teman (Lawan)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                        SizedBox(width: 4),
-                        CircleAvatar(backgroundColor: Colors.red, radius: 14, child: Icon(Icons.person, size: 16, color: Colors.white)),
-                      ],
-                    ),
+                    Text('Kamu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                    Text('Teman (Lawan)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -1383,11 +1190,6 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Status Tali: ${((1 - _ropePosition) * 100).toInt()}% Ketarikan Kamu',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54),
-                ),
               ],
             ),
           ),
@@ -1402,11 +1204,7 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
                     child: Text(currentQ['question'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                   ),
                   const SizedBox(height: 16),
@@ -1414,30 +1212,18 @@ class _TugOfWarQuizScreenState extends State<TugOfWarQuizScreen> {
                     child: ListView.builder(
                       itemCount: (currentQ['options'] as List).length,
                       itemBuilder: (context, index) {
-                        final optionText = currentQ['options'][index];
                         final isSelected = _selectedOption == index;
                         final isCorrect = index == currentQ['answer'];
-
-                        Color btnColor = Colors.white;
-                        Color borderColor = Colors.grey.shade200;
-
-                        if (isSelected) {
-                          btnColor = isCorrect ? Colors.green.shade50 : Colors.red.shade50;
-                          borderColor = isCorrect ? Colors.green : Colors.red;
-                        }
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           decoration: BoxDecoration(
-                            color: btnColor,
+                            color: isSelected ? (isCorrect ? Colors.green.shade50 : Colors.red.shade50) : Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borderColor, width: 1.5),
+                            border: Border.all(color: isSelected ? (isCorrect ? Colors.green : Colors.red) : Colors.grey.shade200, width: 1.5),
                           ),
                           child: ListTile(
-                            title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            trailing: isSelected
-                                ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red)
-                                : null,
+                            title: Text(currentQ['options'][index], style: const TextStyle(fontWeight: FontWeight.w600)),
                             onTap: _selectedOption == null ? () => _answerQuestion(index) : null,
                           ),
                         );

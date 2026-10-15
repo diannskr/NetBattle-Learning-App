@@ -417,7 +417,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (WARNA-WARNI KANAN DENGAN XP AWAL 0)
+// 4. HOME SCREEN (XP & LEVEL KOSONG AWAL = 0)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final String studentName;
@@ -433,7 +433,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _userXP = 0; // Dimulai dari 0 kosong sesuai instruksi
+  int _userXP = 0; // Dimulai dari 0
   int _unlockedStageIndex = 0;
 
   int get level => (_userXP / 300).floor() + 1;
@@ -610,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (DIBUAT DALAM 1 BOX DOKUMEN TUNGGAL BERSIH TANPA STIKER EMOJI)
+// 5. QUEST SCREEN (1 BOX DOKUMEN BERSIH TANPA STIKER)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -842,7 +842,6 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  // DIALOG MATERI DENGAN 1 WADAH/BOX TUNGGAL TANPA STIKER EMOJI
   void _showSingleBoxMaterialDialog(BuildContext context, int index, String title, List<Map<String, dynamic>> sections, int xp) {
     showDialog(
       context: context,
@@ -934,7 +933,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (DILENGKAPI SKOR AKHIR DAN SKOR DIALOG)
+// 6. QUIZ BATTLE SCREEN
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -1021,7 +1020,6 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
     });
   }
 
-  // TAMPILAN DIALOG SKOR AKHIR KUIS SOLO
   void _showFinalScoreDialog() {
     int finalScore = (_correctCount / _questions.length * 100).toInt();
     int xpGained = finalScore * 2;
@@ -1366,7 +1364,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. TUG OF WAR MULTIPLAYER ENGINE
+// 8. TUG OF WAR MULTIPLAYER ENGINE (SEIMBANG: BUTUH MINIMAL 5 POINT UNTUK MENANG)
 // ---------------------------------------------------------------------------
 class TugOfWarMultiplayerScreen extends StatefulWidget {
   final String roomCode;
@@ -1387,7 +1385,7 @@ class TugOfWarMultiplayerScreen extends StatefulWidget {
 }
 
 class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
-  double _ropePosition = 0.5;
+  double _ropePosition = 0.5; // Posisi awal persis di tengah
   int _currentIndex = 0;
   int? _selectedOption;
 
@@ -1492,7 +1490,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
     _timer?.cancel();
     setState(() {
       _selectedOption = -1;
-      _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
+      _ropePosition = (_ropePosition + 0.1).clamp(0.0, 1.0);
     });
 
     _nextQuestionOrFinish();
@@ -1500,17 +1498,17 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 
   void _answer(int optionIndex) {
     _timer?.cancel();
-    int timeSpent = 10 - _questionTimer;
 
     setState(() {
       _selectedOption = optionIndex;
       bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
 
+      // RUMUS TARIKAN SEIMBANG:
+      // Dari tengah (0.5), dibutuhkan minimal 5 poin (0.1 x 5 = 0.5) untuk mencapai batas 0.0 (Menang).
       if (isCorrect) {
-        double pullForce = timeSpent <= 3 ? 0.25 : 0.15;
-        _ropePosition = (_ropePosition - pullForce).clamp(0.0, 1.0);
+        _ropePosition = (_ropePosition - 0.1).clamp(0.0, 1.0);
       } else {
-        _ropePosition = (_ropePosition + 0.15).clamp(0.0, 1.0);
+        _ropePosition = (_ropePosition + 0.1).clamp(0.0, 1.0);
       }
     });
 
@@ -1518,7 +1516,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   }
 
   void _nextQuestionOrFinish() {
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (!mounted) return;
 
       if (_ropePosition <= 0.0 || _ropePosition >= 1.0) {

@@ -417,7 +417,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (XP & LEVEL KOSONG AWAL = 0)
+// 4. HOME SCREEN (XP AWAL KOSONG = 0)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final String studentName;
@@ -508,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildGameCard(
               context,
               title: 'Quest: Modul Materi (8 Babak)',
-              subtitle: 'Pelajari konsep mendalam & buka babak selanjutnya otomatis',
+              subtitle: 'Pelajari konsep mendalam & jawab checkpoint untuk membuka babak',
               icon: Icons.menu_book_rounded,
               color: Colors.green,
               xp: '+150 XP/Babak',
@@ -610,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (1 BOX DOKUMEN BERSIH TANPA STIKER)
+// 5. QUEST SCREEN (DILENGKAPI CHECKPOINT & KODING RUMPANG AGAR SISWA MEMBACA)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -646,12 +646,13 @@ class _QuestScreenState extends State<QuestScreen> {
           'header': '3. Contoh Kode Koding Nyata (Dart/Java/C++)',
           'isCode': true,
           'body': 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
-        },
-        {
-          'header': '4. Kesalahan Umum (Common Errors)',
-          'body': '1. Mengisi nilai teks tanpa tanda petik: String nama = Satria; (Harus "Satria")\n2. Lupa tanda titik koma (;) di akhir baris kode.'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nAturan penamaan variabel manakah yang BENAR berdasarkan materi di atas?',
+        'options': ['1namaSiswa', 'nama lengkap', 'skorPemain', 'nama-siswa'],
+        'correctIndex': 2 // skorPemain (camelCase)
+      },
       'xp': 150
     },
     {
@@ -660,22 +661,19 @@ class _QuestScreenState extends State<QuestScreen> {
       'sections': [
         {
           'header': '1. Pengenalan Tipe Data Statis',
-          'body': 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif (contoh: 10, -5, 100).\n- double / float: Angka desimal bertitik (contoh: 3.14, 85.5).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool (Boolean): Nilai logika yang hanya bernilai true atau false.'
+          'body': 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif.\n- double: Angka desimal bertitik (contoh: 3.14).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool: Nilai logika true atau false.'
         },
         {
-          'header': '2. Operator Aritmatika Dasar',
-          'body': 'Operasi Matematika dalam koding:\n- Penjumlahan (+)\n- Pengurangan (-)\n- Perkalian (*)\n- Pembagian (/)\n- Modulo / Sisa Bagi (%) : Menghitung sisa hasil pembagian.'
-        },
-        {
-          'header': '3. Studi Kasus Perhitungan Toko',
+          'header': '2. Studi Kasus Perhitungan Toko',
           'isCode': true,
-          'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\n\ndouble pajak = totalHarga * 0.1; // Pajak 10%\ndouble totalBayar = totalHarga + pajak;\n\nprint("Total Akhir: Rp " + totalBayar.toString());'
-        },
-        {
-          'header': '4. Rangkuman Logika Modulo (%)',
-          'body': 'Operator modulo % sangat berguna untuk mengecek apakah suatu angka genap atau ganjil.\nContoh: 10 % 2 == 0 (Genap), sedangkan 7 % 2 == 1 (Ganjil).'
+          'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\nprint("Total: " + totalHarga.toString());'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nTipe data apakah yang paling tepat untuk menyimpan angka desimal 3.14?',
+        'options': ['int', 'double', 'String', 'bool'],
+        'correctIndex': 1 // double
+      },
       'xp': 150
     },
     {
@@ -684,22 +682,19 @@ class _QuestScreenState extends State<QuestScreen> {
       'sections': [
         {
           'header': '1. Mengapa Perlu Percabangan?',
-          'body': 'Program yang cerdas harus bisa mengambil keputusan berbeda berdasarkan kondisi nyata. Contoh: Jika password benar maka izinkan masuk, jika salah maka tampilkan error.'
+          'body': 'Program cerdas mengambil keputusan berbeda menggunakan kondisi IF. Operator perbandingan meliputi ==, !=, >, <, >=, dan <=.'
         },
         {
-          'header': '2. Operator Perbandingan (Relational Operators)',
-          'body': 'Kondisi IF dibentuk menggunakan operator relasional:\n- == (Sama dengan)\n- != (Tidak sama dengan)\n- > (Lebih besar)\n- < (Lebih kecil)\n- >= (Lebih besar atau sama dengan)\n- <= (Lebih kecil atau sama dengan)'
-        },
-        {
-          'header': '3. Kode Sistem Kelulusan Ujian',
+          'header': '2. Kode Sistem Kelulusan Ujian',
           'isCode': true,
-          'body': 'int nilaiSiswa = 78;\nint batasLulus = 75;\n\nif (nilaiSiswa >= batasLulus) {\n  print("Selamat, Anda dinyatakan LULUS!");\n} else {\n  print("Mohon maaf, Anda harus mengikuti REMIDI.");\n}'
-        },
-        {
-          'header': '4. Kesalahan Paling Sering Terjadi',
-          'body': 'Tertukar antara = dan ==!\nSatu sama dengan (=) digunakan untuk MENGISI NILAI ke variabel.\nDua sama dengan (==) digunakan untuk MEMBANDINGKAN dua nilai.'
+          'body': 'int nilaiSiswa = 78;\nif (nilaiSiswa >= 75) {\n  print("LULUS");\n} else {\n  print("REMIDI");\n}'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nSimbol apa yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
+        'options': ['=', '==', '!=', '=>'],
+        'correctIndex': 1 // ==
+      },
       'xp': 200
     },
     {
@@ -707,99 +702,79 @@ class _QuestScreenState extends State<QuestScreen> {
       'desc': 'Modul Lengkap: Logika DAN (&&), ATAU (||), serta pengkondisian bersarang.',
       'sections': [
         {
-          'header': '1. Menangani Lebih dari 2 Pilihan Kondisi',
-          'body': 'Ketika pilihan hasil logika bertingkat (misal menentukan Nilai Huruf A, B, C, D, E), gunakan struktur Else If.'
-        },
-        {
-          'header': '2. Operator Logika Kombinasi (&& dan ||)',
-          'body': '- AND (&&): Kedua syarat HARUS bernilai TRUE agar kondisi terpenuhi.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE agar kondisi terpenuhi.\n- NOT (!): Membalikkan nilai logika (true menjadi false).'
-        },
-        {
-          'header': '3. Contoh Penilaian Grade Akademik',
-          'isCode': true,
-          'body': 'int nilai = 88;\n\nif (nilai >= 85) {\n  print("Grade A - Sangat Memuaskan");\n} else if (nilai >= 75) {\n  print("Grade B - Baik");\n} else if (nilai >= 60) {\n  print("Grade C - Cukup");\n} else {\n  print("Grade D - Perlu Bimbingan");\n}'
+          'header': '1. Operator Logika Kombinasi',
+          'body': '- AND (&&): Kedua syarat HARUS bernilai TRUE.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE.'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nOperator logika manakah yang mengharuskan KEDUA syarat bernilai TRUE?',
+        'options': ['||', '&&', '!', '=='],
+        'correctIndex': 1 // &&
+      },
       'xp': 200
     },
     {
       'title': 'Babak 5: Perulangan Terhitung (For Loop)',
-      'desc': 'Modul Lengkap: Otomasisasi tugas berulang dengan counter increment/decrement.',
+      'desc': 'Modul Lengkap: Otomatisasi tugas berulang dengan counter increment.',
       'sections': [
         {
-          'header': '1. Efisiensi Eksekusi Berulang',
-          'body': 'Bayangkan kamu diminta mencetak tulisan "Saya Tidak Akan Terlambat" sebanyak 100 kali. Tanpa loop, kamu harus menulis 100 baris print. Dengan For Loop, cukup 3 baris kode!'
-        },
-        {
-          'header': '2. Structure For Loop',
-          'body': 'for (inisialisasi; kondisi_batas; iterasi) {\n  // kode yang diulang\n}\n\n1. Inisialisasi: int i = 1 (Nilai awal hitungan).\n2. Kondisi: i <= 5 (Selama i kurang dari sama dengan 5, terus ulang).\n3. Iterasi: i++ (Tambahkan i sebesar 1 setiap kali 1 putaran selesai).'
-        },
-        {
-          'header': '3. Contoh Kode Cetak Perkalian 5',
-          'isCode': true,
-          'body': 'for (int i = 1; i <= 10; i++) {\n  int hasil = 5 * i;\n  print("5 x " + i.toString() + " = " + hasil.toString());\n}'
+          'header': '1. Struktur For Loop',
+          'body': 'for (inisialisasi; kondisi_batas; iterasi) { ... }\nContoh: int i = 1; i <= 5; i++'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nBagian manakah pada For Loop yang berfungsi menambahkan nilai hitungan setiap putaran?',
+        'options': ['Inisialisasi', 'Kondisi batas', 'Iterasi (i++)', 'Blok cetak'],
+        'correctIndex': 2 // Iterasi (i++)
+      },
       'xp': 250
     },
     {
-      'title': 'Babak 6: Perulangan Kondisional (While & Do-While)',
-      'desc': 'Modul Lengkap: Loop tak terhitung berbasis kondisi dinamis dan Infinite Loop Hazard.',
+      'title': 'Babak 6: Perulangan Kondisional (While Loop)',
+      'desc': 'Modul Lengkap: Loop berbasis kondisi dinamis dan Infinite Loop Hazard.',
       'sections': [
         {
-          'header': '1. Kapan Menggunakan While Loop?',
-          'body': 'While Loop digunakan ketika jumlah perulangan TIDAK DIKETAHUI secara pasti di awal, melainkan bergantung pada peristiwa saat program berjalan (contoh: mengulang input hingga user mengetik "stop").'
-        },
-        {
-          'header': '2. Bahaya Infinite Loop (Perulangan Abadi)',
-          'body': 'Jika kondisi dalam While selalu bernilai TRUE dan tidak ada pembaruan nilai variabel, aplikasi akan crash/hang karena kehabisan memori!'
-        },
-        {
-          'header': '3. Contoh Game Nyawa Karakter',
-          'isCode': true,
-          'body': 'int nyawaPemain = 3;\n\nwhile (nyawaPemain > 0) {\n  print("Pemain bertarung... Nyawa tersisa: " + nyawaPemain.toString());\n  nyawaPemain--; // Mengurangi nyawa\n}\nprint("GAME OVER!");'
+          'header': '1. Bahaya Infinite Loop',
+          'body': 'Jika kondisi dalam While selalu bernilai true tanpa ada pembaruan variabel, aplikasi akan mengalami crash/hang.'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nApa akibat jika pengkondisian While bernilai true terus-menerus tanpa henti?',
+        'options': ['Program berjalan sangat cepat', 'Infinite Loop (Crash)', 'Data tersimpan otomatis', 'Tidak terjadi apa-apa'],
+        'correctIndex': 1 // Infinite Loop
+      },
       'xp': 250
     },
     {
-      'title': 'Babak 7: Fungsi / Subprogram (Method & Return Value)',
-      'desc': 'Modul Lengkap: Pemrograman modular, pemanggilan parameter, dan nilai kembalian.',
+      'title': 'Babak 7: Fungsi / Subprogram (Method)',
+      'desc': 'Modul Lengkap: Pemrograman modular, parameter, dan nilai kembalian.',
       'sections': [
         {
-          'header': '1. Prinsip DRY (Don\'t Repeat Yourself)',
-          'body': 'Fungsi adalah sekelompok baris kode yang diberi nama khusus untuk menjalankan tugas spesifik. Fungsi dapat dipanggil berulang kali dari bagian program mana pun.'
-        },
-        {
-          'header': '2. Void vs Return Value Function',
-          'body': '- Void Function: Fungsi yang HANYA menjalankan perintah tanpa mengembalikan nilai data hasil.\n- Return Function: Fungsi yang mengolah data lalu MENGEMBALIKAN (return) sebuah nilai hasil perhitungan.'
-        },
-        {
-          'header': '3. Contoh Kode Fungsi Matematika',
-          'isCode': true,
-          'body': '// Definisi Fungsi\nint hitungLuasPersegi(int panjang, int lebar) {\n  return panjang * lebar;\n}\n\n// Pemanggilan Fungsi di Main Program\nvoid main() {\n  int hasilLuas = hitungLuasPersegi(10, 4);\n  print("Luas Tanah: " + hasilLuas.toString() + " m2");\n}'
+          'header': '1. Void vs Return Function',
+          'body': '- Void: Fungsi tanpa nilai kembalian.\n- Return: Fungsi yang mengolah data lalu mengembalikan nilai hasil.'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nKata kunci apa yang digunakan untuk mengembalikan nilai dari sebuah fungsi?',
+        'options': ['print', 'void', 'return', 'main'],
+        'correctIndex': 2 // return
+      },
       'xp': 300
     },
     {
-      'title': 'Babak 8: Struktur Data Array / List & Manipulasinya',
-      'desc': 'Modul Lengkap: Koleksi data sejenis, elemen Zero-Indexed, dan looping elemen List.',
+      'title': 'Babak 8: Struktur Data Array / List',
+      'desc': 'Modul Lengkap: Koleksi data sejenis dan elemen Zero-Indexed.',
       'sections': [
         {
-          'header': '1. Apa itu Array / List?',
-          'body': 'Daripada membuat 10 variabel terpisah (siswa1, siswa2, ..., siswa10), kita bisa menyimpan kesepuluh nama siswa tersebut di dalam satu variabel List tunggal.'
-        },
-        {
-          'header': '2. Konsep Indeks Nol (Zero-Indexed)',
-          'body': 'Komputer selalu menghitung urutan elemen dalam List dimulai dari posisi angka 0, bukan 1!\n- Elemen ke-1 -> Indeks [0]\n- Elemen ke-2 -> Indeks [1]\n- Elemen ke-N -> Indeks [N-1]'
-        },
-        {
-          'header': '3. Contoh Manipulasi List di Dart',
-          'isCode': true,
-          'body': 'List<String> daftarHero = ["Miya", "Layla", "Alucard"];\n\n// Menambah data baru\ndaftarHero.add("Zilong");\n\n// Mengakses elemen pertama\nprint("Hero Utama: " + daftarHero[0]); // Output: Miya\n\n// Menampilkan semua item menggunakan For Loop\nfor (int i = 0; i < daftarHero.length; i++) {\n  print("Hero " + i.toString() + ": " + daftarHero[i]);\n}'
+          'header': '1. Konsep Zero-Indexed',
+          'body': 'Komputer selalu menghitung urutan elemen dalam List dimulai dari angka 0, bukan 1.'
         }
       ],
+      'checkpoint': {
+        'question': 'Pertanyaan Checkpoint:\nBerapakah indeks elemen pertama dari sebuah List di dalam pemrograman?',
+        'options': ['Indeks [1]', 'Indeks [0]', 'Indeks [-1]', 'Indeks [first]'],
+        'correctIndex': 1 // Indeks [0]
+      },
       'xp': 300
     },
   ];
@@ -832,7 +807,14 @@ class _QuestScreenState extends State<QuestScreen> {
                 if (!isUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selesaikan babak sebelumnya terlebih dahulu!')));
                 } else {
-                  _showSingleBoxMaterialDialog(context, index, stage['title'], stage['sections'] as List<Map<String, dynamic>>, stage['xp']);
+                  _showSingleBoxMaterialDialog(
+                    context,
+                    index,
+                    stage['title'],
+                    stage['sections'] as List<Map<String, dynamic>>,
+                    stage['checkpoint'] as Map<String, dynamic>,
+                    stage['xp'],
+                  );
                 }
               },
             ),
@@ -842,91 +824,192 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  void _showSingleBoxMaterialDialog(BuildContext context, int index, String title, List<Map<String, dynamic>> sections, int xp) {
+  // DIALOG MATERI DENGAN CHECKPOINT SOAL DI BAGIAN BAWAH
+  void _showSingleBoxMaterialDialog(
+    BuildContext context,
+    int index,
+    String title,
+    List<Map<String, dynamic>> sections,
+    Map<String, dynamic> checkpoint,
+    int xp,
+  ) {
+    int? selectedAnswer;
+    bool isAnswerChecked = false;
+    bool isAnswerCorrect = false;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(Icons.menu_book_rounded, color: Theme.of(context).primaryColor),
-            const SizedBox(width: 10),
-            Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Icon(Icons.menu_book_rounded, color: Theme.of(context).primaryColor),
+              const SizedBox(width: 10),
+              Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(sections.length, (i) {
-                  final sec = sections[i];
-                  final bool isCode = sec['isCode'] == true;
+                children: [
+                  // Box Materi Utama
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List.generate(sections.length, (i) {
+                        final sec = sections[i];
+                        final bool isCode = sec['isCode'] == true;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        sec['header']!,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
-                      ),
-                      const SizedBox(height: 6),
-                      if (isCode)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(14),
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(12)),
-                          child: Text(
-                            sec['body']!,
-                            style: const TextStyle(fontSize: 13, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8)),
-                          ),
-                        )
-                      else
-                        Text(
-                          sec['body']!,
-                          style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              sec['header']!,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
+                            ),
+                            const SizedBox(height: 6),
+                            if (isCode)
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(14),
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(12)),
+                                child: Text(
+                                  sec['body']!,
+                                  style: const TextStyle(fontSize: 13, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8)),
+                                ),
+                              )
+                            else
+                              Text(
+                                sec['body']!,
+                                style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
+                              ),
+                            if (i < sections.length - 1) ...[
+                              const SizedBox(height: 14),
+                              Divider(color: Colors.grey.shade300, height: 1),
+                              const SizedBox(height: 14),
+                            ],
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Kotak Checkpoint Pemahaman
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.blue.shade200, width: 1.5),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.quiz_rounded, color: Colors.blue, size: 20),
+                            const SizedBox(width: 8),
+                            const Text('VERIFIKASI BACAAN MATERI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blue)),
+                          ],
                         ),
-                      if (i < sections.length - 1) ...[
-                        const SizedBox(height: 14),
-                        Divider(color: Colors.grey.shade300, height: 1),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 10),
+                        Text(
+                          checkpoint['question'],
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                        ),
+                        const SizedBox(height: 10),
+                        ...List.generate((checkpoint['options'] as List).length, (optIdx) {
+                          return RadioListTile<int>(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(checkpoint['options'][optIdx], style: const TextStyle(fontSize: 13)),
+                            value: optIdx,
+                            groupValue: selectedAnswer,
+                            onChanged: (val) {
+                              setDialogState(() {
+                                selectedAnswer = val;
+                              });
+                            },
+                          );
+                        }),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: BorderSide(color: Colors.blue.shade400),
+                            ),
+                            onPressed: selectedAnswer == null
+                                ? null
+                                : () {
+                                    setDialogState(() {
+                                      isAnswerChecked = true;
+                                      isAnswerCorrect = (selectedAnswer == checkpoint['correctIndex']);
+                                    });
+                                  },
+                            child: const Text('CEK JAWABAN CHECKPOINT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                          ),
+                        ),
+                        if (isAnswerChecked) ...[
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              isAnswerCorrect ? 'BENAR! Tombol buka babak telah aktif.' : 'SALAH! Silakan baca kembali materi di atas.',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isAnswerCorrect ? Colors.green : Colors.red),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  );
-                }),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isAnswerCorrect ? Theme.of(context).primaryColor : Colors.grey.shade400,
+              ),
+              // Tombol terkunci (disabled) jika siswa belum menjawab benar
+              onPressed: !isAnswerCorrect
+                  ? null
+                  : () {
+                      Navigator.pop(context);
+
+                      setState(() {
+                        if (index == currentUnlocked && currentUnlocked < stages.length - 1) {
+                          currentUnlocked = index + 1;
+                        }
+                      });
+
+                      widget.onStageCompleted(currentUnlocked, xp);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Babak Selesai! +$xp XP & Babak Selanjutnya Terbuka!')),
+                      );
+                    },
+              child: const Text('PAHAM & BUKA BABAK BERIKUTNYA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
         ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
-            onPressed: () {
-              Navigator.pop(context);
-
-              setState(() {
-                if (index == currentUnlocked && currentUnlocked < stages.length - 1) {
-                  currentUnlocked = index + 1;
-                }
-              });
-
-              widget.onStageCompleted(currentUnlocked, xp);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Babak Selesai! +$xp XP & Babak Selanjutnya Terbuka!')),
-              );
-            },
-            child: const Text('PAHAM & BUKA BABAK BERIKUTNYA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
     );
   }
@@ -1364,7 +1447,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. TUG OF WAR MULTIPLAYER ENGINE (SEIMBANG: BUTUH MINIMAL 5 POINT UNTUK MENANG)
+// 8. TUG OF WAR MULTIPLAYER ENGINE
 // ---------------------------------------------------------------------------
 class TugOfWarMultiplayerScreen extends StatefulWidget {
   final String roomCode;
@@ -1385,7 +1468,7 @@ class TugOfWarMultiplayerScreen extends StatefulWidget {
 }
 
 class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
-  double _ropePosition = 0.5; // Posisi awal persis di tengah
+  double _ropePosition = 0.5;
   int _currentIndex = 0;
   int? _selectedOption;
 
@@ -1503,8 +1586,6 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       _selectedOption = optionIndex;
       bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
 
-      // RUMUS TARIKAN SEIMBANG:
-      // Dari tengah (0.5), dibutuhkan minimal 5 poin (0.1 x 5 = 0.5) untuk mencapai batas 0.0 (Menang).
       if (isCorrect) {
         _ropePosition = (_ropePosition - 0.1).clamp(0.0, 1.0);
       } else {

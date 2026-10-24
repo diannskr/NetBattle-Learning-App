@@ -52,7 +52,6 @@ class UserDatabase {
 class NetBattleApp extends StatefulWidget {
   const NetBattleApp({super.key});
 
-  // Diubah agar menghindari warning private type in public API
   static NetBattleAppState of(BuildContext context) =>
       context.findAncestorStateOfType<NetBattleAppState>()!;
 
@@ -202,7 +201,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => AvatarCustomizerScreen(username: name, isInitialSetup: true),
+          builder: (context) => AvatarCustomizerScreen(username: name, email: email, isInitialSetup: true),
         ),
       );
     } else {
@@ -223,7 +222,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       String studentName = UserDatabase.getUserName(email);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen(studentName: studentName)),
+        MaterialPageRoute(builder: (context) => HomeScreen(studentName: studentName, studentEmail: email)),
       );
     }
   }
@@ -300,12 +299,13 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
+  final String email;
   final bool isInitialSetup;
   final IconData? currentHat;
   final IconData? currentFace;
   final IconData? currentOutfit;
 
-  const AvatarCustomizerScreen({super.key, required this.username, this.isInitialSetup = false, this.currentHat, this.currentFace, this.currentOutfit});
+  const AvatarCustomizerScreen({super.key, required this.username, required this.email, this.isInitialSetup = false, this.currentHat, this.currentFace, this.currentOutfit});
 
   @override
   State<AvatarCustomizerScreen> createState() => _AvatarCustomizerScreenState();
@@ -398,6 +398,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       MaterialPageRoute(
                         builder: (context) => HomeScreen(
                           studentName: widget.username,
+                          studentEmail: widget.email,
                           hatIcon: _hats[_hatIndex],
                           faceIcon: _faces[_faceIndex],
                           outfitIcon: _outfits[_outfitIndex],
@@ -418,26 +419,34 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 4. HOME SCREEN (XP AWAL KOSONG = 0)
+// 4. HOME SCREEN (DILENGKAPI TOMBOL PROFIL)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final String studentName;
+  final String studentEmail;
   final IconData? hatIcon;
   final IconData faceIcon;
   final IconData outfitIcon;
   final Color themeColor;
 
-  const HomeScreen({super.key, required this.studentName, this.hatIcon, this.faceIcon = Icons.face_rounded, this.outfitIcon = Icons.checkroom_rounded, this.themeColor = const Color(0xFF6C63FF)});
+  const HomeScreen({super.key, required this.studentName, required this.studentEmail, this.hatIcon, this.faceIcon = Icons.face_rounded, this.outfitIcon = Icons.checkroom_rounded, this.themeColor = const Color(0xFF6C63FF)});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _userXP = 0; // Dimulai dari 0
+  int _userXP = 0;
   int _unlockedStageIndex = 0;
+  late String _currentName;
 
   int get level => (_userXP / 300).floor() + 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentName = widget.studentName;
+  }
 
   void _addXP(int points) {
     setState(() => _userXP += points);
@@ -456,6 +465,30 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle, color: widget.themeColor, size: 32),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                    currentEmail: widget.studentEmail,
+                    currentName: _currentName,
+                    userXP: _userXP,
+                    level: level,
+                    themeColor: widget.themeColor,
+                    onProfileUpdated: (newName) {
+                      setState(() {
+                        _currentName = newName;
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -487,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.studentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text(_currentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         const SizedBox(height: 4),
                         Text('Level $level • $_userXP XP', style: const TextStyle(fontSize: 13, color: Colors.white70)),
                         const SizedBox(height: 8),
@@ -497,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.checkroom, color: Colors.white),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AvatarCustomizerScreen(username: widget.studentName, currentHat: widget.hatIcon, currentFace: widget.faceIcon, currentOutfit: widget.outfitIcon))),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AvatarCustomizerScreen(username: _currentName, email: widget.studentEmail, currentHat: widget.hatIcon, currentFace: widget.faceIcon, currentOutfit: widget.outfitIcon))),
                   ),
                 ],
               ),
@@ -544,7 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () async {
                 final xp = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CustomRoomScreen(currentUserName: widget.studentName)),
+                  MaterialPageRoute(builder: (context) => CustomRoomScreen(currentUserName: _currentName)),
                 );
                 if (xp != null && xp is int) _addXP(xp);
               },
@@ -833,7 +866,6 @@ class _QuestScreenState extends State<QuestScreen> {
     );
   }
 
-  // DIALOG MATERI DENGAN CHECKPOINT SOAL DI BAGIAN BAWAH
   void _showSingleBoxMaterialDialog(
     BuildContext context,
     int index,
@@ -943,9 +975,7 @@ class _QuestScreenState extends State<QuestScreen> {
                             contentPadding: EdgeInsets.zero,
                             title: Text(checkpoint['options'][optIdx], style: const TextStyle(fontSize: 13)),
                             value: optIdx,
-                            // ignore: deprecated_member_use
                             groupValue: selectedAnswer,
-                            // ignore: deprecated_member_use
                             onChanged: (val) {
                               setDialogState(() {
                                 selectedAnswer = val;
@@ -1049,7 +1079,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN (DILENGKAPI RIWAYAT & PEMBAHASAN JAWABAN)
+// 6. QUIZ BATTLE SCREEN
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -1924,7 +1954,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 9. MODEL & HALAMAN PEMBAHASAN JAWABAN (FITUR TAMBAHAN BARU)
+// 9. MODEL & HALAMAN PEMBAHASAN JAWABAN
 // ---------------------------------------------------------------------------
 class QuizDiscussionItem {
   final String question;
@@ -2071,6 +2101,232 @@ class DiscussionScreen extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. HALAMAN PROFIL PENGGUNA (BISA DIEDIT & LOGOUT)
+// ---------------------------------------------------------------------------
+class ProfileScreen extends StatefulWidget {
+  final String currentEmail;
+  final String currentName;
+  final int userXP;
+  final int level;
+  final Color themeColor;
+  final Function(String newName) onProfileUpdated;
+
+  const ProfileScreen({
+    super.key,
+    required this.currentEmail,
+    required this.currentName,
+    required this.userXP,
+    required this.level,
+    required this.themeColor,
+    required this.onProfileUpdated,
+  });
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late TextEditingController _nameController;
+  late TextEditingController _passwordController;
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.currentName);
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _saveProfileChanges() {
+    String newName = _nameController.text.trim();
+    String newPassword = _passwordController.text.trim();
+
+    if (newName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nama tidak boleh kosong!')),
+      );
+      return;
+    }
+
+    if (UserDatabase.isEmailRegistered(widget.currentEmail)) {
+      UserDatabase.registerUser(widget.currentEmail, newName, newPassword.isNotEmpty ? newPassword : '123');
+    }
+
+    widget.onProfileUpdated(newName);
+
+    setState(() {
+      _isEditing = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profil berhasil diperbarui!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profil Pengguna', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF2D3142),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(_isEditing ? Icons.cancel : Icons.edit_note, color: widget.themeColor, size: 28),
+            onPressed: () {
+              setState(() {
+                _isEditing = !_isEditing;
+              });
+            },
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: widget.themeColor.withValues(alpha: 0.15),
+              child: Icon(Icons.person_rounded, size: 60, color: widget.themeColor),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _nameController.text,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              widget.currentEmail,
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      const Text('LEVEL', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      const SizedBox(height: 4),
+                      Text('Lv. ${widget.level}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: widget.themeColor)),
+                    ],
+                  ),
+                  Container(width: 1, height: 35, color: Colors.grey.shade300),
+                  Column(
+                    children: [
+                      const Text('TOTAL XP', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      const SizedBox(height: 4),
+                      Text('${widget.userXP} XP', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Detail Informasi Akun', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _nameController,
+                    enabled: _isEditing,
+                    decoration: InputDecoration(
+                      labelText: 'Nama Lengkap',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _passwordController,
+                    enabled: _isEditing,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: _isEditing ? 'Password Baru (Opsional)' : 'Password',
+                      hintText: _isEditing ? 'Masukkan password baru' : '••••••••',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  if (_isEditing) ...[
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: widget.themeColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.save_rounded, color: Colors.white),
+                        label: const Text('SIMPAN PERUBAHAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                        onPressed: _saveProfileChanges,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.redAccent),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.logout_rounded),
+                label: const Text('KELUAR / LOGOUT AKUN', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AuthLoginScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

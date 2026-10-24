@@ -52,14 +52,15 @@ class UserDatabase {
 class NetBattleApp extends StatefulWidget {
   const NetBattleApp({super.key});
 
-  static _NetBattleAppState of(BuildContext context) =>
-      context.findAncestorStateOfType<_NetBattleAppState>()!;
+  // Diubah agar menghindari warning private type in public API
+  static NetBattleAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<NetBattleAppState>()!;
 
   @override
-  State<NetBattleApp> createState() => _NetBattleAppState();
+  State<NetBattleApp> createState() => NetBattleAppState();
 }
 
-class _NetBattleAppState extends State<NetBattleApp> {
+class NetBattleAppState extends State<NetBattleApp> {
   Color _primaryThemeColor = const Color(0xFF6C63FF);
 
   void updateThemeColor(Color newColor) {
@@ -123,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.code_rounded, size: 90, color: Colors.white),
@@ -312,8 +313,8 @@ class AvatarCustomizerScreen extends StatefulWidget {
 
 class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   int _hatIndex = 0;
-  int _faceIndex = 0;
-  int _outfitIndex = 0;
+  final int _faceIndex = 0;
+  final int _outfitIndex = 0;
   int _colorIndex = 0;
 
   final List<IconData?> _hats = [null, Icons.sports_esports, Icons.school_rounded, Icons.military_tech];
@@ -345,7 +346,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 height: 240,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: activeColor.withOpacity(0.12),
+                  color: activeColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: activeColor, width: 3),
                 ),
@@ -355,7 +356,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                     SizedBox(height: 28, child: _hats[_hatIndex] != null ? Icon(_hats[_hatIndex], size: 30, color: Colors.amber.shade800) : const SizedBox()),
                     Icon(_faces[_faceIndex], size: 65, color: activeColor),
                     const SizedBox(height: 2),
-                    Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withOpacity(0.9)),
+                    Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withValues(alpha: 0.9)),
                     const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -465,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [widget.themeColor, widget.themeColor.withOpacity(0.75)]),
+                gradient: LinearGradient(colors: [widget.themeColor, widget.themeColor.withValues(alpha: 0.75)]),
                 borderRadius: BorderRadius.circular(22),
               ),
               child: Row(
@@ -573,7 +574,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildGameCard(BuildContext context, {required String title, required String subtitle, required IconData icon, required Color color, required String xp, required VoidCallback onTap}) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 3))]),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 3))]),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -583,7 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: color, size: 30)),
+                Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: color, size: 30)),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -610,7 +611,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN (DILENGKAPI CHECKPOINT & KODING RUMPANG AGAR SISWA MEMBACA)
+// 5. QUEST SCREEN (DILENGKAPI CHECKPOINT & KODING RUMPANG)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -651,7 +652,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nAturan penamaan variabel manakah yang BENAR berdasarkan materi di atas?',
         'options': ['1namaSiswa', 'nama lengkap', 'skorPemain', 'nama-siswa'],
-        'correctIndex': 2 // skorPemain (camelCase)
+        'correctIndex': 2,
+        'explanation': 'Aturan penamaan variabel yang benar harus menggunakan format camelCase (seperti skorPemain), tidak boleh menggunakan spasi, dan tidak boleh diawali dengan angka.'
       },
       'xp': 150
     },
@@ -672,7 +674,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nTipe data apakah yang paling tepat untuk menyimpan angka desimal 3.14?',
         'options': ['int', 'double', 'String', 'bool'],
-        'correctIndex': 1 // double
+        'correctIndex': 1,
+        'explanation': 'Tipe data double digunakan khusus untuk menampung nilai angka pecahan atau desimal yang memiliki titik koma/desimal.'
       },
       'xp': 150
     },
@@ -693,7 +696,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nSimbol apa yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
         'options': ['=', '==', '!=', '=>'],
-        'correctIndex': 1 // ==
+        'correctIndex': 1,
+        'explanation': 'Simbol tanda sama dengan ganda (==) adalah operator perbandingan kesetaraan, sedangkan tanda (=) tunggal digunakan untuk proses assignment (pengisian nilai).'
       },
       'xp': 200
     },
@@ -709,7 +713,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nOperator logika manakah yang mengharuskan KEDUA syarat bernilai TRUE?',
         'options': ['||', '&&', '!', '=='],
-        'correctIndex': 1 // &&
+        'correctIndex': 1,
+        'explanation': 'Operator AND (&&) menghasilkan nilai true hanya jika seluruh kondisi yang dihubungkan bernilai true secara bersamaan.'
       },
       'xp': 200
     },
@@ -725,7 +730,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nBagian manakah pada For Loop yang berfungsi menambahkan nilai hitungan setiap putaran?',
         'options': ['Inisialisasi', 'Kondisi batas', 'Iterasi (i++)', 'Blok cetak'],
-        'correctIndex': 2 // Iterasi (i++)
+        'correctIndex': 2,
+        'explanation': 'Bagian iterasi (seperti i++) dieksekusi di akhir setiap putaran loop untuk menambah atau mengubah nilai penghitung.'
       },
       'xp': 250
     },
@@ -741,7 +747,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nApa akibat jika pengkondisian While bernilai true terus-menerus tanpa henti?',
         'options': ['Program berjalan sangat cepat', 'Infinite Loop (Crash)', 'Data tersimpan otomatis', 'Tidak terjadi apa-apa'],
-        'correctIndex': 1 // Infinite Loop
+        'correctIndex': 1,
+        'explanation': 'Kondisi true tanpa henti memicu Infinite Loop yang menghabiskan sumber daya memori dan membuat aplikasi mengalami crash.'
       },
       'xp': 250
     },
@@ -757,7 +764,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nKata kunci apa yang digunakan untuk mengembalikan nilai dari sebuah fungsi?',
         'options': ['print', 'void', 'return', 'main'],
-        'correctIndex': 2 // return
+        'correctIndex': 2,
+        'explanation': 'Kata kunci return berfungsi untuk mengalirkan hasil keluaran data kembali ke bagian pemanggil fungsi tersebut.'
       },
       'xp': 300
     },
@@ -773,7 +781,8 @@ class _QuestScreenState extends State<QuestScreen> {
       'checkpoint': {
         'question': 'Pertanyaan Checkpoint:\nBerapakah indeks elemen pertama dari sebuah List di dalam pemrograman?',
         'options': ['Indeks [1]', 'Indeks [0]', 'Indeks [-1]', 'Indeks [first]'],
-        'correctIndex': 1 // Indeks [0]
+        'correctIndex': 1,
+        'explanation': 'Sistem komputer menggunakan konsep zero-indexed, di mana elemen pertama dalam memori array/list selalu dimulai dari indeks angka 0.'
       },
       'xp': 300
     },
@@ -799,7 +808,7 @@ class _QuestScreenState extends State<QuestScreen> {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: isUnlocked ? Colors.orange : Colors.grey.shade200, width: isUnlocked ? 2 : 1)),
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
-              leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withOpacity(0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
+              leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withValues(alpha: 0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
               title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: isUnlocked ? const Color(0xFF2D3142) : Colors.grey)),
               subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
               trailing: isUnlocked ? const Icon(Icons.arrow_forward_ios_rounded, size: 18) : const Icon(Icons.lock),
@@ -856,7 +865,6 @@ class _QuestScreenState extends State<QuestScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Box Materi Utama
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -906,7 +914,6 @@ class _QuestScreenState extends State<QuestScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Kotak Checkpoint Pemahaman
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -936,7 +943,9 @@ class _QuestScreenState extends State<QuestScreen> {
                             contentPadding: EdgeInsets.zero,
                             title: Text(checkpoint['options'][optIdx], style: const TextStyle(fontSize: 13)),
                             value: optIdx,
+                            // ignore: deprecated_member_use
                             groupValue: selectedAnswer,
+                            // ignore: deprecated_member_use
                             onChanged: (val) {
                               setDialogState(() {
                                 selectedAnswer = val;
@@ -971,6 +980,31 @@ class _QuestScreenState extends State<QuestScreen> {
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isAnswerCorrect ? Colors.green : Colors.red),
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: TextButton.icon(
+                              icon: const Icon(Icons.menu_book, size: 16),
+                              label: const Text('Lihat Penjelasan Materi'),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DiscussionScreen(
+                                      history: [
+                                        QuizDiscussionItem(
+                                          question: checkpoint['question'],
+                                          options: List<String>.from(checkpoint['options']),
+                                          selectedIndex: selectedAnswer ?? 0,
+                                          correctIndex: checkpoint['correctIndex'],
+                                          explanation: checkpoint['explanation'],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ],
                       ],
                     ),
@@ -988,7 +1022,6 @@ class _QuestScreenState extends State<QuestScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: isAnswerCorrect ? Theme.of(context).primaryColor : Colors.grey.shade400,
               ),
-              // Tombol terkunci (disabled) jika siswa belum menjawab benar
               onPressed: !isAnswerCorrect
                   ? null
                   : () {
@@ -1016,7 +1049,7 @@ class _QuestScreenState extends State<QuestScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 6. QUIZ BATTLE SCREEN
+// 6. QUIZ BATTLE SCREEN (DILENGKAPI RIWAYAT & PEMBAHASAN JAWABAN)
 // ---------------------------------------------------------------------------
 class QuizBattleScreen extends StatefulWidget {
   const QuizBattleScreen({super.key});
@@ -1030,65 +1063,88 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
   int _currentIndex = 0;
   int? _selectedOption;
 
+  final List<QuizDiscussionItem> _quizHistory = [];
+
   final List<Map<String, dynamic>> _questions = [
     {
       'question': 'Lengkapi sintaks deklarasi variabel teks berikut:\n\n____ nama = "NetBattle";',
       'options': ['String', 'int', 'bool', 'double'],
       'answer': 0,
+      'explanation': 'Tipe data String digunakan khusus untuk menyimpan nilai berupa teks atau kumpulan karakter di dalam tanda petik.'
     },
     {
       'question': 'Lengkapi perintah pengkondisian IF di bawah ini:\n\n____ (skor >= 80) {\n  print("Lulus");\n}',
       'options': ['if', 'when', 'check', 'loop'],
       'answer': 0,
+      'explanation': 'Kata kunci if digunakan untuk melakukan percabangan keputusan bersyarat di dalam struktur bahasa pemrograman Dart/Java.'
     },
     {
       'question': 'Kata kunci apa yang digunakan sebagai alternatif jika kondisi IF bernilai FALSE?',
       'options': ['then', 'else', 'other', 'default'],
       'answer': 1,
+      'explanation': 'Blok else dijalankan apabila kondisi pada pernyataan if utama bernilai false (tidak terpenuhi).'
     },
     {
       'question': 'Sintaks deklarasi variabel bilangan bulat berangka 25:\n\n____ umur = 25;',
       'options': ['String', 'bool', 'int', 'double'],
       'answer': 2,
+      'explanation': 'Tipe data int (integer) digunakan untuk mendeklarasikan variabel yang menyimpan angka bilangan bulat.'
     },
     {
       'question': 'Manakah operator yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
       'options': ['=', '==', '!=', '=>'],
       'answer': 1,
+      'explanation': 'Operator kesetaraan (==) membandingkan apakah dua buah nilai bernilai sama persis.'
     },
     {
       'question': 'Kata kunci yang digunakan untuk menghentikan perulangan (loop) secara paksa:',
       'options': ['stop', 'exit', 'break', 'return'],
       'answer': 2,
+      'explanation': 'Perintah break digunakan untuk menghentikan alur perulangan secara paksa.'
     },
     {
       'question': 'Tipe data yang hanya bernilai benar (true) atau salah (false) adalah:',
       'options': ['int', 'bool', 'String', 'char'],
       'answer': 1,
+      'explanation': 'Tipe data bool menampung nilai kebenaran logika boolean true atau false.'
     },
     {
       'question': 'Kata kunci yang digunakan untuk mendefinisikan sebuah fungsi tanpa mengembalikan nilai (return):',
       'options': ['null', 'empty', 'void', 'static'],
       'answer': 2,
+      'explanation': 'Void menyatakan bahwa fungsi mengeksekusi perintah tanpa memberikan nilai kembalian.'
     },
     {
       'question': 'Bagaimanakah cara mengambil jumlah elemen pada variabel List bernama angka?',
       'options': ['angka.size', 'angka.length', 'angka.count', 'angka.total'],
       'answer': 1,
+      'explanation': 'Properti .length digunakan pada tipe data List untuk mengetahui jumlah total elemen yang tersimpan.'
     },
     {
       'question': 'Simbol apa yang digunakan untuk menambahkan komentar satu baris pada kode Dart/Java?',
       'options': ['//', '<!--', '#', '/*'],
       'answer': 0,
+      'explanation': 'Garis miring ganda (//) berfungsi sebagai penanda komentar baris tunggal.'
     },
   ];
 
   void _answer(int optionIndex) {
     setState(() {
       _selectedOption = optionIndex;
-      if (optionIndex == _questions[_currentIndex]['answer']) {
+      bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
+      if (isCorrect) {
         _correctCount++;
       }
+
+      _quizHistory.add(
+        QuizDiscussionItem(
+          question: _questions[_currentIndex]['question'],
+          options: List<String>.from(_questions[_currentIndex]['options']),
+          selectedIndex: optionIndex,
+          correctIndex: _questions[_currentIndex]['answer'],
+          explanation: _questions[_currentIndex]['explanation'] ?? 'Pahami kembali materi dasar mengenai logika pemrograman terkait soal ini.',
+        ),
+      );
     });
 
     Future.delayed(const Duration(seconds: 1), () {
@@ -1136,6 +1192,24 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.blue.shade800,
+                side: BorderSide(color: Colors.blue.shade300),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: const Icon(Icons.menu_book_rounded),
+              label: const Text('LIHAT PEMBAHASAN JAWABAN'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DiscussionScreen(history: _quizHistory),
+                  ),
+                );
+              },
+            ),
           ],
         ),
         actions: [
@@ -1182,7 +1256,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                 color: const Color(0xFF1E1E2E),
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -1234,7 +1308,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: borderColor, width: 1.5),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
                       ],
                     ),
                     child: ListTile(
@@ -1352,7 +1426,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.7)],
+                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withValues(alpha: 0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -1773,7 +1847,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                       color: const Color(0xFF1E1E2E),
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
                       ],
                     ),
                     child: Column(
@@ -1845,6 +1919,158 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 9. MODEL & HALAMAN PEMBAHASAN JAWABAN (FITUR TAMBAHAN BARU)
+// ---------------------------------------------------------------------------
+class QuizDiscussionItem {
+  final String question;
+  final List<String> options;
+  final int selectedIndex;
+  final int correctIndex;
+  final String explanation;
+
+  QuizDiscussionItem({
+    required this.question,
+    required this.options,
+    required this.selectedIndex,
+    required this.correctIndex,
+    required this.explanation,
+  });
+
+  bool get isCorrect => selectedIndex == correctIndex;
+}
+
+class DiscussionScreen extends StatelessWidget {
+  final List<QuizDiscussionItem> history;
+
+  const DiscussionScreen({super.key, required this.history});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pembahasan Jawaban', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF2D3142),
+        elevation: 0,
+      ),
+      body: history.isEmpty
+          ? const Center(child: Text('Belum ada riwayat pembahasan.'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: history.length,
+              itemBuilder: (context, index) {
+                final item = history[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: item.isCorrect ? Colors.green.shade100 : Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Soal ${index + 1} • ${item.isCorrect ? 'BENAR' : 'SALAH'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: item.isCorrect ? Colors.green.shade900 : Colors.red.shade900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          item.question,
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                        ),
+                        const SizedBox(height: 12),
+                        Column(
+                          children: List.generate(item.options.length, (optIdx) {
+                            bool isUserChoice = optIdx == item.selectedIndex;
+                            bool isCorrectChoice = optIdx == item.correctIndex;
+
+                            Color tileBg = Colors.grey.shade100;
+                            Color borderColor = Colors.transparent;
+
+                            if (isCorrectChoice) {
+                              tileBg = Colors.green.shade50;
+                              borderColor = Colors.green;
+                            } else if (isUserChoice && !item.isCorrect) {
+                              tileBg = Colors.red.shade50;
+                              borderColor = Colors.red;
+                            }
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: tileBg,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: borderColor, width: 1.5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      item.options[optIdx],
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isUserChoice || isCorrectChoice ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  if (isCorrectChoice)
+                                    const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                                  else if (isUserChoice && !item.isCorrect)
+                                    const Icon(Icons.cancel, color: Colors.red, size: 20),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.lightbulb_outline, color: Colors.blue.shade800, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Pembahasan:\n${item.explanation}',
+                                  style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

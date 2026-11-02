@@ -354,10 +354,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT AVATAR CUSTOMIZER (VERSI IKON INTERAKTIF TANPA DEPENDENSI ASET)
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// 3. MASKOT AVATAR CUSTOMIZER (MENGGUNAKAN LIST ASET STRING)
+// 3. MASKOT AVATAR CUSTOMIZER (MODE TERANG & BOX ITEM LEBIH KECIL)
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
@@ -384,30 +381,35 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   int _selectedBag = 0;
   int _colorIndex = 0;
 
-  final List _hatOptions = [
-    'assets/images/hat_none.png',
-    'assets/images/hat_frog.png',
-    'assets/images/hat_helmet.png',
+  // Daftar Icon Topi / Aksesoris Kepala yang Nyambung
+  final List _hatIcons = [
+    Icons.block,                  // 0: Tanpa Topi
+    Icons.engineering,            // 1: Helm Safety/Coder
+    Icons.school,                 // 2: Topi Akademik
+    Icons.military_tech,          // 3: Topi Badge
   ];
 
-  final List _outfitOptions = [
-    'assets/images/outfit_default.png',
-    'assets/images/outfit_red.png',
-    'assets/images/outfit_blue.png',
+  // Daftar Icon Baju / Kostum Utama yang Nyambung
+  final List _outfitIcons = [
+    Icons.smart_toy,              // 0: Robot Standar
+    Icons.code,                   // 1: Kostum Coder
+    Icons.laptop_mac,             // 2: Kostum Developer
+    Icons.security,               // 3: Kostum Keamanan Sistem
   ];
 
-  final List _bagOptions = [
-    'assets/images/bag_none.png',
-    'assets/images/bag_mushroom.png',
-    'assets/images/bag_blue.png',
+  // Daftar Icon Tas Punggung yang Nyambung
+  final List _bagIcons = [
+    Icons.block,                  // 0: Tanpa Tas
+    Icons.backpack,               // 1: Tas Ransel Laptop
+    Icons.work,                // 2: Tas Kantor
   ];
 
   final List _themeColors = [
-    {'name': 'Cyber Indigo', 'color': Color(0xFF6C63FF)},
+    {'name': 'Cyber Indigo', 'color': const Color(0xFF6C63FF)},
     {'name': 'Blaze Orange', 'color': Colors.orange},
-    {'name': 'Matrix Green', 'color': Color(0xFF00B09B)},
-    {'name': 'Royal Purple', 'color': Color(0xFF8E2DE2)},
-    {'name': 'Ruby Red', 'color': Color(0xFFE53935)},
+    {'name': 'Matrix Green', 'color': const Color(0xFF00B09B)},
+    {'name': 'Royal Purple', 'color': const Color(0xFF8E2DE2)},
+    {'name': 'Ruby Red', 'color': const Color(0xFFE53935)},
   ];
 
   @override
@@ -415,19 +417,19 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     Color activeColor = _themeColors[_colorIndex]['color'] as Color;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E2E),
+      backgroundColor: const Color(0xFFF4F6F9), // MODE TERANG (LIGHT MODE)
       appBar: AppBar(
-        title: Text(widget.isInitialSetup ? 'Rakit Maskot Coder' : 'Edit Avatar', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
+        title: Text(widget.isInitialSetup ? 'Rakit Maskot Coder' : 'Edit Avatar', style: const TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Color(0xFF2D3142)),
       ),
       body: Column(
         children: [
-          const SizedBox(height: 6),
-          Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold)),
           
-          // PREVIEW MASKOT DI TENGAH
+          // PREVIEW MASKOT DI TENGAH (MODE TERANG)
           Expanded(
             flex: 4,
             child: Center(
@@ -435,42 +437,63 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    width: 170,
-                    height: 170,
+                    width: 150,
+                    height: 150,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: activeColor.withValues(alpha: 0.2),
+                      color: activeColor.withValues(alpha: 0.15),
                       boxShadow: [
                         BoxShadow(
-                          color: activeColor.withValues(alpha: 0.4),
-                          blurRadius: 40,
-                          spreadRadius: 10,
+                          color: activeColor.withValues(alpha: 0.2),
+                          blurRadius: 30,
+                          spreadRadius: 5,
                         )
                       ],
                     ),
                   ),
-                  // Avatar Base / Outfit Utama
-                  Image.asset(
-                    _outfitOptions[_selectedOutfit],
-                    height: 140,
-                    fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => Icon(Icons.smart_toy, size: 80, color: activeColor),
+                  // Baju / Badan Utama
+                  Icon(
+                    _outfitIcons[_selectedOutfit],
+                    size: 80,
+                    color: activeColor,
                   ),
-                  // Topi
+                  // Topi di atas kepala
                   if (_selectedHat > 0)
-                    Image.asset(
-                      _hatOptions[_selectedHat],
-                      height: 140,
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => const SizedBox(),
+                    Positioned(
+                      top: 20,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
+                          border: Border.all(color: activeColor, width: 2),
+                        ),
+                        child: Icon(
+                          _hatIcons[_selectedHat],
+                          size: 30,
+                          color: activeColor,
+                        ),
+                      ),
                     ),
-                  // Tas
+                  // Tas di punggung
                   if (_selectedBag > 0)
-                    Image.asset(
-                      _bagOptions[_selectedBag],
-                      height: 140,
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => const SizedBox(),
+                    Positioned(
+                      bottom: 25,
+                      right: 45,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                        ),
+                        child: Icon(
+                          _bagIcons[_selectedBag],
+                          size: 26,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -483,7 +506,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Warna: ', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                const Text('Warna Tema: ', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
                 ...List.generate(_themeColors.length, (i) {
                   Color c = _themeColors[i]['color'] as Color;
                   return GestureDetector(
@@ -498,7 +521,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       decoration: BoxDecoration(
                         color: c,
                         shape: BoxShape.circle,
-                        border: Border.all(color: _colorIndex == i ? Colors.white : Colors.transparent, width: 2),
+                        border: Border.all(color: _colorIndex == i ? Colors.black87 : Colors.transparent, width: 2),
                       ),
                     ),
                   );
@@ -506,11 +529,11 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
-          // MENU KATEGORI TAB (Topi, Baju, Tas)
+          // MENU KATEGORI TAB (Topi, Baju, Tas) - MODE TERANG
           Container(
-            color: const Color(0xFF2A2A3C),
+            color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -522,22 +545,23 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
             ),
           ),
 
-          // GRID PILIHAN ITEM
+          // GRID PILIHAN ITEM (DIKECILKAN UKURANNYA & 4 KOLOM AGAR RAPI)
           Expanded(
             flex: 3,
             child: Container(
-              color: const Color(0xFF151521),
+              color: Colors.grey.shade100,
               padding: const EdgeInsets.all(12),
               child: GridView.builder(
                 itemCount: _getCurrentOptionsCount(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 4, // 4 Kolom agar box item lebih kecil & compact
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
+                  childAspectRatio: 1.1,
                 ),
                 itemBuilder: (context, index) {
                   bool isSelected = _isCurrentOptionSelected(index);
-                  String imagePath = _getCurrentOptionImage(index);
+                  IconData currentIcon = _getCurrentOptionIcon(index);
 
                   return GestureDetector(
                     onTap: () {
@@ -547,23 +571,35 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF252538),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? Colors.amberAccent : Colors.transparent,
-                          width: 2,
+                          color: isSelected ? activeColor : Colors.grey.shade300,
+                          width: isSelected ? 2 : 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 2))
+                        ],
                       ),
                       padding: const EdgeInsets.all(6),
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.contain,
-                        errorBuilder: (c, e, s) => Center(
-                          child: Text(
-                            index == 0 ? 'None' : 'Item $index',
-                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            currentIcon,
+                            size: 26, // Ukuran ikon diperkecil agar proporsional dalam box kecil
+                            color: isSelected ? activeColor : Colors.grey.shade700,
                           ),
-                        ),
+                          const SizedBox(height: 4),
+                          Text(
+                            index == 0 ? 'None' : 'Item $index',
+                            style: TextStyle(
+                              color: isSelected ? activeColor : Colors.black54,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -574,8 +610,8 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
 
           // TOMBOL SIMPAN
           Container(
-            padding: const EdgeInsets.all(12),
-            color: const Color(0xFF151521),
+            padding: const EdgeInsets.all(16),
+            color: Colors.white,
             child: SizedBox(
               width: double.infinity,
               height: 48,
@@ -583,6 +619,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: activeColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
                 ),
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -591,13 +628,13 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                       builder: (context) => HomeScreen(
                         studentName: widget.username,
                         studentEmail: widget.email,
-                        mascotImagePath: _outfitOptions[_selectedOutfit],
+                        mascotImagePath: null, 
                         themeColor: activeColor,
                       ),
                     ),
                   );
                 },
-                child: const Text('SIMPAN & PAKAI AVATAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                child: const Text('SIMPAN & PAKAI AVATAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
               ),
             ),
           ),
@@ -611,16 +648,16 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedTabCategory = categoryIndex),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B3B54) : Colors.transparent,
+          color: isSelected ? const Color(0xFF6C63FF).withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? Colors.amberAccent : Colors.white60, size: 18),
+            Icon(icon, color: isSelected ? const Color(0xFF6C63FF) : Colors.grey, size: 16),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.white60, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(label, style: TextStyle(color: isSelected ? const Color(0xFF6C63FF) : Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
           ],
         ),
       ),
@@ -628,9 +665,9 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   }
 
   int _getCurrentOptionsCount() {
-    if (_selectedTabCategory == 0) return _hatOptions.length;
-    if (_selectedTabCategory == 1) return _outfitOptions.length;
-    return _bagOptions.length;
+    if (_selectedTabCategory == 0) return _hatIcons.length;
+    if (_selectedTabCategory == 1) return _outfitIcons.length;
+    return _bagIcons.length;
   }
 
   bool _isCurrentOptionSelected(int index) {
@@ -639,10 +676,10 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
     return _selectedBag == index;
   }
 
-  String _getCurrentOptionImage(int index) {
-    if (_selectedTabCategory == 0) return _hatOptions[index];
-    if (_selectedTabCategory == 1) return _outfitOptions[index];
-    return _bagOptions[index];
+  IconData _getCurrentOptionIcon(int index) {
+    if (_selectedTabCategory == 0) return _hatIcons[index];
+    if (_selectedTabCategory == 1) return _outfitIcons[index];
+    return _bagIcons[index];
   }
 
   void _setCurrentOption(int index) {

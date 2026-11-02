@@ -6,6 +6,65 @@ void main() {
 }
 
 // ---------------------------------------------------------------------------
+// MODEL KELAS DATA UNTUK MENGHINDARI ERROR LIST & MAP DINAMIS
+// ---------------------------------------------------------------------------
+class SectionModel {
+  final String header;
+  final String body;
+  final bool isCode;
+
+  SectionModel({
+    required this.header,
+    required this.body,
+    this.isCode = false,
+  });
+}
+
+class CheckpointModel {
+  final String question;
+  final List<String> options;
+  final int correctIndex;
+  final String explanation;
+
+  CheckpointModel({
+    required this.question,
+    required this.options,
+    required this.correctIndex,
+    required this.explanation,
+  });
+}
+
+class StageModel {
+  final String title;
+  final String desc;
+  final List<SectionModel> sections;
+  final CheckpointModel checkpoint;
+  final int xp;
+
+  StageModel({
+    required this.title,
+    required this.desc,
+    required this.sections,
+    required this.checkpoint,
+    required this.xp,
+  });
+}
+
+class QuestionModel {
+  final String question;
+  final List<String> options;
+  final int answer;
+  final String explanation;
+
+  QuestionModel({
+    required this.question,
+    required this.options,
+    required this.answer,
+    required this.explanation,
+  });
+}
+
+// ---------------------------------------------------------------------------
 // DATABASE LOKAL BERBASIS EMAIL
 // ---------------------------------------------------------------------------
 class UserDatabase {
@@ -295,7 +354,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT AVATAR CUSTOMIZER (SISTEM LAYERING ALA QUIZZIZZ)[cite: 4]
+// 3. MASKOT AVATAR CUSTOMIZER
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
@@ -316,36 +375,37 @@ class AvatarCustomizerScreen extends StatefulWidget {
 }
 
 class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
-  int _selectedTabCategory = 0; // 0: Topi, 1: Baju, 2: Tas
+  int _selectedTabCategory = 0;
   int _selectedHat = 0;
   int _selectedOutfit = 0;
   int _selectedBag = 0;
   int _colorIndex = 0;
 
-  final List<String> _hatOptions = [
+ // Menggunakan tipe dynamic agar tidak pernah error oleh compiler Dart
+  final List _hatOptions = [
     'assets/images/hat_none.png',
     'assets/images/hat_frog.png',
     'assets/images/hat_helmet.png',
   ];
 
-  final List<String> _outfitOptions = [
+  final List _outfitOptions = [
     'assets/images/outfit_default.png',
     'assets/images/outfit_red.png',
     'assets/images/outfit_blue.png',
   ];
 
-  final List<String> _bagOptions = [
+  final List _bagOptions = [
     'assets/images/bag_none.png',
     'assets/images/bag_mushroom.png',
     'assets/images/bag_blue.png',
   ];
 
-  final List> _themeColors = [
-    {'name': 'Cyber Indigo', 'color': const Color(0xFF6C63FF)},
+  final List _themeColors = [
+    {'name': 'Cyber Indigo', 'color': Color(0xFF6C63FF)},
     {'name': 'Blaze Orange', 'color': Colors.orange},
-    {'name': 'Matrix Green', 'color': const Color(0xFF00B09B)},
-    {'name': 'Royal Purple', 'color': const Color(0xFF8E2DE2)},
-    {'name': 'Ruby Red', 'color': const Color(0xFFE53935)},
+    {'name': 'Matrix Green', 'color': Color(0xFF00B09B)},
+    {'name': 'Royal Purple', 'color': Color(0xFF8E2DE2)},
+    {'name': 'Ruby Red', 'color': Color(0xFFE53935)},
   ];
 
   @override
@@ -364,8 +424,6 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
         children: [
           const SizedBox(height: 6),
           Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
-          
-          // PANGGUNG PODIUM & TAMPILAN AVATAR BERLAPIS (STACK)
           Expanded(
             flex: 4,
             child: Center(
@@ -378,45 +436,16 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: activeColor.withValues(alpha: 0.2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: activeColor.withValues(alpha: 0.4),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        )
-                      ],
                     ),
                   ),
-                  Image.asset(
-                    'assets/images/avatar_base.png',
-                    height: 150,
-                    fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(Icons.smart_toy, size: 80, color: Colors.amber),
-                  ),
-                  Image.asset(
-                    _outfitOptions[_selectedOutfit],
-                    height: 150,
-                    fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const SizedBox(),
-                  ),
-                  Image.asset(
-                    _bagOptions[_selectedBag],
-                    height: 150,
-                    fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const SizedBox(),
-                  ),
-                  Image.asset(
-                    _hatOptions[_selectedHat],
-                    height: 150,
-                    fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const SizedBox(),
-                  ),
+                  Image.asset('assets/images/avatar_base.png', height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const Icon(Icons.smart_toy, size: 80, color: Colors.amber)),
+                  Image.asset(_outfitOptions[_selectedOutfit], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
+                  Image.asset(_bagOptions[_selectedBag], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
+                  Image.asset(_hatOptions[_selectedHat], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
                 ],
               ),
             ),
           ),
-
-          // PILIHAN WARNA TEMA
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
             child: Row(
@@ -446,8 +475,6 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
             ),
           ),
           const SizedBox(height: 6),
-
-          // MENU KATEGORI DI BAWAH (TAB PILIHAN: TOPI, BAJU, TAS)
           Container(
             color: const Color(0xFF2A2A3C),
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -460,8 +487,6 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ],
             ),
           ),
-
-          // GRID PILIHAN ITEM SESUAI TAB
           Expanded(
             flex: 3,
             child: Container(
@@ -479,36 +504,21 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                   String imagePath = _getCurrentOptionImage(index);
 
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _setCurrentOption(index);
-                      });
-                    },
+                    onTap: () => setState(() => _setCurrentOption(index)),
                     child: Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFF252538),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? Colors.amberAccent : Colors.transparent,
-                          width: 2,
-                        ),
+                        border: Border.all(color: isSelected ? Colors.amberAccent : Colors.transparent, width: 2),
                       ),
                       padding: const EdgeInsets.all(6),
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.contain,
-                        errorBuilder: (c, e, s) => Center(
-                          child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
+                      child: Image.asset(imagePath, fit: BoxFit.contain, errorBuilder: (c, e, s) => Center(child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
                     ),
                   );
                 },
               ),
             ),
           ),
-
-          // TOMBOL SIMPAN
           Container(
             padding: const EdgeInsets.all(12),
             color: const Color(0xFF151521),
@@ -516,10 +526,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: activeColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: activeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
@@ -684,11 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(16)),
                     child: widget.mascotImagePath != null
-                        ? Image.asset(
-                            widget.mascotImagePath!,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 36),
-                          )
+                        ? Image.asset(widget.mascotImagePath!, fit: BoxFit.contain, errorBuilder: (c, e, s) => const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 36))
                         : const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 36),
                   ),
                   const SizedBox(width: 16),
@@ -829,7 +832,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. QUEST SCREEN
+// 5. QUEST SCREEN (MENGGUNAKAN OBJEK MODEL YANG AMAN DARI ERROR)
 // ---------------------------------------------------------------------------
 class QuestScreen extends StatefulWidget {
   final int unlockedStageIndex;
@@ -848,162 +851,171 @@ class QuestScreen extends StatefulWidget {
 class _QuestScreenState extends State<QuestScreen> {
   late int currentUnlocked = widget.unlockedStageIndex;
 
-  final List> stages = [
-    {
-      'title': 'Babak 1: Konsep Algoritma, Memori & Variabel',
-      'desc': 'Modul Lengkap: Memahami wadah memori, aturan penamaan variabel, dan Output.',
-      'sections': [
-        {
-          'header': '1. Apa itu Algoritma dan Variabel?',
-          'body': 'Dalam dunia komputer, Algoritma adalah langkah-langkah logis berurutan untuk menyelesaikan masalah.\n\nKetika program berjalan, data (seperti nama, skor, atau harga) perlu disimpan di dalam RAM komputer. Wadah penyimpanan sementara di dalam memori inilah yang disebut Variabel.'
-        },
-        {
-          'header': '2. Aturan Penamaan Variabel (Naming Convention)',
-          'body': '- Menggunakan camelCase (contoh: namaLengkap, skorPemain).\n- Tidak boleh diawali angka (contoh salah: 1nama).\n- Tidak boleh menggunakan spasi (contoh salah: nama saya).\n- Bersifat Case-Sensitive (nama dan Nama dianggap dua variabel yang berbeda).'
-        },
-        {
-          'header': '3. Contoh Kode Koding Nyata (Dart/Java/C++)',
-          'isCode': true,
-          'body': 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());'
-        }
+  final List<StageModel> stages = <StageModel>[
+    StageModel(
+      title: 'Babak 1: Konsep Algoritma, Memori & Variabel',
+      desc: 'Modul Lengkap: Memahami wadah memori, aturan penamaan variabel, dan Output.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Apa itu Algoritma dan Variabel?',
+          body: 'Dalam dunia komputer, Algoritma adalah langkah-langkah logis berurutan untuk menyelesaikan masalah.\n\nKetika program berjalan, data (seperti nama, skor, atau harga) perlu disimpan di dalam RAM komputer. Wadah penyimpanan sementara di dalam memori inilah yang disebut Variabel.',
+          isCode: false,
+        ),
+        SectionModel(
+          header: '2. Aturan Penamaan Variabel (Naming Convention)',
+          body: '- Menggunakan camelCase (contoh: namaLengkap, skorPemain).\n- Tidak boleh diawali angka (contoh salah: 1nama).\n- Tidak boleh menggunakan spasi (contoh salah: nama saya).\n- Bersifat Case-Sensitive (nama dan Nama dianggap dua variabel yang berbeda).',
+          isCode: false,
+        ),
+        SectionModel(
+          header: '3. Contoh Kode Koding Nyata (Dart/Java/C++)',
+          body: 'String namaSiswa = "Satria Coder";\nint nilaiUjian = 95;\n\n// Menampilkan output ke konsol\nprint("Nama: " + namaSiswa);\nprint("Nilai: " + nilaiUjian.toString());',
+          isCode: true,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nAturan penamaan variabel manakah yang BENAR berdasarkan materi di atas?',
-        'options': ['1namaSiswa', 'nama lengkap', 'skorPemain', 'nama-siswa'],
-        'correctIndex': 2,
-        'explanation': 'Aturan penamaan variabel yang benar harus menggunakan format camelCase (seperti skorPemain), tidak boleh menggunakan spasi, dan tidak boleh diawali dengan angka.'
-      },
-      'xp': 150
-    },
-    {
-      'title': 'Babak 2: Tipe Data Dasar & Operator Aritmatika',
-      'desc': 'Modul Lengkap: int, double, String, bool, serta perhitungan matematika.',
-      'sections': [
-        {
-          'header': '1. Pengenalan Tipe Data Statis',
-          'body': 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif.\n- double: Angka desimal bertitik (contoh: 3.14).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool: Nilai logika true atau false.'
-        },
-        {
-          'header': '2. Studi Kasus Perhitungan Toko',
-          'isCode': true,
-          'body': 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\nprint("Total: " + totalHarga.toString());'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nAturan penamaan variabel manakah yang BENAR berdasarkan materi di atas?',
+        options: <String>['1namaSiswa', 'nama lengkap', 'skorPemain', 'nama-siswa'],
+        correctIndex: 2,
+        explanation: 'Aturan penamaan variabel yang benar harus menggunakan format camelCase (seperti skorPemain), tidak boleh menggunakan spasi, dan tidak boleh diawali dengan angka.',
+      ),
+      xp: 150,
+    ),
+    StageModel(
+      title: 'Babak 2: Tipe Data Dasar & Operator Aritmatika',
+      desc: 'Modul Lengkap: int, double, String, bool, serta perhitungan matematika.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Pengenalan Tipe Data Statis',
+          body: 'Tipe data menentukan jenis nilai apa yang boleh disimpan dalam sebuah variabel:\n- int (Integer): Bilangan bulat positif/negatif.\n- double: Angka desimal bertitik (contoh: 3.14).\n- String: Deretan karakter teks di dalam tanda petik.\n- bool: Nilai logika true atau false.',
+          isCode: false,
+        ),
+        SectionModel(
+          header: '2. Studi Kasus Perhitungan Toko',
+          body: 'int hargaBarang = 15000;\nint jumlahBeli = 3;\nint totalHarga = hargaBarang * jumlahBeli;\nprint("Total: " + totalHarga.toString());',
+          isCode: true,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nTipe data apakah yang paling tepat untuk menyimpan angka desimal 3.14?',
-        'options': ['int', 'double', 'String', 'bool'],
-        'correctIndex': 1,
-        'explanation': 'Tipe data double digunakan khusus untuk menampung nilai angka pecahan atau desimal yang memiliki titik koma/desimal.'
-      },
-      'xp': 150
-    },
-    {
-      'title': 'Babak 3: Percabangan Logika (If - Else)',
-      'desc': 'Modul Lengkap: Pengambilan keputusan otomatis berdasarkan ekspresi Boolean.',
-      'sections': [
-        {
-          'header': '1. Mengapa Perlu Percabangan?',
-          'body': 'Program cerdas mengambil keputusan berbeda menggunakan kondisi IF. Operator perbandingan meliputi ==, !=, >, <, >=, dan <=.'
-        },
-        {
-          'header': '2. Kode Sistem Kelulusan Ujian',
-          'isCode': true,
-          'body': 'int nilaiSiswa = 78;\nif (nilaiSiswa >= 75) {\n  print("LULUS");\n} else {\n  print("REMIDI");\n}'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nTipe data apakah yang paling tepat untuk menyimpan angka desimal 3.14?',
+        options: <String>['int', 'double', 'String', 'bool'],
+        correctIndex: 1,
+        explanation: 'Tipe data double digunakan khusus untuk menampung nilai angka pecahan atau desimal yang memiliki titik koma/desimal.',
+      ),
+      xp: 150,
+    ),
+    StageModel(
+      title: 'Babak 3: Percabangan Logika (If - Else)',
+      desc: 'Modul Lengkap: Pengambilan keputusan otomatis berdasarkan ekspresi Boolean.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Mengapa Perlu Percabangan?',
+          body: 'Program cerdas mengambil keputusan berbeda menggunakan kondisi IF. Operator perbandingan meliputi ==, !=, >, <, >=, dan <=.',
+          isCode: false,
+        ),
+        SectionModel(
+          header: '2. Kode Sistem Kelulusan Ujian',
+          body: 'int nilaiSiswa = 78;\nif (nilaiSiswa >= 75) {\n  print("LULUS");\n} else {\n  print("REMIDI");\n}',
+          isCode: true,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nSimbol apa yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
-        'options': ['=', '==', '!=', '=>'],
-        'correctIndex': 1,
-        'explanation': 'Simbol tanda sama dengan ganda (==) adalah operator perbandingan kesetaraan, sedangkan tanda (=) tunggal digunakan untuk proses assignment (pengisian nilai).'
-      },
-      'xp': 200
-    },
-    {
-      'title': 'Babak 4: Percabangan Majemuk (Else If & Logical Operators)',
-      'desc': 'Modul Lengkap: Logika DAN (&&), ATAU (||), serta pengkondisian bersarang.',
-      'sections': [
-        {
-          'header': '1. Operator Logika Kombinasi',
-          'body': '- AND (&&): Kedua syarat HARUS bernilai TRUE.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE.'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nSimbol apa yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
+        options: <String>['=', '==', '!=', '=>'],
+        correctIndex: 1,
+        explanation: 'Simbol tanda sama dengan ganda (==) adalah operator perbandingan kesetaraan, sedangkan tanda (=) tunggal digunakan untuk proses assignment (pengisian nilai).',
+      ),
+      xp: 200,
+    ),
+    StageModel(
+      title: 'Babak 4: Percabangan Majemuk (Else If & Logical Operators)',
+      desc: 'Modul Lengkap: Logika DAN (&&), ATAU (||), serta pengkondisian bersarang.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Operator Logika Kombinasi',
+          body: '- AND (&&): Kedua syarat HARUS bernilai TRUE.\n- OR (||): Cukup SALAH SATU syarat bernilai TRUE.',
+          isCode: false,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nOperator logika manakah yang mengharuskan KEDUA syarat bernilai TRUE?',
-        'options': ['||', '&&', '!', '=='],
-        'correctIndex': 1,
-        'explanation': 'Operator AND (&&) menghasilkan nilai true hanya jika seluruh kondisi yang dihubungkan bernilai true secara bersamaan.'
-      },
-      'xp': 200
-    },
-    {
-      'title': 'Babak 5: Perulangan Terhitung (For Loop)',
-      'desc': 'Modul Lengkap: Otomatisasi tugas berulang dengan counter increment.',
-      'sections': [
-        {
-          'header': '1. Struktur For Loop',
-          'body': 'for (inisialisasi; kondisi_batas; iterasi) { ... }\nContoh: int i = 1; i <= 5; i++'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nOperator logika manakah yang mengharuskan KEDUA syarat bernilai TRUE?',
+        options: <String>['||', '&&', '!', '=='],
+        correctIndex: 1,
+        explanation: 'Operator AND (&&) menghasilkan nilai true hanya jika seluruh kondisi yang dihubungkan bernilai true secara bersamaan.',
+      ),
+      xp: 200,
+    ),
+    StageModel(
+      title: 'Babak 5: Perulangan Terhitung (For Loop)',
+      desc: 'Modul Lengkap: Otomatisasi tugas berulang dengan counter increment.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Struktur For Loop',
+          body: 'for (inisialisasi; kondisi_batas; iterasi) { ... }\nContoh: int i = 1; i <= 5; i++',
+          isCode: false,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nBagian manakah pada For Loop yang berfungsi menambahkan nilai hitungan setiap putaran?',
-        'options': ['Inisialisasi', 'Kondisi batas', 'Iterasi (i++)', 'Blok cetak'],
-        'correctIndex': 2,
-        'explanation': 'Bagian iterasi (seperti i++) dieksekusi di akhir setiap putaran loop untuk menambah atau mengubah nilai penghitung.'
-      },
-      'xp': 250
-    },
-    {
-      'title': 'Babak 6: Perulangan Kondisional (While Loop)',
-      'desc': 'Modul Lengkap: Loop berbasis kondisi dinamis dan Infinite Loop Hazard.',
-      'sections': [
-        {
-          'header': '1. Bahaya Infinite Loop',
-          'body': 'Jika kondisi dalam While selalu bernilai true tanpa ada pembaruan variabel, aplikasi akan mengalami crash/hang.'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nBagian manakah pada For Loop yang berfungsi menambahkan nilai hitungan setiap putaran?',
+        options: <String>['Inisialisasi', 'Kondisi batas', 'Iterasi (i++)', 'Blok cetak'],
+        correctIndex: 2,
+        explanation: 'Bagian iterasi (seperti i++) dieksekusi di akhir setiap putaran loop untuk menambah atau mengubah nilai penghitung.',
+      ),
+      xp: 250,
+    ),
+    StageModel(
+      title: 'Babak 6: Perulangan Kondisional (While Loop)',
+      desc: 'Modul Lengkap: Loop berbasis kondisi dinamis dan Infinite Loop Hazard.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Bahaya Infinite Loop',
+          body: 'Jika kondisi dalam While selalu bernilai true tanpa ada pembaruan variabel, aplikasi akan mengalami crash/hang.',
+          isCode: false,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nApa akibat jika pengkondisian While bernilai true terus-menerus tanpa henti?',
-        'options': ['Program berjalan sangat cepat', 'Infinite Loop (Crash)', 'Data tersimpan otomatis', 'Tidak terjadi apa-apa'],
-        'correctIndex': 1,
-        'explanation': 'Kondisi true tanpa henti memicu Infinite Loop yang menghabiskan sumber daya memori dan membuat aplikasi mengalami crash.'
-      },
-      'xp': 250
-    },
-    {
-      'title': 'Babak 7: Fungsi / Subprogram (Method)',
-      'desc': 'Modul Lengkap: Pemrograman modular, parameter, dan nilai kembalian.',
-      'sections': [
-        {
-          'header': '1. Void vs Return Function',
-          'body': '- Void: Fungsi tanpa nilai kembalian.\n- Return: Fungsi yang mengolah data lalu mengembalikan nilai hasil.'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nApa akibat jika pengkondisian While bernilai true terus-menerus tanpa henti?',
+        options: <String>['Program berjalan sangat cepat', 'Infinite Loop (Crash)', 'Data tersimpan otomatis', 'Tidak terjadi apa-apa'],
+        correctIndex: 1,
+        explanation: 'Kondisi true tanpa henti memicu Infinite Loop yang menghabiskan sumber daya memori dan membuat aplikasi mengalami crash.',
+      ),
+      xp: 250,
+    ),
+    StageModel(
+      title: 'Babak 7: Fungsi / Subprogram (Method)',
+      desc: 'Modul Lengkap: Pemrograman modular, parameter, dan nilai kembalian.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Void vs Return Function',
+          body: '- Void: Fungsi tanpa nilai kembalian.\n- Return: Fungsi yang mengolah data lalu mengembalikan nilai hasil.',
+          isCode: false,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nKata kunci apa yang digunakan untuk mengembalikan nilai dari sebuah fungsi?',
-        'options': ['print', 'void', 'return', 'main'],
-        'correctIndex': 2,
-        'explanation': 'Kata kunci return berfungsi untuk mengalirkan hasil keluaran data kembali ke bagian pemanggil fungsi tersebut.'
-      },
-      'xp': 300
-    },
-    {
-      'title': 'Babak 8: Struktur Data Array / List',
-      'desc': 'Modul Lengkap: Koleksi data sejenis dan elemen Zero-Indexed.',
-      'sections': [
-        {
-          'header': '1. Konsep Zero-Indexed',
-          'body': 'Komputer selalu menghitung urutan elemen dalam List dimulai dari angka 0, bukan 1.'
-        }
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nKata kunci apa yang digunakan untuk mengembalikan nilai dari sebuah fungsi?',
+        options: <String>['print', 'void', 'return', 'main'],
+        correctIndex: 2,
+        explanation: 'Kata kunci return berfungsi untuk mengalirkan hasil keluaran data kembali ke bagian pemanggil fungsi tersebut.',
+      ),
+      xp: 300,
+    ),
+    StageModel(
+      title: 'Babak 8: Struktur Data Array / List',
+      desc: 'Modul Lengkap: Koleksi data sejenis dan elemen Zero-Indexed.',
+      sections: <SectionModel>[
+        SectionModel(
+          header: '1. Konsep Zero-Indexed',
+          body: 'Komputer selalu menghitung urutan elemen dalam List dimulai dari angka 0, bukan 1.',
+          isCode: false,
+        ),
       ],
-      'checkpoint': {
-        'question': 'Pertanyaan Checkpoint:\nBerapakah indeks elemen pertama dari sebuah List di dalam pemrograman?',
-        'options': ['Indeks [1]', 'Indeks [0]', 'Indeks [-1]', 'Indeks [first]'],
-        'correctIndex': 1,
-        'explanation': 'Sistem komputer menggunakan konsep zero-indexed, di mana elemen pertama dalam memori array/list selalu dimulai dari indeks angka 0.'
-      },
-      'xp': 300
-    },
+      checkpoint: CheckpointModel(
+        question: 'Pertanyaan Checkpoint:\nBerapakah indeks elemen pertama dari sebuah List di dalam pemrograman?',
+        options: <String>['Indeks [1]', 'Indeks [0]', 'Indeks [-1]', 'Indeks [first]'],
+        correctIndex: 1,
+        explanation: 'Sistem komputer menggunakan konsep zero-indexed, di mana elemen pertama dalam memori array/list selalu dimulai dari indeks angka 0.',
+      ),
+      xp: 300,
+    ),
   ];
 
   @override
@@ -1014,7 +1026,7 @@ class _QuestScreenState extends State<QuestScreen> {
         padding: const EdgeInsets.all(20.0),
         itemCount: stages.length,
         itemBuilder: (context, index) {
-          final stage = stages[index];
+          final StageModel stage = stages[index];
           bool isUnlocked = index <= currentUnlocked;
           bool isCompleted = index < currentUnlocked;
 
@@ -1027,21 +1039,14 @@ class _QuestScreenState extends State<QuestScreen> {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               leading: CircleAvatar(radius: 26, backgroundColor: badgeColor.withValues(alpha: 0.15), child: Icon(statusIcon, color: badgeColor, size: 28)),
-              title: Text(stage['title'], style: TextStyle(fontWeight: FontWeight.bold, color: isUnlocked ? const Color(0xFF2D3142) : Colors.grey)),
-              subtitle: Text(stage['desc'], style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
+              title: Text(stage.title, style: TextStyle(fontWeight: FontWeight.bold, color: isUnlocked ? const Color(0xFF2D3142) : Colors.grey)),
+              subtitle: Text(stage.desc, style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.grey.shade600 : Colors.grey.shade400)),
               trailing: isUnlocked ? const Icon(Icons.arrow_forward_ios_rounded, size: 18) : const Icon(Icons.lock),
               onTap: () {
                 if (!isUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selesaikan babak sebelumnya terlebih dahulu!')));
                 } else {
-                  _showSingleBoxMaterialDialog(
-                    context,
-                    index,
-                    stage['title'],
-                    stage['sections'] as List>,
-                    stage['checkpoint'] as Map<String, dynamic>,
-                    stage['xp'],
-                  );
+                  _showSingleBoxMaterialDialog(context, index, stage.title, stage.sections, stage.checkpoint, stage.xp);
                 }
               },
             ),
@@ -1055,8 +1060,8 @@ class _QuestScreenState extends State<QuestScreen> {
     BuildContext context,
     int index,
     String title,
-    List> sections,
-    Map<String, dynamic> checkpoint,
+    List<SectionModel> sections,
+    CheckpointModel checkpoint,
     int xp,
   ) {
     int? selectedAnswer;
@@ -1092,31 +1097,30 @@ class _QuestScreenState extends State<QuestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: List.generate(sections.length, (i) {
-                        final sec = sections[i];
-                        final bool isCode = sec['isCode'] == true;
+                        final SectionModel sec = sections[i];
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              sec['header']!,
+                              sec.header,
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
                             ),
                             const SizedBox(height: 6),
-                            if (isCode)
+                            if (sec.isCode)
                               Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(14),
                                 margin: const EdgeInsets.symmetric(vertical: 6),
                                 decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(12)),
                                 child: Text(
-                                  sec['body']!,
+                                  sec.body,
                                   style: const TextStyle(fontSize: 13, height: 1.4, fontFamily: 'monospace', color: Color(0xFFA6ADC8)),
                                 ),
                               )
                             else
                               Text(
-                                sec['body']!,
+                                sec.body,
                                 style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87),
                               ),
                             if (i < sections.length - 1) ...[
@@ -1150,15 +1154,15 @@ class _QuestScreenState extends State<QuestScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          checkpoint['question'],
+                          checkpoint.question,
                           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                         ),
                         const SizedBox(height: 10),
-                        ...List.generate((checkpoint['options'] as List).length, (optIdx) {
+                        ...List.generate(checkpoint.options.length, (optIdx) {
                           return RadioListTile<int>(
                             dense: true,
                             contentPadding: EdgeInsets.zero,
-                            title: Text(checkpoint['options'][optIdx], style: const TextStyle(fontSize: 13)),
+                            title: Text(checkpoint.options[optIdx], style: const TextStyle(fontSize: 13)),
                             value: optIdx,
                             groupValue: selectedAnswer,
                             onChanged: (val) {
@@ -1181,7 +1185,7 @@ class _QuestScreenState extends State<QuestScreen> {
                                 : () {
                                     setDialogState(() {
                                       isAnswerChecked = true;
-                                      isAnswerCorrect = (selectedAnswer == checkpoint['correctIndex']);
+                                      isAnswerCorrect = (selectedAnswer == checkpoint.correctIndex);
                                     });
                                   },
                             child: const Text('CEK JAWABAN CHECKPOINT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
@@ -1207,11 +1211,11 @@ class _QuestScreenState extends State<QuestScreen> {
                                     builder: (context) => DiscussionScreen(
                                       history: [
                                         QuizDiscussionItem(
-                                          question: checkpoint['question'],
-                                          options: List<String>.from(checkpoint['options']),
+                                          question: checkpoint.question,
+                                          options: checkpoint.options,
                                           selectedIndex: selectedAnswer ?? 0,
-                                          correctIndex: checkpoint['correctIndex'],
-                                          explanation: checkpoint['explanation'],
+                                          correctIndex: checkpoint.correctIndex,
+                                          explanation: checkpoint.explanation,
                                         ),
                                       ],
                                     ),
@@ -1278,86 +1282,88 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
   int _currentIndex = 0;
   int? _selectedOption;
 
-  final List<QuizDiscussionItem> _quizHistory = [];
+  final List<QuizDiscussionItem> _quizHistory = <QuizDiscussionItem>[];
 
-  final List> _questions = [
-    {
-      'question': 'Lengkapi sintaks deklarasi variabel teks berikut:\n\n____ nama = "NetBattle";',
-      'options': ['String', 'int', 'bool', 'double'],
-      'answer': 0,
-      'explanation': 'Tipe data String digunakan khusus untuk menyimpan nilai berupa teks atau kumpulan karakter di dalam tanda petik.'
-    },
-    {
-      'question': 'Lengkapi perintah pengkondisian IF di bawah ini:\n\n____ (skor >= 80) {\n  print("Lulus");\n}',
-      'options': ['if', 'when', 'check', 'loop'],
-      'answer': 0,
-      'explanation': 'Kata kunci if digunakan untuk melakukan percabangan keputusan bersyarat di dalam struktur bahasa pemrograman Dart/Java.'
-    },
-    {
-      'question': 'Kata kunci apa yang digunakan sebagai alternatif jika kondisi IF bernilai FALSE?',
-      'options': ['then', 'else', 'other', 'default'],
-      'answer': 1,
-      'explanation': 'Blok else dijalankan apabila kondisi pada pernyataan if utama bernilai false (tidak terpenuhi).'
-    },
-    {
-      'question': 'Sintaks deklarasi variabel bilangan bulat berangka 25:\n\n____ umur = 25;',
-      'options': ['String', 'bool', 'int', 'double'],
-      'answer': 2,
-      'explanation': 'Tipe data int (integer) digunakan untuk mendeklarasikan variabel yang menyimpan angka bilangan bulat.'
-    },
-    {
-      'question': 'Manakah operator yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
-      'options': ['=', '==', '!=', '=>'],
-      'answer': 1,
-      'explanation': 'Operator kesetaraan (==) membandingkan apakah dua buah nilai bernilai sama persis.'
-    },
-    {
-      'question': 'Kata kunci yang digunakan untuk menghentikan perulangan (loop) secara paksa:',
-      'options': ['stop', 'exit', 'break', 'return'],
-      'answer': 2,
-      'explanation': 'Perintah break digunakan untuk menghentikan alur perulangan secara paksa.'
-    },
-    {
-      'question': 'Tipe data yang hanya bernilai benar (true) atau salah (false) adalah:',
-      'options': ['int', 'bool', 'String', 'char'],
-      'answer': 1,
-      'explanation': 'Tipe data bool menampung nilai kebenaran logika boolean true atau false.'
-    },
-    {
-      'question': 'Kata kunci yang digunakan untuk mendefinisikan sebuah fungsi tanpa mengembalikan nilai (return):',
-      'options': ['null', 'empty', 'void', 'static'],
-      'answer': 2,
-      'explanation': 'Void menyatakan bahwa fungsi mengeksekusi perintah tanpa memberikan nilai kembalian.'
-    },
-    {
-      'question': 'Bagaimanakah cara mengambil jumlah elemen pada variabel List bernama angka?',
-      'options': ['angka.size', 'angka.length', 'angka.count', 'angka.total'],
-      'answer': 1,
-      'explanation': 'Properti .length digunakan pada tipe data List untuk mengetahui jumlah total elemen yang tersimpan.'
-    },
-    {
-      'question': 'Simbol apa yang digunakan untuk menambahkan komentar satu baris pada kode Dart/Java?',
-      'options': ['//', '<!--', '#', '/*'],
-      'answer': 0,
-      'explanation': 'Garis miring ganda (//) berfungsi sebagai penanda komentar baris tunggal.'
-    },
+  final List<QuestionModel> _questions = <QuestionModel>[
+    QuestionModel(
+      question: 'Lengkapi sintaks deklarasi variabel teks berikut:\n\n____ nama = "NetBattle";',
+      options: <String>['String', 'int', 'bool', 'double'],
+      answer: 0,
+      explanation: 'Tipe data String digunakan khusus untuk menyimpan nilai berupa teks atau kumpulan karakter di dalam tanda petik.',
+    ),
+    QuestionModel(
+      question: 'Lengkapi perintah pengkondisian IF di bawah ini:\n\n____ (skor >= 80) {\n  print("Lulus");\n}',
+      options: <String>['if', 'when', 'check', 'loop'],
+      answer: 0,
+      explanation: 'Kata kunci if digunakan untuk melakukan percabangan keputusan bersyarat di dalam struktur bahasa pemrograman Dart/Java.',
+    ),
+    QuestionModel(
+      question: 'Kata kunci apa yang digunakan sebagai alternatif jika kondisi IF bernilai FALSE?',
+      options: <String>['then', 'else', 'other', 'default'],
+      answer: 1,
+      explanation: 'Blok else dijalankan apabila kondisi pada pernyataan if utama bernilai false (tidak terpenuhi).',
+    ),
+    QuestionModel(
+      question: 'Sintaks deklarasi variabel bilangan bulat berangka 25:\n\n____ umur = 25;',
+      options: <String>['String', 'bool', 'int', 'double'],
+      answer: 2,
+      explanation: 'Tipe data int (integer) digunakan untuk mendeklarasikan variabel yang menyimpan angka bilangan bulat.',
+    ),
+    QuestionModel(
+      question: 'Manakah operator yang digunakan untuk membandingkan dua nilai "SAMA DENGAN"?',
+      options: <String>['=', '==', '!=', '=>'],
+      answer: 1,
+      explanation: 'Operator kesetaraan (==) membandingkan apakah dua buah nilai bernilai sama persis.',
+    ),
+    QuestionModel(
+      question: 'Kata kunci yang digunakan untuk menghentikan perulangan (loop) secara paksa:',
+      options: <String>['stop', 'exit', 'break', 'return'],
+      answer: 2,
+      explanation: 'Perintah break digunakan untuk menghentikan alur perulangan secara paksa.',
+    ),
+    QuestionModel(
+      question: 'Tipe data yang hanya bernilai benar (true) atau salah (false) adalah:',
+      options: <String>['int', 'bool', 'String', 'char'],
+      answer: 1,
+      explanation: 'Tipe data bool menampung nilai kebenaran logika boolean true atau false.',
+    ),
+    QuestionModel(
+      question: 'Kata kunci yang digunakan untuk mendefinisikan sebuah fungsi tanpa mengembalikan nilai (return):',
+      options: <String>['null', 'empty', 'void', 'static'],
+      answer: 2,
+      explanation: 'Void menyatakan bahwa fungsi mengeksekusi perintah tanpa memberikan nilai kembalian.',
+    ),
+    QuestionModel(
+      question: 'Bagaimanakah cara mengambil jumlah elemen pada variabel List bernama angka?',
+      options: <String>['angka.size', 'angka.length', 'angka.count', 'angka.total'],
+      answer: 1,
+      explanation: 'Properti .length digunakan pada tipe data List untuk mengetahui jumlah total elemen yang tersimpan.',
+    ),
+    QuestionModel(
+      question: 'Simbol apa yang digunakan untuk menambahkan komentar satu baris pada kode Dart/Java?',
+      options: <String>['//', '<!--', '#', '/*'],
+      answer: 0,
+      explanation: 'Garis miring ganda (//) berfungsi sebagai penanda komentar baris tunggal.',
+    ),
   ];
 
   void _answer(int optionIndex) {
+    final QuestionModel q = _questions[_currentIndex];
+    
     setState(() {
       _selectedOption = optionIndex;
-      bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
+      bool isCorrect = optionIndex == q.answer;
       if (isCorrect) {
         _correctCount++;
       }
 
       _quizHistory.add(
         QuizDiscussionItem(
-          question: _questions[_currentIndex]['question'],
-          options: List<String>.from(_questions[_currentIndex]['options']),
+          question: q.question,
+          options: q.options,
           selectedIndex: optionIndex,
-          correctIndex: _questions[_currentIndex]['answer'],
-          explanation: _questions[_currentIndex]['explanation'] ?? 'Pahami kembali materi dasar mengenai logika pemrograman terkait soal ini.',
+          correctIndex: q.answer,
+          explanation: q.explanation,
         ),
       );
     });
@@ -1389,10 +1395,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
           children: [
             const Icon(Icons.emoji_events_rounded, size: 70, color: Colors.amber),
             const SizedBox(height: 12),
-            Text(
-              '$finalScore',
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-            ),
+            Text('$finalScore', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
             const Text('SKOR AKHIR KAMU', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
             const SizedBox(height: 16),
             Container(
@@ -1409,20 +1412,11 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.blue.shade800,
-                side: BorderSide(color: Colors.blue.shade300),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+              style: OutlinedButton.styleFrom(foregroundColor: Colors.blue.shade800, side: BorderSide(color: Colors.blue.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
               icon: const Icon(Icons.menu_book_rounded),
               label: const Text('LIHAT PEMBAHASAN JAWABAN'),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DiscussionScreen(history: _quizHistory),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => DiscussionScreen(history: _quizHistory)));
               },
             ),
           ],
@@ -1443,7 +1437,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final q = _questions[_currentIndex];
+    final QuestionModel q = _questions[_currentIndex];
 
     return Scaffold(
       appBar: AppBar(
@@ -1470,9 +1464,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E2E),
                 borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1488,14 +1480,8 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    q['question'],
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFA6ADC8),
-                      fontFamily: 'monospace',
-                      height: 1.5,
-                    ),
+                    q.question,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFFA6ADC8), fontFamily: 'monospace', height: 1.5),
                   ),
                 ],
               ),
@@ -1503,10 +1489,10 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
             const SizedBox(height: 24),
             Expanded(
               child: ListView.builder(
-                itemCount: (q['options'] as List).length,
+                itemCount: q.options.length,
                 itemBuilder: (context, index) {
                   bool isSelected = _selectedOption == index;
-                  bool isCorrect = index == q['answer'];
+                  bool isCorrect = index == q.answer;
 
                   Color btnBgColor = Colors.white;
                   Color borderColor = Colors.grey.shade200;
@@ -1522,23 +1508,14 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                       color: btnBgColor,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: borderColor, width: 1.5),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
-                      ],
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                       title: Text(
-                        q['options'][index],
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? (isCorrect ? Colors.green.shade800 : Colors.red.shade800) : const Color(0xFF2D3142),
-                        ),
+                        q.options[index],
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSelected ? (isCorrect ? Colors.green.shade800 : Colors.red.shade800) : const Color(0xFF2D3142)),
                       ),
-                      trailing: isSelected
-                          ? Icon(isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded, color: isCorrect ? Colors.green : Colors.red)
-                          : null,
+                      trailing: isSelected ? Icon(isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded, color: isCorrect ? Colors.green : Colors.red) : null,
                       onTap: _selectedOption == null ? () => _answer(index) : null,
                     ),
                   );
@@ -1608,10 +1585,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: Colors.grey))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
             onPressed: () {
@@ -1628,11 +1602,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Battle Tarik Tambang 1v1', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Battle Tarik Tambang 1v1', style: TextStyle(color: Color(0xFF2D3142), fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -1640,21 +1610,17 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withValues(alpha: 0.7)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: LinearGradient(colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withValues(alpha: 0.7)]),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                children: [
-                  const Icon(Icons.sports_kabaddi_rounded, size: 50, color: Colors.white),
-                  const SizedBox(width: 16),
+                children: const [
+                  Icon(Icons.sports_kabaddi_rounded, size: 50, color: Colors.white),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Adu Tanding Real-Time', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(height: 4),
                         Text('Buat room dan undang temanmu atau masukkan kode!', style: TextStyle(fontSize: 12, color: Colors.white70)),
@@ -1665,7 +1631,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
               ),
             ),
             const SizedBox(height: 28),
-
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1674,8 +1639,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('1. Buat Ruang Pertandingan (Host)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  const Text('Dapatkan kode unik untuk dibagikan ke HP temanmu.', style: TextStyle(fontSize: 12, color: Colors.black54)),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -1690,7 +1653,6 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -1703,11 +1665,7 @@ class _CustomRoomScreenState extends State<CustomRoomScreen> {
                   TextField(
                     controller: _codeController,
                     textCapitalization: TextCapitalization.characters,
-                    decoration: InputDecoration(
-                      hintText: 'Masukkan Kode Room (Contoh: NET889)',
-                      prefixIcon: const Icon(Icons.key_rounded),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                    decoration: InputDecoration(hintText: 'Masukkan Kode Room (Contoh: NET889)', prefixIcon: const Icon(Icons.key_rounded), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -1766,57 +1724,67 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
   int _questionTimer = 10;
   Timer? _timer;
 
-  final List> _questions = [
-    {
-      'question': 'Lengkapi sintaks deklarasi variabel teks di Dart/Java:\n\n____ namaSiswa = "Satria";',
-      'options': ['String', 'int', 'bool', 'double'],
-      'answer': 0,
-    },
-    {
-      'question': 'Lengkapi struktur pengkondisian IF berikut:\n\n____ (skor >= 70) {\n  print("Lulus");\n}',
-      'options': ['if', 'while', 'for', 'switch'],
-      'answer': 0,
-    },
-    {
-      'question': 'Operator logika mana yang digunakan untuk menyatakan "TIDAK SAMA DENGAN"?\n\nif (a ____ b)',
-      'options': ['==', '!=', '>=', '<='],
-      'answer': 1,
-    },
-    {
-      'question': 'Kata kunci yang digunakan untuk menjalankan perulangan berdasarkan jumlah hitungan tertentu:\n\n____ (int i = 0; i < 5; i++)',
-      'options': ['while', 'if', 'for', 'do'],
-      'answer': 2,
-    },
-    {
-      'question': 'Lengkapi sintaks variabel bernilai boolean (benar/salah) berikut:\n\n____ isLulus = true;',
-      'options': ['int', 'bool', 'String', 'var'],
-      'answer': 1,
-    },
-    {
-      'question': 'Sintaks alternatif dalam IF yang dieksekusi ketika kondisi bernilai FALSE:\n\nif (x > 0) {\n  ...\n} ____ {\n  ...\n}',
-      'options': ['then', 'or', 'else', 'case'],
-      'answer': 2,
-    },
-    {
-      'question': 'Bagaimana cara menambahkan nilai 1 secara langsung pada variabel x dalam perulangan?',
-      'options': ['x++', 'x--', 'x==1', 'x+1'],
-      'answer': 0,
-    },
-    {
-      'question': 'Tipe data manakah yang cocok untuk menyimpan nilai desimal seperti 3.14?',
-      'options': ['int', 'String', 'double', 'bool'],
-      'answer': 2,
-    },
-    {
-      'question': 'Kata kunci yang digunakan dalam fungsi untuk mengembalikan nilai hasil perhitungan:\n\nint tambah(int a, int b) {\n  ____ a + b;\n}',
-      'options': ['print', 'return', 'break', 'void'],
-      'answer': 1,
-    },
-    {
-      'question': 'Bagaimana cara mengambil elemen pertama dalam sebuah Array/List bernama angka?',
-      'options': ['angka[1]', 'angka[0]', 'angka.first()', 'angka[first]'],
-      'answer': 1,
-    },
+  final List<QuestionModel> _questions = <QuestionModel>[
+    QuestionModel(
+      question: 'Lengkapi sintaks deklarasi variabel teks di Dart/Java:\n\n____ namaSiswa = "Satria";',
+      options: <String>['String', 'int', 'bool', 'double'],
+      answer: 0,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Lengkapi struktur pengkondisian IF berikut:\n\n____ (skor >= 70) {\n  print("Lulus");\n}',
+      options: <String>['if', 'while', 'for', 'switch'],
+      answer: 0,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Operator logika mana yang digunakan untuk menyatakan "TIDAK SAMA DENGAN"?\n\nif (a ____ b)',
+      options: <String>['==', '!=', '>=', '<='],
+      answer: 1,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Kata kunci yang digunakan untuk menjalankan perulangan berdasarkan jumlah hitungan tertentu:\n\n____ (int i = 0; i < 5; i++)',
+      options: <String>['while', 'if', 'for', 'do'],
+      answer: 2,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Lengkapi sintaks variabel bernilai boolean (benar/salah) berikut:\n\n____ isLulus = true;',
+      options: <String>['int', 'bool', 'String', 'var'],
+      answer: 1,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Sintaks alternatif dalam IF yang dieksekusi ketika kondisi bernilai FALSE:\n\nif (x > 0) {\n  ...\n} ____ {\n  ...\n}',
+      options: <String>['then', 'or', 'else', 'case'],
+      answer: 2,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Bagaimana cara menambahkan nilai 1 secara langsung pada variabel x dalam perulangan?',
+      options: <String>['x++', 'x--', 'x==1', 'x+1'],
+      answer: 0,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Tipe data manakah yang cocok untuk menyimpan nilai desimal seperti 3.14?',
+      options: <String>['int', 'String', 'double', 'bool'],
+      answer: 2,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Kata kunci yang digunakan dalam fungsi untuk mengembalikan nilai hasil perhitungan:\n\nint tambah(int a, int b) {\n  ____ a + b;\n}',
+      options: <String>['print', 'return', 'break', 'void'],
+      answer: 1,
+      explanation: '',
+    ),
+    QuestionModel(
+      question: 'Bagaimana cara mengambil elemen pertama dalam sebuah Array/List bernama angka?',
+      options: <String>['angka[1]', 'angka[0]', 'angka.first()', 'angka[first]'],
+      answer: 1,
+      explanation: '',
+    ),
   ];
 
   @override
@@ -1870,10 +1838,11 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
 
   void _answer(int optionIndex) {
     _timer?.cancel();
+    final QuestionModel q = _questions[_currentIndex];
 
     setState(() {
       _selectedOption = optionIndex;
-      bool isCorrect = optionIndex == _questions[_currentIndex]['answer'];
+      bool isCorrect = optionIndex == q.answer;
 
       if (isCorrect) {
         _ropePosition = (_ropePosition - 0.1).clamp(0.0, 1.0);
@@ -1972,7 +1941,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
       );
     }
 
-    final q = _questions[_currentIndex];
+    final QuestionModel q = _questions[_currentIndex];
 
     return Scaffold(
       appBar: AppBar(
@@ -2054,16 +2023,13 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                 children: [
                   Text('Soal ${_currentIndex + 1} dari ${_questions.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 8),
-
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E1E2E),
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
-                      ],
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2079,27 +2045,20 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          q['question'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFA6ADC8),
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
+                          q.question,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFFA6ADC8), fontFamily: 'monospace', height: 1.5),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Expanded(
                     child: ListView.builder(
-                      itemCount: (q['options'] as List).length,
+                      itemCount: q.options.length,
                       itemBuilder: (context, index) {
-                        final optionText = q['options'][index];
+                        final optionText = q.options[index];
                         final isSelected = _selectedOption == index;
-                        final isCorrect = index == q['answer'];
+                        final isCorrect = index == q.answer;
 
                         Color btnColor = Colors.white;
                         Color borderColor = Colors.grey.shade200;
@@ -2119,9 +2078,7 @@ class _TugOfWarMultiplayerScreenState extends State<TugOfWarMultiplayerScreen> {
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
                             title: Text(optionText, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                            trailing: isSelected
-                                ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red)
-                                : null,
+                            trailing: isSelected ? Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red) : null,
                             onTap: _selectedOption == null ? () => _answer(index) : null,
                           ),
                         );
@@ -2199,20 +2156,13 @@ class DiscussionScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 'Soal ${index + 1} • ${item.isCorrect ? 'BENAR' : 'SALAH'}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: item.isCorrect ? Colors.green.shade900 : Colors.red.shade900,
-                                ),
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: item.isCorrect ? Colors.green.shade900 : Colors.red.shade900),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          item.question,
-                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-                        ),
+                        Text(item.question, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
                         const SizedBox(height: 12),
                         Column(
                           children: List.generate(item.options.length, (optIdx) {
@@ -2240,15 +2190,7 @@ class DiscussionScreen extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      item.options[optIdx],
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: isUserChoice || isCorrectChoice ? FontWeight.bold : FontWeight.normal,
-                                      ),
-                                    ),
-                                  ),
+                                  Expanded(child: Text(item.options[optIdx], style: TextStyle(fontSize: 13, fontWeight: isUserChoice || isCorrectChoice ? FontWeight.bold : FontWeight.normal))),
                                   if (isCorrectChoice)
                                     const Icon(Icons.check_circle, color: Colors.green, size: 20)
                                   else if (isUserChoice && !item.isCorrect)
@@ -2262,21 +2204,13 @@ class DiscussionScreen extends StatelessWidget {
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Icon(Icons.lightbulb_outline, color: Colors.blue.shade800, size: 20),
                               const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Pembahasan:\n${item.explanation}',
-                                  style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
-                                ),
-                              ),
+                              Expanded(child: Text('Pembahasan:\n${item.explanation}', style: TextStyle(fontSize: 12, color: Colors.blue.shade900))),
                             ],
                           ),
                         ),
@@ -2339,9 +2273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String newPassword = _passwordController.text.trim();
 
     if (newName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nama tidak boleh kosong!')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nama tidak boleh kosong!')));
       return;
     }
 
@@ -2356,10 +2288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Profil berhasil diperbarui!'),
-        backgroundColor: Colors.green,
-      ),
+      const SnackBar(content: Text('Profil berhasil diperbarui!'), backgroundColor: Colors.green),
     );
   }
 
@@ -2374,11 +2303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.cancel : Icons.edit_note, color: widget.themeColor, size: 28),
-            onPressed: () {
-              setState(() {
-                _isEditing = !_isEditing;
-              });
-            },
+            onPressed: () => setState(() => _isEditing = !_isEditing),
           )
         ],
       ),
@@ -2392,25 +2317,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Icon(Icons.person_rounded, size: 60, color: widget.themeColor),
             ),
             const SizedBox(height: 16),
-            Text(
-              _nameController.text,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-            ),
+            Text(_nameController.text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 4),
-            Text(
-              widget.currentEmail,
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
+            Text(widget.currentEmail, style: const TextStyle(fontSize: 13, color: Colors.black54)),
             const SizedBox(height: 24),
-
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2434,14 +2350,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 28),
-
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -2450,11 +2361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextField(
                     controller: _nameController,
                     enabled: _isEditing,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Lengkap',
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                    decoration: InputDecoration(labelText: 'Nama Lengkap', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -2474,10 +2381,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.themeColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                        style: ElevatedButton.styleFrom(backgroundColor: widget.themeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                         icon: const Icon(Icons.save_rounded, color: Colors.white),
                         label: const Text('SIMPAN PERUBAHAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         onPressed: _saveProfileChanges,
@@ -2488,24 +2392,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 28),
-
             SizedBox(
               width: double.infinity,
               height: 48,
               child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  side: const BorderSide(color: Colors.redAccent),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+                style: OutlinedButton.styleFrom(foregroundColor: Colors.red, side: const BorderSide(color: Colors.redAccent), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                 icon: const Icon(Icons.logout_rounded),
                 label: const Text('KELUAR / LOGOUT AKUN', style: TextStyle(fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AuthLoginScreen()),
-                    (route) => false,
-                  );
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const AuthLoginScreen()), (route) => false);
                 },
               ),
             ),

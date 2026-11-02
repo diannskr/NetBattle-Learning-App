@@ -295,351 +295,274 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT AVATAR CUSTOMIZER
+// 3. MASKOT AVATAR CUSTOMIZER (SISTEM LAYERING ALA QUIZZIZZ)
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
   final String email;
   final bool isInitialSetup;
-  final IconData? currentHat;
-  final IconData? currentFace;
-  final IconData? currentOutfit;
+  final Color themeColor;
 
-  const AvatarCustomizerScreen({super.key, required this.username, required this.email, this.isInitialSetup = false, this.currentHat, this.currentFace, this.currentOutfit});
+  const AvatarCustomizerScreen({
+    super.key, 
+    required this.username, 
+    required this.email, 
+    this.isInitialSetup = false,
+    this.themeColor = const Color(0xFF6C63FF),
+  });
 
   @override
   State<AvatarCustomizerScreen> createState() => _AvatarCustomizerScreenState();
 }
 
 class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
-  int _hatIndex = 0;
-  final int _faceIndex = 0;
-  final int _outfitIndex = 0;
-  int _colorIndex = 0;
+  // Indeks kategori aktif (0: Topi, 1: Baju, 2: Tas)
+  int _selectedTabCategory = 0;
 
-  final List<IconData?> _hats = [null, Icons.sports_esports, Icons.school_rounded, Icons.military_tech];
-  final List<IconData> _faces = [Icons.face_rounded, Icons.sentiment_very_satisfied_rounded, Icons.face_retouching_natural, Icons.smart_toy_rounded];
-  final List<IconData> _outfits = [Icons.checkroom_rounded, Icons.shield_outlined, Icons.sports_kabaddi, Icons.dry_cleaning_rounded];
-  final List<Map<String, dynamic>> _themeColors = [
-    {'name': 'Cyber Indigo', 'color': const Color(0xFF6C63FF)},
-    {'name': 'Blaze Orange', 'color': Colors.orange},
-    {'name': 'Matrix Green', 'color': const Color(0xFF00B09B)},
-    {'name': 'Royal Purple', 'color': const Color(0xFF8E2DE2)},
-    {'name': 'Ruby Red', 'color': const Color(0xFFE53935)},
+  // Pilihan item yang sedang dipakai oleh avatar
+  int _selectedHat = 0;
+  int _selectedOutfit = 0;
+  int _selectedBag = 0;
+
+  // Daftar aset gambar untuk masing-masing kategori
+  // (Pastikan file .png ini nanti sudah kamu masukkan ke folder assets/images/)
+  final List<String> _hatOptions = [
+    'assets/images/hat_none.png',
+    'assets/images/hat_frog.png',
+    'assets/images/hat_helmet.png',
+  ];
+
+  final List<String> _outfitOptions = [
+    'assets/images/outfit_default.png',
+    'assets/images/outfit_red.png',
+    'assets/images/outfit_blue.png',
+  ];
+
+  final List<String> _bagOptions = [
+    'assets/images/bag_none.png',
+    'assets/images/bag_mushroom.png',
+    'assets/images/bag_blue.png',
   ];
 
   @override
   Widget build(BuildContext context) {
-    Color activeColor = _themeColors[_colorIndex]['color'];
-
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isInitialSetup ? 'Rakit Maskot Coder' : 'Edit Avatar'), centerTitle: true),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              Container(
-                width: 200,
-                height: 240,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: activeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: activeColor, width: 3),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 28, child: _hats[_hatIndex] != null ? Icon(_hats[_hatIndex], size: 30, color: Colors.amber.shade800) : const SizedBox()),
-                    Icon(_faces[_faceIndex], size: 65, color: activeColor),
-                    const SizedBox(height: 2),
-                    Icon(_outfits[_outfitIndex], size: 70, color: activeColor.withValues(alpha: 0.9)),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
-                        const SizedBox(width: 12),
-                        Container(width: 14, height: 20, decoration: BoxDecoration(color: activeColor, borderRadius: BorderRadius.circular(4))),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text('Pilih Aksesori Topi/Kepala:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(_hats.length, (i) => ChoiceChip(label: _hats[i] == null ? const Text('Tanpa', style: TextStyle(fontSize: 11)) : Icon(_hats[i], size: 20), selected: _hatIndex == i, onSelected: (v) => setState(() => _hatIndex = i)))),
-              const SizedBox(height: 16),
-              const Text('Pilih Warna Tema:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Wrap(spacing: 8, children: List.generate(_themeColors.length, (i) {
-                Color c = _themeColors[i]['color'];
-                return ChoiceChip(
-                  avatar: CircleAvatar(backgroundColor: c, radius: 8),
-                  label: Text(_themeColors[i]['name'], style: const TextStyle(fontSize: 11)),
-                  selected: _colorIndex == i,
-                  onSelected: (v) {
-                    setState(() => _colorIndex = i);
-                    NetBattleApp.of(context).updateThemeColor(c);
-                  },
-                );
-              })),
-              const SizedBox(height: 28),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: activeColor),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeScreen(
-                          studentName: widget.username,
-                          studentEmail: widget.email,
-                          hatIcon: _hats[_hatIndex],
-                          faceIcon: _faces[_faceIndex],
-                          outfitIcon: _outfits[_outfitIndex],
-                          themeColor: activeColor,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('SIMPAN & MASUK DASHBOARD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 4. HOME SCREEN (DILENGKAPI TOMBOL PROFIL)
-// ---------------------------------------------------------------------------
-class HomeScreen extends StatefulWidget {
-  final String studentName;
-  final String studentEmail;
-  final IconData? hatIcon;
-  final IconData faceIcon;
-  final IconData outfitIcon;
-  final Color themeColor;
-
-  const HomeScreen({super.key, required this.studentName, required this.studentEmail, this.hatIcon, this.faceIcon = Icons.face_rounded, this.outfitIcon = Icons.checkroom_rounded, this.themeColor = const Color(0xFF6C63FF)});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _userXP = 0;
-  int _unlockedStageIndex = 0;
-  late String _currentName;
-
-  int get level => (_userXP / 300).floor() + 1;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentName = widget.studentName;
-  }
-
-  void _addXP(int points) {
-    setState(() => _userXP += points);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+      backgroundColor: const Color(0xFF1E1E2E), // Tema gelap ala game kuis
       appBar: AppBar(
-        title: Row(
-          children: const [
-            Icon(Icons.code, color: Colors.amber, size: 28),
-            SizedBox(width: 8),
-            Text('NetBattle Code Arena', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-          ],
-        ),
-        backgroundColor: Colors.white,
+        title: const Text('Kustomisasi Avatar Coder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle, color: widget.themeColor, size: 32),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
-                    currentEmail: widget.studentEmail,
-                    currentName: _currentName,
-                    userXP: _userXP,
-                    level: level,
-                    themeColor: widget.themeColor,
-                    onProfileUpdated: (newName) {
-                      setState(() {
-                        _currentName = newName;
-                      });
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [widget.themeColor, widget.themeColor.withValues(alpha: 0.75)]),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Row(
+      body: Column(
+        children: [
+          const SizedBox(height: 10),
+          Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
+          
+          // --- BAGIAN 1: PANGGUNG PODIUM & TAMPILAN AVATAR BERLAPIS (STACK) ---
+          Expanded(
+            flex: 5,
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
+                  // Efek Cahaya Panggung (Spotlight / Podium)
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(16)),
-                    child: Column(
-                      children: [
-                        if (widget.hatIcon != null) Icon(widget.hatIcon, size: 20, color: Colors.amberAccent),
-                        Icon(widget.faceIcon, size: 26, color: Colors.white),
-                        Icon(widget.outfitIcon, size: 26, color: Colors.white),
+                    width: 180,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: widget.themeColor.withValues(alpha: 0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.themeColor.withValues(alpha: 0.4),
+                          blurRadius: 40,
+                          spreadRadius: 10,
+                        )
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_currentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                        const SizedBox(height: 4),
-                        Text('Level $level • $_userXP XP', style: const TextStyle(fontSize: 13, color: Colors.white70)),
-                        const SizedBox(height: 8),
-                        LinearProgressIndicator(value: (_userXP % 300) / 300, color: Colors.amberAccent, backgroundColor: Colors.white24),
-                      ],
-                    ),
+
+                  // Lapis 1: Badan / Base Karakter Utama
+                  Image.asset(
+                    'assets/images/avatar_base.png',
+                    height: 170,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(Icons.smart_toy, size: 90, color: Colors.amber),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.checkroom, color: Colors.white),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AvatarCustomizerScreen(username: _currentName, email: widget.studentEmail, currentHat: widget.hatIcon, currentFace: widget.faceIcon, currentOutfit: widget.outfitIcon))),
+
+                  // Lapis 2: Baju / Outfit Karakter
+                  Image.asset(
+                    _outfitOptions[_selectedOutfit],
+                    height: 170,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const SizedBox(),
+                  ),
+
+                  // Lapis 3: Tas Ransel (Biasanya di belakang badan atau samping)
+                  Image.asset(
+                    _bagOptions[_selectedBag],
+                    height: 170,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const SizedBox(),
+                  ),
+
+                  // Lapis 4: Topi / Aksesori Kepala
+                  Image.asset(
+                    _hatOptions[_selectedHat],
+                    height: 170,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const SizedBox(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            const Text('Menu Misi Belajar Pemrograman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-            const SizedBox(height: 14),
+          ),
 
-            _buildGameCard(
-              context,
-              title: 'Quest: Modul Materi (8 Babak)',
-              subtitle: 'Pelajari konsep mendalam & jawab checkpoint untuk membuka babak',
-              icon: Icons.menu_book_rounded,
-              color: Colors.green,
-              xp: '+150 XP/Babak',
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuestScreen(
-                      unlockedStageIndex: _unlockedStageIndex,
-                      onStageCompleted: (newUnlockedIndex, xpGained) {
-                        setState(() {
-                          if (newUnlockedIndex > _unlockedStageIndex) {
-                            _unlockedStageIndex = newUnlockedIndex;
-                          }
-                        });
-                        _addXP(xpGained);
-                      },
+          // --- BAGIAN 2: MENU KATEGORI DI BAWAH (TAB PILIHAN: TOPI, BAJU, TAS) ---
+          Container(
+            color: const Color(0xFF2A2A3C),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildCategoryTab(0, Icons.roller_shades, 'Topi'),
+                _buildCategoryTab(1, Icons.checkroom, 'Baju'),
+                _buildCategoryTab(2, Icons.backpack, 'Tas'),
+              ],
+            ),
+          ),
+
+          // --- BAGIAN 3: GRID PILIHAN ITEM SESUAI TAB YANG DIPILIH (ALA QUIZZIZZ) ---
+          Expanded(
+            flex: 4,
+            child: Container(
+              color: const Color(0xFF151521),
+              padding: const EdgeInsets.all(16),
+              child: GridView.builder(
+                itemCount: _getCurrentOptionsCount(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemBuilder: (context, index) {
+                  bool isSelected = _isCurrentOptionSelected(index);
+                  String imagePath = _getCurrentOptionImage(index);
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _setCurrentOption(index);
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF252538),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected ? Colors.amberAccent : Colors.transparent,
+                          width: 2.5,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        imagePath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) => Center(
+                          child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 12),
+          ),
 
-            _buildGameCard(
-              context,
-              title: 'Battle Tarik Tambang (1v1)',
-              subtitle: 'Lengkapi sintaks koding rumpang untuk menarik tali!',
-              icon: Icons.sports_kabaddi_rounded,
-              color: Colors.orange,
-              xp: '+200 XP',
-              onTap: () async {
-                final xp = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CustomRoomScreen(currentUserName: _currentName)),
-                );
-                if (xp != null && xp is int) _addXP(xp);
-              },
+          // --- BAGIAN 4: TOMBOL SIMPAN ---
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFF151521),
+            child: SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.themeColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () {
+                  // Kirim data avatar kembali ke HomeScreen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeScreen(
+                        studentName: widget.username,
+                        studentEmail: widget.email,
+                        mascotImagePath: _outfitOptions[_selectedOutfit], // Bisa disesuaikan untuk menyimpan state avatar
+                        themeColor: widget.themeColor,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('SIMPAN & PAKAI AVATAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
             ),
-            const SizedBox(height: 12),
+          ),
+        ],
+      ),
+    );
+  }
 
-            _buildGameCard(
-              context,
-              title: 'Battle Kuis Kilat (10 Soal Solo)',
-              subtitle: 'Tantangan kuis cepat 10 soal logika & koding',
-              icon: Icons.flash_on_rounded,
-              color: widget.themeColor,
-              xp: '+100 XP',
-              onTap: () async {
-                final xp = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const QuizBattleScreen()),
-                );
-                if (xp != null && xp is int) _addXP(xp);
-              },
-            ),
+  // Widget Tombol Kategori di Bawah Panggung
+  Widget _buildCategoryTab(int categoryIndex, IconData icon, String label) {
+    bool isSelected = _selectedTabCategory == categoryIndex;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTabCategory = categoryIndex),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3B3B54) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: isSelected ? Colors.amberAccent : Colors.white60, size: 20),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.white60, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildGameCard(BuildContext context, {required String title, required String subtitle, required IconData icon, required Color color, required String xp, required VoidCallback onTap}) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 3))]),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: color, size: 30)),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)))),
-                          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(8)), child: Text(xp, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber.shade900))),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  // Helper untuk menentukan jumlah item berdasarkan tab aktif
+  int _getCurrentOptionsCount() {
+    if (_selectedTabCategory == 0) return _hatOptions.length;
+    if (_selectedTabCategory == 1) return _outfitOptions.length;
+    return _bagOptions.length;
+  }
+
+  // Helper untuk mengecek apakah item sedang dipilih
+  bool _isCurrentOptionSelected(int index) {
+    if (_selectedTabCategory == 0) return _selectedHat == index;
+    if (_selectedTabCategory == 1) return _selectedOutfit == index;
+    return _selectedBag == index;
+  }
+
+  // Helper untuk mengambil jalur gambar aset item di grid
+  String _getCurrentOptionImage(int index) {
+    if (_selectedTabCategory == 0) return _hatOptions[index];
+    if (_selectedTabCategory == 1) return _outfitOptions[index];
+    return _bagOptions[index];
+  }
+
+  // Helper untuk mengubah pilihan item saat diklik
+  void _setCurrentOption(int index) {
+    if (_selectedTabCategory == 0) _selectedHat = index;
+    else if (_selectedTabCategory == 1) _selectedOutfit = index;
+    else if (_selectedTabCategory == 2) _selectedBag = index;
   }
 }
 

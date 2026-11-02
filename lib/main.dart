@@ -354,7 +354,10 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MASKOT AVATAR CUSTOMIZER
+// 3. MASKOT AVATAR CUSTOMIZER (VERSI IKON INTERAKTIF TANPA DEPENDENSI ASET)
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// 3. MASKOT AVATAR CUSTOMIZER (MENGGUNAKAN LIST ASET STRING)
 // ---------------------------------------------------------------------------
 class AvatarCustomizerScreen extends StatefulWidget {
   final String username;
@@ -375,13 +378,12 @@ class AvatarCustomizerScreen extends StatefulWidget {
 }
 
 class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
-  int _selectedTabCategory = 0;
+  int _selectedTabCategory = 0; // 0: Topi, 1: Baju, 2: Tas
   int _selectedHat = 0;
   int _selectedOutfit = 0;
   int _selectedBag = 0;
   int _colorIndex = 0;
 
- // Menggunakan tipe dynamic agar tidak pernah error oleh compiler Dart
   final List _hatOptions = [
     'assets/images/hat_none.png',
     'assets/images/hat_frog.png',
@@ -424,6 +426,8 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
         children: [
           const SizedBox(height: 6),
           Text('Coder: ${widget.username}', style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
+          
+          // PREVIEW MASKOT DI TENGAH
           Expanded(
             flex: 4,
             child: Center(
@@ -436,16 +440,44 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: activeColor.withValues(alpha: 0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: activeColor.withValues(alpha: 0.4),
+                          blurRadius: 40,
+                          spreadRadius: 10,
+                        )
+                      ],
                     ),
                   ),
-                  Image.asset('assets/images/avatar_base.png', height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const Icon(Icons.smart_toy, size: 80, color: Colors.amber)),
-                  Image.asset(_outfitOptions[_selectedOutfit], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
-                  Image.asset(_bagOptions[_selectedBag], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
-                  Image.asset(_hatOptions[_selectedHat], height: 150, fit: BoxFit.contain, errorBuilder: (c, e, s) => const SizedBox()),
+                  // Avatar Base / Outfit Utama
+                  Image.asset(
+                    _outfitOptions[_selectedOutfit],
+                    height: 140,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => Icon(Icons.smart_toy, size: 80, color: activeColor),
+                  ),
+                  // Topi
+                  if (_selectedHat > 0)
+                    Image.asset(
+                      _hatOptions[_selectedHat],
+                      height: 140,
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => const SizedBox(),
+                    ),
+                  // Tas
+                  if (_selectedBag > 0)
+                    Image.asset(
+                      _bagOptions[_selectedBag],
+                      height: 140,
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => const SizedBox(),
+                    ),
                 ],
               ),
             ),
           ),
+
+          // PILIHAN WARNA TEMA
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
             child: Row(
@@ -475,6 +507,8 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
             ),
           ),
           const SizedBox(height: 6),
+
+          // MENU KATEGORI TAB (Topi, Baju, Tas)
           Container(
             color: const Color(0xFF2A2A3C),
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -487,6 +521,8 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               ],
             ),
           ),
+
+          // GRID PILIHAN ITEM
           Expanded(
             flex: 3,
             child: Container(
@@ -495,7 +531,7 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               child: GridView.builder(
                 itemCount: _getCurrentOptionsCount(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+                  crossAxisCount: 3,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
@@ -504,21 +540,39 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
                   String imagePath = _getCurrentOptionImage(index);
 
                   return GestureDetector(
-                    onTap: () => setState(() => _setCurrentOption(index)),
+                    onTap: () {
+                      setState(() {
+                        _setCurrentOption(index);
+                      });
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFF252538),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: isSelected ? Colors.amberAccent : Colors.transparent, width: 2),
+                        border: Border.all(
+                          color: isSelected ? Colors.amberAccent : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                       padding: const EdgeInsets.all(6),
-                      child: Image.asset(imagePath, fit: BoxFit.contain, errorBuilder: (c, e, s) => Center(child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
+                      child: Image.asset(
+                        imagePath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) => Center(
+                          child: Text(
+                            index == 0 ? 'None' : 'Item $index',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 },
               ),
             ),
           ),
+
+          // TOMBOL SIMPAN
           Container(
             padding: const EdgeInsets.all(12),
             color: const Color(0xFF151521),
@@ -526,7 +580,10 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: activeColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: activeColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
@@ -589,9 +646,11 @@ class _AvatarCustomizerScreenState extends State<AvatarCustomizerScreen> {
   }
 
   void _setCurrentOption(int index) {
-    if (_selectedTabCategory == 0) _selectedHat = index;
-    else if (_selectedTabCategory == 1) _selectedOutfit = index;
-    else if (_selectedTabCategory == 2) _selectedBag = index;
+    setState(() {
+      if (_selectedTabCategory == 0) _selectedHat = index;
+      else if (_selectedTabCategory == 1) _selectedOutfit = index;
+      else if (_selectedTabCategory == 2) _selectedBag = index;
+    });
   }
 }
 
